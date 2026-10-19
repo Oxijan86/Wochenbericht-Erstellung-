@@ -1,4 +1,4 @@
-# Wochenbericht Lovrencic – Web-Anwendung V2.3
+# Wochenbericht Lovrencic – Web-Anwendung V2.4
 
 Offlinefähige Wochenbericht-Erstellung im Original-Excel-Format mit SQLite-Datei, IndexedDB, revisionsgeschützter Ordnersynchronisierung und Backups. **Kein Backend, kein Account und keine Installation notwendig.** Die öffentliche Projektfassung enthält anonymisierte Musterdaten und eine bereinigte Excel-Layoutvorlage; die Vorlage behält die ursprünglichen Spalten, Zellformatierungen, Druckeinstellungen und Tabellenstruktur.
 
@@ -11,14 +11,14 @@ Offlinefähige Wochenbericht-Erstellung im Original-Excel-Format mit SQLite-Date
 5. Unter **Speicherung & Sync** den Modus einstellen. Unter **Backups** Sicherungen prüfen und exportieren.
 
 
-## Neue Oberfläche V2.3
+## Neue Oberfläche V2.4
 
 - **Dashboard als Startseite:** Zeigt den ausgewählten Techniker, die aktuelle ISO-Kalenderwoche, die an diesem Kalendertag gebuchten Gesamtstunden (Arbeit + Reise), die Wochenstunden, die Differenz zum vollständigen Wochen-Soll und den Freizeitausgleich-Saldo. Noch nicht erreichte Wochen-Sollstunden werden auch während einer laufenden Woche angezeigt; es handelt sich **nicht** um eine Tages-Sollberechnung.
 - **20 zuletzt hinzugefügte Einträge:** Die Sortierung basiert bei neuen Einträgen auf `createdAt` (Erfassungszeitpunkt), **nicht** auf dem Einsatzdatum. Beim Bearbeiten bleibt der ursprüngliche Erfassungszeitpunkt erhalten. Für frühere Einträge ohne `createdAt` wird ein Zeitstempel aus der älteren Datensatz-ID verwendet, soweit vorhanden, sonst das Einsatzdatum. Alte Einträge werden dafür nicht verändert. Einträge stammen aus allen Kalenderwochen des **aktiven Technikers**.
 - **Aktionen im Dashboard:** „Bearbeiten“ öffnet die betreffende ursprüngliche Woche. „Übernehmen“ kopiert den Einsatz in ein neues Formular, ohne Datum oder Arbeitszeiten zu übernehmen.
 - **Smartphone-Navigation:** Bis 780 Pixel Bildschirmbreite ersetzt das ☰-Menü die Reiter. Es schließt nach der Auswahl automatisch. Auf dem Desktop bleiben die Reiter bestehen.
 - **Einsatzdaten:** Standardmäßig werden alle Monate durchsucht; die bisherige Zusatz-Checkbox entfällt. Filter sind optional für Monat, Jahr, individuelles Datumsintervall, Kunde, Ort und Tätigkeitsart. Unter „Weitere Filter & Sortierung“ werden selten benötigte Einstellungen ausgeblendet.
-- **Kundenübernahme:** Beim manuellen Eingeben eines bekannten Kunden erscheinen passende Vorschläge (Kunde + Ort). Ticketnummern und Zeiten werden nicht automatisch kopiert.
+- **Kundenübernahme:** Beim Schreiben eines Kundennamens erscheinen ältere Einsätze zur Auswahl, nach Kundenstandort und optionaler Kundennummer unterschieden. Nach der Auswahl ausdrücklich **Vorhandene Kundendaten übernehmen** verwenden. Die gemeinsame Vorschau lässt Kilometer und Reisezeit zunächst eingeschaltet. Ticket, Bemerkungen, alte Tätigkeiten und Arbeitszeiten werden immer geleert. Das neue Datum bleibt erhalten.
 - **Tageszeile:** Oberhalb der Zeiterfassung werden die Gesamtstunden des ausgewählten Tages und die ausgewählte KW angezeigt.
 - **Speicherstatus:** Im Dashboard steht ein kompakter aktueller Status; Berechtigungen, Konflikte und Backups bleiben in den bisherigen Verwaltungsbereichen.
 
@@ -105,3 +105,27 @@ Version 2.2 korrigiert den XLSX-Download: offizieller MIME-Typ `application/vnd.
 Auf Android: im Browser **Wochenbericht / Export → Excel (.xlsx) exportieren** verwenden. Datei im Download-Ordner speichern; Excel öffnen und über **Datei öffnen** die `.xlsx` auswählen. Nicht `.db`, `.json` oder `.tsv` auswählen. Falls eine vorhandene heruntergeladene Datei defekt erscheint, mit V2.2 neu exportieren.
 
 Auch eine technisch valide XLSX-Datei kann je nach Excel-App-Version und Android-Dateianbieter gesonderte Probleme verursachen; für einen solchen Fall die Fehlermeldung und einen anonymisierten Export zur Analyse bereitstellen.
+
+
+## Neu in V2.4 – geführte Einrichtung und Übernahme
+
+### Einrichtungsassistent
+
+1. **Neue Datenbank erstellen** nur für einen neuen Datenbestand auf Gerät A wählen oder **Vorhandene Datenbank öffnen** für ein zweites Gerät mit einer bereits exportierten `wochenberichte.db`. Die Datei wird vor dem Import auf Format und Datenintegrität geprüft.
+2. **Lokal auf diesem Gerät** oder **Über Cloud-Synchronisationsordner** auswählen. Auch bei Cloud-Wunsch existiert zunächst eine echte lokal gespeicherte Browser-Arbeitskopie.
+3. Bei Browsern mit File System Access API kann optional über **Speicherordner auswählen** ein Ordner verbunden werden. Ohne Picker (häufig auf Android) ist **keine automatische Ordnersynchronisierung** möglich. Die Einrichtung bleibt nutzbar; Austausch über Datei herunterladen/importieren.
+4. Vor dem Abschluss die Zusammenfassung prüfen; **Einrichtung abschließen und Anwendung starten** speichert lokal dauerhaft. Speicheroptionen später unter **Speicherung & Sync** ändern. Bestehende Ordnerdateien werden bei Verbindung nicht still überschrieben.
+
+**Google Drive / OneDrive:** Es existiert **keine direkte Cloud-API-Anmeldung**. Ein tatsächlich für den Browser nutzbarer und vom Cloud-Anbieter synchronisierter lokaler Ordner ist Voraussetzung. Die Installation der Smartphone-App allein genügt nicht. Unternehmenskonten können Sicherheitseinschränkungen haben. Vor dem Gerätewechsel: Gerät A speichern/synchronisieren, Gerät B laden; niemals auf B unabhängig eine neue Datenbank für denselben Bestand anlegen.
+
+### Frühere Einsätze und Kundendaten
+
+- Übernahme aus dem Reiter **Einsatzdaten**, dem **Dashboard** sowie über **Kundenvorschläge** verwendet dieselbe Vorschau.
+- **Kunde, Einsatzort und vorhandene Stammdaten** (Kundennummer, Anschrift, PLZ/Ort, Filiale) werden übernommen. **Kilometer und Reisezeit** sind standardmäßig angehakt und können unabhängig abgewählt werden. **Ticketnummer, Bemerkung, Arbeitsbeginn/Ende, Arbeitsdauer und Tätigkeit** werden nicht aus dem alten Einsatz übernommen. Das neue ausgewählte Datum bleibt erhalten.
+- Neue Kundenstammdaten lassen sich im manuellen Formular über **Weitere Kundenstammdaten (optional)** hinterlegen und bleiben im SQLite-Datenbankinhalt. Das Original-Excel-Drucklayout wird nicht verändert.
+- Die Vorschläge ignorieren Groß-/Kleinschreibung, akzentbedingte Unterschiede und überzählige Leerzeichen, unterscheiden aber gleiche Namen an verschiedenen Standorten. **Auch ältere Treffer desselben Standorts** sind auswählbar.
+- Eine Vorschau allein legt **keinen** neuen Eintrag an. Gespeichert wird erst über **Eintrag speichern**. Auch bisherige gespeicherte Einträge bleiben unangetastet.
+
+### V2.3 → V2.4
+
+Die Datenbankstruktur und der Original-Excel-Export bleiben kompatibel. Vor dem Wechsel trotzdem `wochenberichte.db` sichern. Läuft die neue GitHub-Pages-Version unter derselben URL und demselben Browserprofil, bleibt die IndexedDB-Arbeitskopie erreichbar. Eine lokal geöffnete HTML-Datei oder eine andere Domain/URL kann einen **anderen** Browser-Speicherbereich verwenden; dort die exportierte `.db` importieren.
