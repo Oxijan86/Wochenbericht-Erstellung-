@@ -1,4 +1,19 @@
-# Wochenbericht Lovrencic – Web-Anwendung V2.4
+# Wochenbericht Lovrencic – Web-Anwendung V2.5
+
+## Neu: Geordnet schließen, Versionsanzeige und frei wählbarer Excel-Exportordner
+
+- Der Kopfbereich zeigt die **Anwendungsversion 2.5.0** und auf jedem Bildschirm die Schaltfläche **Speichern / Synchronisieren / Schließen**.
+- Der Abschlussdialog zeigt Speichermodus, Ordner, Eingabe- und Syncstatus, letzten Abgleich und Fehler. **Synchronisieren und schließen** speichert offene Entwürfe, wartet auf dauerhafte IndexedDB-Speicherung, führt den geschützten Dateiabgleich aus, überprüft die geschriebene Datenbank und legt danach ein Backup an. **Nur lokal speichern und schließen** aktualisiert keine Ordnerdatei. Bei fehlender Berechtigung kann der Ordnerzugriff per ausdrücklichem Klick neu freigegeben werden. Bei Fehlern bleibt die Sitzung geöffnet. Bei Erfolg steht eine Abschlussansicht bereit, die nicht vorgibt, den Browser-Tab schließen zu können.
+- Bei erfolgreicher Synchronisierung und fehlgeschlagenem Abschlussbackup wird **nur** die Backup-Wiederholung angeboten, ohne dieselbe Ordnerdatei erneut zu überschreiben.
+- Die **Datenbankrevision** ist etwas anderes als die **Anwendungsversion**. Anwendungsversion und Veröffentlichungstag sind unter **Hilfe / Über diese Anwendung** sichtbar.
+- Die Service-Worker-Cache-Kennung wurde auf `wochenberichte-static-v2.5.0` aktualisiert. Der Browser lädt die neue Oberfläche nach einem Update nur nach ausdrücklichem Speichern der offenen Eingaben neu.
+- Im Reiter **Wochenbericht / Export** kann ein **Excel-Exportordner** auf dem aktuellen Gerät gewählt, freigegeben oder zurückgesetzt werden. Diese Einstellung wird getrennt von der Cloud-/Datenbankordnerverbindung in IndexedDB hinterlegt. Mehrere Exporte gleichen Namens erhalten fortlaufend nummerierte Dateinamen, damit vorhandene Wochenberichte erhalten bleiben.
+- **Ohne ausgewählten oder zugänglichen Exportordner** erfolgt der normale Browser-Download. Dieser landet typischerweise in **Downloads**, kann aber durch Browser- und Geräteeinstellungen an anderer Stelle gespeichert werden. Eine echte Auswahl des Downloads-Ordners lässt sich auf Smartphones, die die dauerhafte File-System-Access-Ordnerfreigabe nicht unterstützen, nicht erzwingen.
+
+### Sicheres Update von V2.4
+
+Vor dem Update die komplette `wochenberichte.db` herunterladen. Bestehende SQLite-Daten, Profile und Einsätze behalten dasselbe Format. Wird die aktualisierte `index.html` **unter derselben GitHub-Pages-Adresse und im selben Browserprofil** geöffnet, kann sie die bisherige IndexedDB nutzen. Beim Wechsel der Adresse oder bei lokal geöffneten Einzeldateien die gesicherte `.db` prüfen und importieren. Weder das GitHub-Repository noch der Service-Worker-Cache enthalten private Arbeitsdaten.
+
 
 Offlinefähige Wochenbericht-Erstellung im Original-Excel-Format mit SQLite-Datei, IndexedDB, revisionsgeschützter Ordnersynchronisierung und Backups. **Kein Backend, kein Account und keine Installation notwendig.** Die öffentliche Projektfassung enthält anonymisierte Musterdaten und eine bereinigte Excel-Layoutvorlage; die Vorlage behält die ursprünglichen Spalten, Zellformatierungen, Druckeinstellungen und Tabellenstruktur.
 
@@ -7,11 +22,11 @@ Offlinefähige Wochenbericht-Erstellung im Original-Excel-Format mit SQLite-Date
 1. `index.html` in Chrome oder Edge öffnen. Alternativ die Anwendung über GitHub Pages bereitstellen.
 2. Beim ersten Start **Neue Datenbank erstellen** wählen, Technikername und Personalnummer eingeben. Alternativ **Vorhandene Datenbank öffnen** wählen und eine geprüfte `wochenberichte.db` importieren.
 3. Auf dem **Dashboard** die aktuelle KW, Tages-/Wochenstunden, Freizeitausgleich und die letzten 20 erfassten Einsätze ansehen. Unter **Einsätze erfassen** Einsätze, Homeoffice ohne Ticket, Reise- und Arbeitszeiten erfassen. Für Serviceberichte unter **M365 & Datenimport** den RONDO-Prompt kopieren und TAB-getrennte Ergebnisse importieren.
-4. Unter **Wochenbericht / Export** eine Excel-Datei im Originalformat herunterladen. Die Datei wird mit dem offiziellen Excel-MIME-Typ ausgegeben; auf Android in Microsoft Excel über **Öffnen → Dieses Gerät → Downloads** öffnen.
+4. Unter **Wochenbericht / Export** einen optionalen Exportordner auswählen oder Excel wie gewohnt per Browser herunterladen. Die Datei wird mit dem offiziellen Excel-MIME-Typ ausgegeben; auf Android in Microsoft Excel über **Öffnen → Dieses Gerät → Downloads** öffnen.
 5. Unter **Speicherung & Sync** den Modus einstellen. Unter **Backups** Sicherungen prüfen und exportieren.
 
 
-## Neue Oberfläche V2.4
+## Grundfunktionen und Dashboard
 
 - **Dashboard als Startseite:** Zeigt den ausgewählten Techniker, die aktuelle ISO-Kalenderwoche, die an diesem Kalendertag gebuchten Gesamtstunden (Arbeit + Reise), die Wochenstunden, die Differenz zum vollständigen Wochen-Soll und den Freizeitausgleich-Saldo. Noch nicht erreichte Wochen-Sollstunden werden auch während einer laufenden Woche angezeigt; es handelt sich **nicht** um eine Tages-Sollberechnung.
 - **20 zuletzt hinzugefügte Einträge:** Die Sortierung basiert bei neuen Einträgen auf `createdAt` (Erfassungszeitpunkt), **nicht** auf dem Einsatzdatum. Beim Bearbeiten bleibt der ursprüngliche Erfassungszeitpunkt erhalten. Für frühere Einträge ohne `createdAt` wird ein Zeitstempel aus der älteren Datensatz-ID verwendet, soweit vorhanden, sonst das Einsatzdatum. Alte Einträge werden dafür nicht verändert. Einträge stammen aus allen Kalenderwochen des **aktiven Technikers**.
