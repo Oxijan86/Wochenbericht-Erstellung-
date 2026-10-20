@@ -1,4 +1,4 @@
-# Wochenbericht Lovrencic – Version 2.8.0
+# Wochenbericht Lovrencic – Version 2.8.1
 
 GitHub-Pages-fähige, offline nutzbare Wochenbericht-Anwendung für Service-Techniker. SQLite-Datei `wochenberichte.db` / IndexedDB, Excel-Export im Originalformat, Kundenhistorie, Backup, Datensynchronisation und M365-Vorschau.
 
@@ -23,9 +23,14 @@ Die bestehende Originalvorlage besitzt pro Montag–Freitag je sechs Einsatzzeil
 - Das Datenbankschema wurde **nicht** geändert, vorhandene Profile, Einsätze, Kundenstamm, Entwürfe, Sync-Verknüpfungen und Backups bleiben kompatibel.
 - Vor dem Update eine Sicherung von `wochenberichte.db` erstellen.
 - In deinem GitHub-Repository die Dateien aus dem Schnellupload-Paket **entpackt** ersetzen: `index.html`, `sw.js`, `README.md`, `.nojekyll`. GitHub Pages bleibt auf `main` / `/ (root)`.
-- Der Service-Worker-Cache heißt `wochenberichte-static-v2.8.0`. Nach dem Update im Kopf **Version 2.8.0** kontrollieren.
+- Der Service-Worker-Cache heißt `wochenberichte-static-v2.8.1`. Nach dem Update im Kopf **Version 2.8.1** kontrollieren.
 - Keine persönlichen Datenbanken oder vollständigen Kundenlisten auf GitHub veröffentlichen. Die Projektdateien sind anonymisiert.
 
 ## Grenzen
 
 Die Tests erfolgten in einem isolierten Chromium-Browser bei 390 px Breite mit simulierter Speicherschnittstelle für den UI-Import. Es wurde kein echtes Android-Smartphone, keine reale Cloud-Synchronisation und kein echtes RONDO-PDF getestet. Die Speicherdatei wurde separat durch SQLite-Encode/Decode geprüft.
+
+
+## Korrektur in V2.8.1
+
+Die Hilfe zum M365-Import dokumentiert jetzt ausdrücklich den Import über mehrere Kalenderwochen und Jahre unabhängig von der aktuell gewählten KW. Auch Hinweise zur Zeiterfassung, zum Übernahmevorgang und zu den Schaltflächen wurden berichtigt. Die Importlogik und das Datenbankformat bleiben unverändert.
