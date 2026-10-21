@@ -210,6 +210,14 @@ body.is-dashboard .config,body.is-dashboard .stats{display:none}
 .runningpanel{margin:14px 0;border:2px solid #badbd2!important;background:#f2fbf8!important}.runningline{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 2px;border-top:1px solid #d5e5dc;flex-wrap:wrap}.runningline .runningtime{font-weight:800;font-size:1.2em}.runningline .btn{min-height:46px}.exportissue{padding:8px 10px;margin:6px 0;border-left:4px solid #d79f3b;background:#fff9eb;border-radius:4px}.exportissue.critical{border-color:#b84949;background:#fff1f1}.entrytimehint{font-size:12px;color:#536678}.inputmask{font-variant-numeric:tabular-nums}
 @media(max-width:640px){.runningline{align-items:stretch}.runningline .btn{width:100%}#epause,#etravel{font-size:18px;min-height:48px}}
 .importerrorcard{border:2px solid #bb5555;background:#fffaf9}.importerrorgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:10px;margin-top:10px}.importerrorgrid input,.importerrorgrid textarea{width:100%;min-width:0}.importerrorcard summary{font-weight:650;cursor:pointer;min-height:36px}#importerrors:empty{display:none}@media(max-width:640px){.importerrorgrid{grid-template-columns:1fr}.importerrorcard .btnrow button{min-height:48px;flex:1 1 100%}}
+
+/* 2.10: Mehrdatei-Import historischer Excel-Wochenberichte */
+#excelarchivepanel{scroll-margin-top:24px}
+#excelarchivepanel input[type="file"]{width:100%;max-width:100%;padding:12px;border:1px dashed var(--border);border-radius:10px;background:#fff;min-height:52px}
+#excelstatus{overflow-wrap:anywhere;white-space:pre-wrap}
+#excelprofilewarn:not([hidden]){display:block;border:1px solid #d1a455;background:#fff9e9;padding:12px;border-radius:9px;margin:12px 0}
+#excelarchivepanel button{min-height:44px}
+@media(max-width:640px){#excelarchivepanel .btnrow{flex-direction:column}#excelarchivepanel .btnrow button{width:100%;min-height:50px}}
 </style></head><body>
 <header><div class="wrap brand"><button id="mobilemenutoggle" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mobilemenu">☰</button><div class="wbbrandname"><h1>Wochenbericht Lovrencic <span id="wbversionhead" class="wbversion">Version …</span></h1><p>Erfassung, M365-Übernahme und Excel-Export nach Originalvorlage</p></div><button class="btn wbheaderclose" id="wbcloseheader" type="button" title="Eingaben speichern, synchronisieren oder lokal schließen">Speichern / Synchronisieren / Schließen</button><span class="offline">● Offline · SQLite + IndexedDB</span></div></header>
 <main class="wrap"><section class="card config"><div class="bar" style="justify-content:space-between;margin-bottom:12px"><h2 style="margin:0">Techniker &amp; Kalenderwoche</h2><span class="small" id="saved">Automatisch gespeichert</span></div>
@@ -223,15 +231,15 @@ body.is-dashboard .config,body.is-dashboard .stats{display:none}
 <section class="card runningpanel" id="runningpanel" hidden><div class="bar" style="justify-content:space-between;align-items:center"><h2>⏱ Laufende Einsätze</h2><span class="badge" id="runningcount"></span></div><div id="runningitems"></div></section><div class="dashdetails"><article class="card"><div class="bar" style="justify-content:space-between;align-items:center;gap:8px"><div><h2>Zuletzt hinzugefügt</h2><p class="hint">Die 20 zuletzt erfassten Einsätze des ausgewählten Technikers – unabhängig vom Einsatzdatum oder der Kalenderwoche.</p></div><button type="button" class="btn tiny" id="dashall">Alle Einsatzdaten</button></div><div id="dashrecentlist" class="dashrecent" aria-live="polite"></div></article><article class="card"><h2>Schnellzugriff</h2><p class="hint" id="dashprofile">Profil</p><div class="dashactionrow"><button class="btn primary" type="button" id="dashcurrentweek">Aktuelle KW öffnen</button><button class="btn" type="button" id="dashexport">Wochenbericht exportieren</button><button class="btn" type="button" id="dashswitchprofile">Techniker wechseln</button></div><hr style="border:0;border-top:1px solid #dae2eb;margin:18px 0"><h3>Speicherstatus</h3><div class="dashstatustext" id="dashstorage" aria-live="polite">Lokale Daten werden geladen …</div><button class="btn tiny" id="dashstorageopen" type="button" style="margin-top:10px">Speicherung &amp; Sync öffnen</button><hr style="border:0;border-top:1px solid #dae2eb;margin:18px 0"><h3>Wochenstunden</h3><p class="hint" id="dashhoursdetail">Arbeitszeit und Reisezeit dieser Woche.</p></article></div>
 </section>
 <section class="page" id="entrypage"><div class="split"><article class="card"><div class="bar"><h2 id="formtitle">Eintrag erfassen</h2><button class="btn tiny alignright" id="newentry" type="button">+ Neuer Eintrag</button></div><form id="entryform" autocomplete="off"><div class="row"><div class="field"><label for="edate">Datum</label><input id="edate" type="date" required></div><div class="field"><label for="etype">Art der Tätigkeit</label><select id="etype"><option value="Einsatz">Kundeneinsatz</option><option value="Homeoffice">Homeoffice</option><option value="Urlaub">Urlaub</option><option value="Feiertag">Feiertag</option><option value="Krankheit">Krankheit</option><option value="Sonderurlaub">Sonderurlaub</option><option value="Freizeitausgleich">Freizeitausgleich</option><option value="Sonstiges">Sonstiges</option></select></div></div>
-<div id="entrydaystats" class="entrydaystats" aria-live="polite">Tages- und Wochenstunden werden geladen …</div><div class="row" style="margin-top:10px"><div class="field"><label for="eticket">Ticketnummer (immer optional)</label><input id="eticket" inputmode="numeric" placeholder="z. B. 90001"></div><div class="field wide"><label for="ecustomer">Kunde / Bezeichnung (optional, später ergänzbar)</label><input id="ecustomer" placeholder="Kunde suchen oder neu eingeben" autocomplete="off" aria-controls="customerSuggestions" aria-expanded="false"><div id="customerSuggestions" hidden></div><div id="customerTransferBox" class="customer-transfer" hidden><strong>Gespeicherten Standort ausgewählt</strong><div class="small" id="customerTransferSummary"></div><button class="btn primary tiny" id="customerApply" type="button">Vorhandene Kundendaten übernehmen</button><button class="btn tiny" id="customerCancel" type="button">Andere Auswahl</button></div></div><div class="field"><label for="elocation">Ort</label><input id="elocation" placeholder="z. B. Köln"></div></div>
-<div class="row" style="margin-top:10px"><div class="field"><label for="ekm">Gefahrene km</label><input id="ekm" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></div><div class="field"><label for="etravel">Reisezeit (h:mm, Doppelpunkt automatisch)</label><input id="etravel" inputmode="numeric" autocomplete="off" placeholder="0130 → 1:30"><small>Einfach 0130 oder 130 tippen – der Doppelpunkt wird übersprungen. Bestehende Schreibweisen wie 1:30 oder 1,5 bleiben möglich.</small></div></div>
+<div id="entrydaystats" class="entrydaystats" aria-live="polite">Tages- und Wochenstunden werden geladen …</div><div class="row" style="margin-top:10px"><div class="field"><label for="eticket">Ticketnummer</label><input id="eticket" inputmode="numeric" placeholder="z. B. 90001"></div><div class="field wide"><label for="ecustomer">Kunde</label><input id="ecustomer" placeholder="Kunde suchen oder neu eingeben" autocomplete="off" aria-controls="customerSuggestions" aria-expanded="false"><div id="customerSuggestions" hidden></div><div id="customerTransferBox" class="customer-transfer" hidden><strong>Gespeicherten Standort ausgewählt</strong><div class="small" id="customerTransferSummary"></div><button class="btn primary tiny" id="customerApply" type="button">Vorhandene Kundendaten übernehmen</button><button class="btn tiny" id="customerCancel" type="button">Andere Auswahl</button></div></div><div class="field"><label for="elocation">Ort</label><input id="elocation" placeholder="z. B. Köln"></div></div>
+<div class="row" style="margin-top:10px"><div class="field"><label for="ekm">Gefahrene km</label><input id="ekm" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></div><div class="field"><label for="etravel">Reisezeit</label><input id="etravel" inputmode="numeric" autocomplete="off" placeholder="0130 → 1:30"></div></div>
 <details class="customerextra" id="customerdetails"><summary>Weitere Kundenstammdaten (optional)</summary><div class="row" style="margin-top:9px"><div class="field"><label for="ecustomerid">Kundennummer</label><input id="ecustomerid" autocomplete="off"></div><div class="field wide"><label for="estreet">Straße und Hausnummer</label><input id="estreet" autocomplete="off"></div><div class="field"><label for="ezip">Postleitzahl</label><input id="ezip" autocomplete="off"></div><div class="field"><label for="ecity">Stadt / Ort laut Stammdaten</label><input id="ecity" autocomplete="off"></div><div class="field"><label for="esite">Filiale / konkreter Einsatzort</label><input id="esite" autocomplete="off"></div></div></details>
- <div class="row" style="margin-top:10px"><div class="field"><label for="estart">Arbeitsbeginn</label><input id="estart" type="time" step="900"><button id="stampstart" type="button" class="btn tiny stampaction">◷ Beginn ab jetzt</button></div><div class="field"><label for="eend">Arbeitsende</label><input id="eend" type="time" step="900"><label for="eenddate" style="margin-top:8px">Enddatum (bei Arbeit über Mitternacht)</label><input id="eenddate" type="date"><small>Ohne Enddatum wird bei Endzeit vor Beginn der Folgetag angenommen.</small><button id="stampend" type="button" class="btn tiny stampaction">◷ Beenden ab jetzt</button></div></div>
-<div class="row" id="pauseinputs" style="margin-top:10px"><div class="field"><label for="epause">Pause (h:mm, optional)</label><input id="epause" inputmode="numeric" autocomplete="off" placeholder="030 → 0:30"></div><div class="field"><label for="epausetarget">Pause abziehen von</label><select id="epausetarget"><option value="work">Arbeitszeit</option><option value="travel">Reisezeit</option></select></div></div><div class="highlight"><div class="bar" style="justify-content:space-between"><span style="font-size:13px;font-weight:800">Berechnete Einsatzzeit</span><strong id="entryduration">0:00 h</strong></div><div class="small">Beginn/Ende werden auf Viertelstunden aufgerundet. Bei Nachtschichten wird das Enddatum berücksichtigt. Die optionale Pause wird nur einmal von der ausgewählten Zeitart abgezogen. Ohne Uhrzeiten ist die PDF-Dauer „Arbeitszeit vor Ort: 2:30“ nutzbar.</div></div>
-<div class="field"><label for="enote">Interne Bemerkung (für gespeicherte Einsatzdaten)</label><input id="enote" placeholder="z. B. Wartung Kombi 3000"></div>
-<div class="btnrow" style="margin-top:14px"><button class="btn primary" type="submit" id="saveentry">Eintrag speichern</button><button class="btn" id="cancelentry" type="button">Zurücksetzen</button></div><p id="formmessage" class="small" role="status"></p><p class="small" id="runninghint" aria-live="polite">Du kannst nur den Beginn speichern und den Einsatz später beenden. Datum und Uhrzeit werden mit „Beginn ab jetzt“ automatisch eingetragen.</p></form></article>
-<article class="card"><div class="bar" style="justify-content:space-between"><h2 style="margin:0">Erfasste Einsätze</h2></div><p class="hint">Alle sieben Wochentage und beliebig viele Einsätze pro Tag. Die Original-Excel-Vorlage enthält weiterhin nur Montag–Freitag mit sechs Zeilen je Tag. Zusätzliche Einsätze werden separat exportiert. Beginn/Ende können im Formular per Zeitstempel erfasst werden. Frühere Einsätze findest du im eigenen Reiter „Einsatzdaten“.</p><div id="entrylist"></div></article></div></section>
-<section class="page" id="historypage"><article class="card"><div class="bar" style="justify-content:space-between;align-items:start;gap:14px"><div><h2 style="margin-bottom:4px">Einsatzdaten – Gesamthistorie</h2><p class="hint">Alle gespeicherten Einsätze und Tätigkeiten des ausgewählten Technikers, auch aus anderen Kalenderwochen. Du kannst Einträge filtern, sortieren, <strong>bearbeiten</strong> oder nach Bestätigung <strong>löschen</strong>. Frühere Daten lassen sich zusätzlich in einen neuen Einsatz übernehmen, ohne den Ursprung zu ändern.</p></div><button class="btn tiny" id="historyreset" type="button">Filter zurücksetzen</button></div>
+ <div class="row" style="margin-top:10px"><div class="field"><label for="estart">Arbeitsbeginn</label><input id="estart" type="time" step="900"><button id="stampstart" type="button" class="btn tiny stampaction">◷ Beginn ab jetzt</button></div><div class="field"><label for="eend">Arbeitsende</label><input id="eend" type="time" step="900"><label for="eenddate" style="margin-top:8px">Enddatum (bei Arbeit über Mitternacht)</label><input id="eenddate" type="date"><button id="stampend" type="button" class="btn tiny stampaction">◷ Beenden ab jetzt</button></div></div>
+<div class="row" id="pauseinputs" style="margin-top:10px"><div class="field"><label for="epause">Pause</label><input id="epause" inputmode="numeric" autocomplete="off" placeholder="030 → 0:30"></div><div class="field"><label for="epausetarget">Pause abziehen von</label><select id="epausetarget"><option value="work">Arbeitszeit</option><option value="travel">Reisezeit</option></select></div></div><div class="highlight"><div class="bar" style="justify-content:space-between"><span style="font-size:13px;font-weight:800">Berechnete Einsatzzeit</span><strong id="entryduration">0:00 h</strong></div></div>
+<div class="field"><label for="enote">Bemerkung</label><input id="enote" placeholder="z. B. Wartung Kombi 3000"></div>
+<div class="btnrow" style="margin-top:14px"><button class="btn primary" type="submit" id="saveentry">Eintrag speichern</button><button class="btn" id="cancelentry" type="button">Zurücksetzen</button></div><p id="formmessage" class="small" role="status"></p><p class="small" id="runninghint" aria-live="polite" hidden></p></form></article>
+<article class="card"><div class="bar" style="justify-content:space-between"><h2 style="margin:0">Erfasste Einsätze</h2></div><div id="entrylist"></div></article></div></section>
+<section class="page" id="historypage"><article class="card"><div class="bar" style="justify-content:space-between;align-items:start;gap:14px"><div><h2 style="margin-bottom:4px">Einsatzdaten – Gesamthistorie</h2></div><button class="btn tiny" id="historyreset" type="button">Filter zurücksetzen</button></div>
 <div class="historyfilters"><div class="field"><label for="historyperiod">Zeitraum</label><select id="historyperiod"><option value="all">Alle gespeicherten Einsätze</option><option value="month">Bestimmter Monat</option><option value="year">Bestimmtes Jahr</option><option value="custom">Individueller Zeitraum</option></select></div><div class="field wide"><label for="historysearch">Suche über alle gespeicherten Daten</label><input type="search" id="historysearch" placeholder="Ticket, Kunde, Ort, Tätigkeit, Datum …" autocomplete="off"></div><div class="field"><label for="historytype">Tätigkeit</label><select id="historytype"><option value="">Alle Tätigkeiten</option><option value="Einsatz">Kundeneinsatz</option><option value="Homeoffice">Homeoffice</option><option value="Urlaub">Urlaub</option><option value="Feiertag">Feiertag</option><option value="Krankheit">Krankheit</option><option value="Sonderurlaub">Sonderurlaub</option><option value="Freizeitausgleich">Freizeitausgleich</option><option value="Sonstiges">Sonstiges</option></select></div></div>
 <div id="historyperiodfields" style="margin:6px 0 12px" hidden><div class="field" id="historymonthfield" hidden><label for="historymonth">Monat</label><div class="historymonthpick"><button class="btn tiny" id="historyprev" type="button" title="Vorheriger Monat">←</button><input type="month" id="historymonth"><button class="btn tiny" id="historynext" type="button" title="Nächster Monat">→</button></div></div><div class="field" id="historyyearfield" hidden><label for="historyyear">Jahr</label><input type="number" id="historyyear" min="2020" max="2100" value="2026"></div><div class="field" id="historyfromfield" hidden><label for="historyfrom">Von</label><input type="date" id="historyfrom"></div><div class="field" id="historytofield" hidden><label for="historyto">Bis einschließlich</label><input type="date" id="historyto"></div></div>
 <details id="historymore"><summary>Weitere Filter &amp; Sortierung</summary>
@@ -244,13 +252,26 @@ body.is-dashboard .config,body.is-dashboard .stats{display:none}
 </details>
 
 <div class="historysum" id="historysummary" aria-live="polite"></div>
-<div class="small" style="margin:8px 0 14px"><strong>Übernehmen:</strong> Vor dem Übertragen erscheint eine Vorschau mit auswählbaren Kilometern und Reisezeiten. Ticketnummer, Bemerkungen, alte Uhrzeiten und Tätigkeiten werden nicht übertragen; dein neues Datum bleibt erhalten.</div>
+
 <div id="historylist" aria-live="polite"></div></article></section>
 <section class="page" id="customerspage"><article class="card"><div class="bar" style="justify-content:space-between;align-items:center"><div><h2>Kunden – gespeicherte Standorte</h2><p class="hint">Zentraler Kundenstamm aus manuellen Einsätzen und M365-Importen. Die <b>zuletzt gespeicherten</b> Kilometer und Reisezeiten stehen hier für neue Einsätze bereit. Vergangene Wochenberichte bleiben unverändert. Gleichnamige Filialen werden nach Standort unterschieden.</p></div><span class="badge" id="customerscount">0 Kunden</span></div>
 <div class="row"><div class="field wide"><label for="customerssearch">Kunden und Standorte durchsuchen</label><input id="customerssearch" type="search" placeholder="Name, Kundennummer, Ort, Filiale …"></div><div class="field"><label for="customerssort">Sortieren</label><select id="customerssort"><option value="latest">Zuletzt aktualisiert</option><option value="name">Kundenname A–Z</option><option value="place">Ort A–Z</option></select></div></div>
 <p class="small">„Für neuen Einsatz“ öffnet die bewährte Übernahmevorschau. Der alte Eintrag wird nicht verändert; Ticket, Bemerkung und Uhrzeiten bleiben leer.</p><div id="customerslist" aria-live="polite"></div></article></section>
 <section class="page" id="importpage"><div class="split"><article class="card"><h2>Serviceberichte in Microsoft 365 auswerten</h2><p class="hint">Kopiere den folgenden Prompt und füge ihn in Microsoft 365 Copilot zusammen mit deinen Serviceberichten ein. Anschließend das Ergebnis rechts einfügen.</p><textarea id="prompttext" readonly spellcheck="false" style="min-height:340px"></textarea><div class="btnrow" style="margin-top:10px"><button class="btn primary" id="copyprompt" type="button">Prompt kopieren</button><span id="copystatus" class="small"></span></div><p class="footnote">Copilot arbeitet außerhalb dieser Anwendung. Unbekannte Daten sollen leer bleiben und nicht erfunden werden.</p></article><article class="card"><h2>Einsatzdaten aus Copilot übernehmen</h2><p class="hint">Kopiere den vollständigen Codeblock aus Copilot hier hinein. Pro Einsatz genau eine TAB-getrennte Zeile mit neun Spalten, ohne Tabellenkopf. Die Codeblock-Markierungen werden entfernt. <strong>Mehrere Berichte aus verschiedenen Kalenderwochen oder Jahren können gemeinsam importiert werden</strong>; die aktuell gewählte Woche spielt beim Import keine Rolle. Nach „Daten prüfen“ bitte für jeden möglichen Treffer entscheiden, ob der vorhandene Einsatz ergänzt oder ein neuer angelegt werden soll.</p><div class="small" style="margin-bottom:7px"><strong>Datum | Ticket | Kunde | Ort | gef. km | Reisezeit | Beginn | Ende | Bemerkung</strong></div><textarea id="importtext" placeholder="```text&#10;19.10.2026&#9;90001&#9;Beispielbäckerei&#9;Köln&#9;125&#9;1:30&#9;&#9;&#9;Arbeitszeit vor Ort: 2:30&#10;```"></textarea><div class="btnrow" style="margin-top:12px"><button class="btn" id="checkimport" type="button">Daten prüfen</button><button class="btn primary" id="doimport" disabled type="button">Auswahl bestätigen und speichern</button><button class="btn" id="clearimport" type="button">Text leeren</button></div><div id="importresult" style="margin-top:12px" aria-live="polite"></div><div id="importerrors" class="importreview" aria-live="polite"></div><div id="importreview" class="importreview" aria-live="polite"></div></article></div>
-<article class="card"><h3>Wichtig für den Import</h3><p class="hint">Import über beliebige Kalenderwochen und Jahre in einem Durchgang, unabhängig von der aktuell ausgewählten KW. Jeder Einsatz wird anhand seines Datums seiner eigenen ISO-KW zugeordnet; beliebig viele Einsätze pro Tag. Wochenend-Einsätze werden gespeichert und sind in der Einsatzhistorie sichtbar, können aber in der Original-Excel-Vorlage (Montag–Freitag) nicht ausgegeben werden. Fehlen echte Beginn-/Endeuhrzeiten, bleiben diese leer. Steht in der Bemerkung „Arbeitszeit vor Ort: hh:mm“, wird diese nachgewiesene Dauer für die Stundensumme auf die nächste Viertelstunde gerundet. Ticketnummern sind bei sämtlichen Einsätzen und Tätigkeitsarten optional. Fehlende Kunden und Zeitangaben werden zur Prüfung markiert, nicht erfunden. <strong>Fehlende oder ungültige Datumsangaben, beschädigte Zeilen und andere Importfehler werden vor der Übernahme einzeln angezeigt.</strong> Jede solche Zeile muss korrigiert oder ausdrücklich als nicht importiert markiert werden; nichts wird stillschweigend verworfen.</p></article></section>
+<article class="card"><h3>Wichtig für den Import</h3><p class="hint">Import über beliebige Kalenderwochen und Jahre in einem Durchgang, unabhängig von der aktuell ausgewählten KW. Jeder Einsatz wird anhand seines Datums seiner eigenen ISO-KW zugeordnet; beliebig viele Einsätze pro Tag. Wochenend-Einsätze werden gespeichert und sind in der Einsatzhistorie sichtbar, können aber in der Original-Excel-Vorlage (Montag–Freitag) nicht ausgegeben werden. Fehlen echte Beginn-/Endeuhrzeiten, bleiben diese leer. Steht in der Bemerkung „Arbeitszeit vor Ort: hh:mm“, wird diese nachgewiesene Dauer für die Stundensumme auf die nächste Viertelstunde gerundet. Ticketnummern sind bei sämtlichen Einsätzen und Tätigkeitsarten optional. Fehlende Kunden und Zeitangaben werden zur Prüfung markiert, nicht erfunden. <strong>Fehlende oder ungültige Datumsangaben, beschädigte Zeilen und andere Importfehler werden vor der Übernahme einzeln angezeigt.</strong> Jede solche Zeile muss korrigiert oder ausdrücklich als nicht importiert markiert werden; nichts wird stillschweigend verworfen.</p></article>
+<article class="card" id="excelarchivepanel" style="margin-top:16px">
+ <div class="bar"><div><h2>Fertige Excel-Wochenberichte nachträglich einlesen</h2>
+ <p class="hint">Eine oder mehrere ausgefüllte Wochenberichte (.xlsx/.xlsm) auswählen. Vor dem Speichern wird jeder Einsatz geprüft.</p></div></div>
+ <div class="field"><label for="historicexcelfiles">Excel-Wochenberichte auswählen (mehrere Dateien möglich)</label>
+ <input id="historicexcelfiles" type="file" accept=".xlsx,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12" multiple></div>
+ <div class="small" style="margin:12px 0">Techniker: <strong id="excelprofile">Aktuell gewähltes Profil</strong></div>
+ <div class="btnrow"><button id="excelcheck" class="btn primary" type="button">Excel-Dateien auslesen und prüfen</button><button id="excelclear" class="btn" type="button">Dateiauswahl löschen</button></div>
+ <div id="excelstatus" class="small" role="status" aria-live="polite" style="margin-top:12px">Noch keine Excel-Dateien geprüft.</div>
+ <label class="setupoption" id="excelprofilewarn" hidden><input id="excelprofileoverride" type="checkbox"> <strong>Bericht eines anders bezeichneten Technikers bewusst dem ausgewählten Profil zuordnen</strong><span class="small" style="display:block;margin-left:22px">Wenn Name/Personalnummer aus einer Excel-Datei nicht zum Zielprofil passen, musst du die Zuordnung vor dem Import ausdrücklich bestätigen. Du kannst stattdessen oben den richtigen Techniker auswählen und erneut prüfen.</span></label>
+
+
+</article>
+</section>
 <section class="page" id="previewpage"><article class="card"><div class="bar preactions" style="margin-bottom:16px"><div><h2 style="margin:0">Wochenbericht – Originalspalten</h2><span class="small">Das Excel-Original mit seinen Zellformaten, Spaltenbreiten, Zusammenführungen und Druckeinstellungen wird beim Export direkt befüllt.</span></div><div class="btnrow alignright"><button class="btn" id="printreport" type="button">Druckansicht</button><button class="btn primary" id="exportxlsx" type="button">Excel (.xlsx) exportieren</button></div></div><div id="exportcheckpanel" class="card" style="margin-bottom:12px" aria-live="polite"><h3>Exportprüfung</h3><p class="small">Vor jedem Export werden Zeitangaben, mögliche Doppelungen, Überschneidungen und die Grenzen der Originalvorlage kontrolliert.</p><div id="exportchecklist"></div></div><div class="highlight preactions" style="margin-bottom:12px" id="xlsxexportsettings"><h3 style="margin:0 0 8px">Ablage des Excel-Wochenberichts</h3>
  <p id="wbexportfolderstatus" class="small" aria-live="polite">Standard-Download (normalerweise im Downloads-Ordner).</p>
  <div class="btnrow"><button id="wbexportchoose" class="btn" type="button">Exportordner auswählen</button><button id="wbexportregrant" class="btn" type="button" hidden>Ordnerzugriff erneut freigeben</button><button id="wbexportreset" class="btn" type="button" hidden>Standard-Download verwenden</button></div>
@@ -262,7 +283,11 @@ body.is-dashboard .config,body.is-dashboard .stats{display:none}
 <p class="hint">Aktuelle Bedienungsanleitung für PC und Smartphone. Alle beschriebenen Funktionen beziehen sich auf die tatsächlich laufende Anwendung.</p>
 <div class="highlight"><p><strong>Anwendungsversion:</strong> <strong id="wbversionhelp">–</strong> · <strong>Veröffentlichung:</strong> <span id="wbreleasedate">–</span></p>
 <p><strong>Datenbankrevision:</strong> <span id="helpdbrev">–</span> – der Stand deiner gespeicherten Daten; nicht die Programmversion.</p></div>
-<h3>Was ist in Version 2.9 neu?</h3>
+<h3>Neu in Version 2.10</h3>
+<ul><li><strong>Historische Excel-Wochenberichte:</strong> Eine oder mehrere ausgefüllte .xlsx/.xlsm-Dateien unter „M365 &amp; Datenimport“ auslesen. Datum, Ticket, Kunde/Ort, Kilometer, Reisezeiten und Uhrzeiten werden erkannt; Summenzeilen übersprungen. Vor dem Speichern werden Dubletten und Profilabweichungen geprüft. Kunden und Kilometer gehen nach Bestätigung auch in den Kundenstamm ein.</li>
+<li><strong>Vereinfachte Erfassung:</strong> Die Eingabemaske zeigt weniger Erklärungen; Details stehen hier in der Hilfe.</li>
+<li><strong>Cloud-Ordner:</strong> Browserberechtigungen können ablaufen. Ist nur die Freigabe verloren, diese ausdrücklich erneut erteilen. Ist die Ordnerverknüpfung nicht mehr verfügbar, denselben Ordner erneut auswählen. Die lokale Datenbank bleibt bestehen; ein abweichender Dateistand wird nicht unbemerkt überschrieben.</li></ul>
+<h3>Bereits seit Version 2.9</h3>
 <ul>
 <li><strong>Prüfung vor dem Excel-Export:</strong> Die Anwendung meldet insbesondere unbekannte Arbeitszeiten, noch laufende Einsätze, ungültige Zeiträume oder Pausen, mögliche Doppelungen und zeitliche Überschneidungen. Ein Hinweis ist kein automatisch korrigierter Eintrag. Vor dem Export prüfen; der Export kann nach ausdrücklicher Bestätigung trotz Hinweisen erfolgen.</li>
 <li><strong>Laufende Einsätze im Dashboard:</strong> Gestartete, noch nicht beendete Einsätze werden oben mit „Jetzt stoppen“ angeboten. Der bestätigte Endzeitstempel wird lokal gespeichert.</li>
@@ -296,7 +321,10 @@ body.is-dashboard .config,body.is-dashboard .stats{display:none}
 <p><strong>Kalenderwoche:</strong> Alle Einsätze aus verschiedenen Wochen oder Jahren zusammen importieren. Das Einsatzdatum bestimmt automatisch die Ziel-ISO-KW, <strong>unabhängig von der oben ausgewählten KW</strong>. Auch Wochenend-Einsätze werden gespeichert.</p>
 <p>Nach <strong>„Daten prüfen“</strong> werden verarbeitbare Einsätze und die <strong>nicht verarbeiteten Zeilen getrennt</strong> angezeigt. Fehlt das Datum oder stimmt die Spaltenzahl nicht, siehst du die betroffene Zeile und den Grund. Datum und andere Felder in der Fehlerkarte berichtigen und „Korrigierte Zeile prüfen“ drücken. Alternativ bewusst „Nicht importieren“ wählen. <strong>Unbehandelte Fehler blockieren die gesamte Übernahme.</strong></p>
 <p>Bei möglichen Doppelungen oder ähnlich geschriebenen Kunden erscheinen passende alte Einsätze. Wähle je Importzeile <strong>Aktualisieren, Neu anlegen oder Überspringen</strong>. Vor dem Überschreiben kannst du gespeicherte, aus M365 erkannte und endgültig zu speichernde Werte vergleichen und bearbeiten, einschließlich <strong>Beginn und Ende</strong>. Deine manuell erfassten Uhrzeiten bleiben zunächst voreingestellt. Erst „Auswahl bestätigen und speichern“ führt die bestätigten Änderungen aus. Die PDF wird von Copilot außerhalb dieser Offline-Anwendung ausgewertet.</p>
-<button class="btn tiny" type="button" data-help-tab="importpage">Zum M365-Import</button></section>
+<p><strong>Fertige Excel-Wochenberichte nachtragen (V2.10):</strong> Im selben Reiter bei „Fertige Excel-Wochenberichte nachträglich einlesen“ eine oder mehrere ausgefüllte <code>.xlsx</code>/<code>.xlsm</code>-Dateien auswählen. Die App liest die Originalspalten und ordnet Datum und Einsätze automatisch den jeweiligen Kalenderwochen zu. Kunde/Ort, Kilometer, Reisezeit, Beginn/Ende und vorhandene Arbeitsdauer werden übernommen; die Kundendaten erscheinen nach dem bestätigten Import im Kundenstamm.</p>
+<p>Bitte vor dem Einlesen das richtige <strong>Technikerprofil</strong> auswählen. Weicht der Name oder die Personalnummer im Excel-Bericht ab, ist eine ausdrückliche Bestätigung nötig. Die Excel-Dateien werden nicht verändert und Makros werden nicht gestartet. Fehlende Daten, unklare Tabellen und Dubletten werden gemeldet; vor dem Speichern entscheidet die gemeinsame Vergleichsvorschau über <strong>Aktualisieren, Neuanlage oder Überspringen</strong>. Ohne Beginn/Ende übernimmt die App nur die nachgewiesene Arbeitsdauer, ohne Uhrzeiten zu erfinden. Freizeitausgleichs-Altbestände aus der Bemerkungszeile werden nicht automatisch in neue Anfangssalden verwandelt.</p>
+<button class="btn tiny" type="button" data-help-tab="importpage">Zum M365- und Excel-Import</button></section>
+<section class="helpsection"><h3>Cloud-Ordner und Browserberechtigungen</h3><p>Die Datenbank bleibt lokal in IndexedDB gespeichert. Ein Cloud-Ordner wird nur über einen tatsächlichen Browser-Ordnerzugriff verbunden. Browser können die Zugriffsberechtigung beim Neustart zurücksetzen: Dann im Reiter „Speicherung &amp; Sync“ auf „Ordnerzugriff erneut freigeben“ tippen. Ist die Verknüpfung nicht mehr vorhanden, denselben Ordner erneut verbinden; dabei nie eine neue leere Datenbank erstellen. Bei Google Drive auf Android ohne dauerhafte Ordnerfreigabe erfolgt der Gerätewechsel durch Download und Import von <code>wochenberichte.db</code>. Die Website-Adresse und der Browser müssen gleich bleiben – verschiedene Domains, private Tabs und geleerte Websitedaten haben getrennte Speicherbereiche.</p></section>
 <section class="helpsection"><h3>6. Wochenbericht, Exportprüfung &amp; Freizeitausgleich</h3>
 <p>Unter <strong>Wochenbericht / Export</strong> die gewählte Kalenderwoche kontrollieren. Die neue Exportprüfung kennzeichnet z. B. offene Einsätze, unbekannte Arbeitsdauer, ungültige Zeiten/Pausen, ähnliche Doppeleinträge und Überschneidungen. Hinweise vor dem Export lesen; sie werden nicht automatisch behoben. Der Freizeitausgleich wird aus Anfangssaldo und Abweichung zwischen Gesamtstunden und Wochensoll berechnet.</p>
 <p>Der <strong>Excel-Wochenbericht</strong> behält die verbindliche Montag-bis-Freitag-Vorlage mit maximal sechs Einsätzen pro Tag unverändert bei. Bei Wochenend- oder zusätzlichen Tageseinsätzen wird neben der XLSX-Datei die <strong>vollständige TSV-Wochenübersicht</strong> erzeugt. Sie enthält alle Einsätze, Pausen und Nettozeiten. Prüfe diese ergänzende Datei – die Original-Excel-Datei allein zeigt dann <strong>nicht alle</strong> Einsätze. Ein druckbarer Wochenbericht und ein zusätzlicher Bemerkungstext sind verfügbar.</p>
@@ -311,7 +339,7 @@ body.is-dashboard .config,body.is-dashboard .stats{display:none}
 <p>Die Schaltfläche <strong>„Speichern / Synchronisieren / Schließen“</strong> im Kopf und im Smartphone-Hamburger-Menü öffnet denselben Abschlussdialog. <strong>Synchronisieren und schließen</strong> speichert lokal, synchronisiert über einen verbundenen Ordner, prüft den Dateistand und erstellt ein Abschlussbackup. <strong>Nur lokal speichern und schließen</strong> speichert lokal mit Backup, ohne die Ordnerdatei zu aktualisieren. <strong>Abbrechen</strong> lässt die App geöffnet. Bei Fehlern bleibt sie geöffnet; ein Browser darf das automatische Tab-Schließen verweigern.</p>
 <p>Vor Gerätewechsel erst auf dem alten Gerät speichern und synchronisieren, danach auf dem zweiten Gerät den aktuellen Datenstand laden. Ohne Ordnerzugriff: Datenbank auf Gerät A herunterladen und auf B öffnen. Beim Programmupdate auf sichtbaren Hinweis achten; <strong>nicht mit offenen ungespeicherten Eingaben ungefragt neu laden</strong>. Auf dem Smartphone öffnet ☰ die Bereiche und die Abschlussfunktion.</p></section>
 </div></section>
-<section class="page" id="backuppage"><article class="card"><h2>Speicherung &amp; Dateisynchronisierung</h2><p class="msg">Die Daten sind auf diesem Gerät gespeichert. Eine heruntergeladene Datei ist eine separate Kopie und wird nicht automatisch aktualisiert.</p><p class="hint">Standard: IndexedDB als lokale Arbeitskopie. Bei freigegebenem Ordner wird die SQLite-Datei <b>wochenberichte.db</b> nach abgeschlossener lokaler Speicherung automatisch (ca. 250 ms) abgeglichen. Ein synchronisierter OneDrive-Ordner wird durch OneDrive übertragen – nicht durch die Anwendung selbst.</p><p id="wbpickerhint" class="small"></p><div class="btnrow"><button id="wbbrowser" class="btn" type="button">Nur dieses Gerät</button><button id="wbconnectlocal" class="btn" type="button">Lokalen Ordner verbinden</button><button id="wbconnectcloud" class="btn" type="button">Cloud-Synchronisationsordner verbinden</button></div><div class="btnrow" style="margin-top:12px"><button id="wbsyncnow" class="btn primary" type="button">Jetzt synchronisieren</button><button id="wbregrant" class="btn" type="button">Ordnerzugriff erneut freigeben</button><button id="wbcompare" class="btn" type="button">Dateistände vergleichen</button><button id="wbretry" class="btn danger" type="button" hidden>Lokales Speichern erneut versuchen</button></div><div id="wbconflict" class="highlight" hidden></div><div class="btnrow" style="margin-top:12px"><button id="wbfileload" class="btn" type="button">Vorhandenen Dateistand laden</button><button id="wbseparatesave" class="btn" type="button">Lokalen Stand separat sichern</button><button id="wbforce" class="btn danger" type="button">Lokalen Stand ausdrücklich übernehmen</button></div><div id="wbunpublished" class="msg error" hidden style="margin-top:14px"><strong>Wiederhergestellter Stand ist noch nicht veröffentlicht.</strong><div class="btnrow" style="margin-top:12px"><button id="wbpublish" class="btn primary" type="button">Prüfen und ausdrücklich veröffentlichen</button><button id="wbdiscardrestore" class="btn" type="button">Verwerfen und Ordnerstand laden</button></div></div><hr style="border:0;border-top:1px solid #dae2eb;margin:18px 0"><h3>Dateiimport und Gerätewechsel</h3><p class="hint">Auf Gerät A speichern und synchronisieren. Auf Gerät B dann die aktuelle Ordnerdatei laden. Ohne Ordnerzugriff: .db auf Gerät A herunterladen und auf Gerät B importieren. Unterschiedliche Dateikopien werden nicht automatisch zusammengeführt.</p><div class="btnrow"><button id="wbdbexport" class="btn primary" type="button">wochenberichte.db herunterladen</button><label class="btn">Datenbank importieren (.db)<input id="wbdbimport" type="file" accept=".db,.sqlite,application/vnd.sqlite3" hidden></label><label class="btn">Alte JSON-Daten importieren<input id="wblegacyimport" type="file" accept=".json,application/json" hidden></label></div><div class="btnrow" style="margin-top:11px"><button id="backup" class="btn" type="button">Zusätzlich JSON exportieren (V1.3)</button><label class="btn">Alte JSON-Sicherung einspielen<input id="restore" type="file" accept=".json,application/json" hidden></label><button id="exporttsv" class="btn" type="button">Aktuelle KW als TSV</button></div><p id="backupmessage" class="small"></p><hr style="border:0;border-top:1px solid #dae2eb;margin:18px 0"><h3>Geordnet schließen</h3><div class="btnrow"><button id="wbclose" class="btn primary" type="button">Speichern &amp; schließen …</button></div><p class="small" id="wbclosemessage"></p></div><div class="highlight" style="margin-top:18px"><h3>Beispieldaten KW 40/2026</h3><p class="hint">Die Originalvorlage kann zur Kontrolle geladen werden, wenn KW 40 noch leer ist.</p><button id="loadsample" class="btn" type="button">Beispielwoche KW 40 laden</button></div></article></section>
+<section class="page" id="backuppage"><article class="card"><h2>Speicherung &amp; Dateisynchronisierung</h2><p class="msg">Die Daten sind auf diesem Gerät gespeichert. Eine heruntergeladene Datei ist eine separate Kopie und wird nicht automatisch aktualisiert.</p><p class="hint">Standard: IndexedDB als lokale Arbeitskopie. Bei freigegebenem Ordner wird die SQLite-Datei <b>wochenberichte.db</b> nach abgeschlossener lokaler Speicherung automatisch (ca. 250 ms) abgeglichen. Ein synchronisierter OneDrive-Ordner wird durch OneDrive übertragen – nicht durch die Anwendung selbst.</p><p id="wbpickerhint" class="small"></p><div class="btnrow"><button id="wbbrowser" class="btn" type="button">Nur dieses Gerät</button><button id="wbconnectlocal" class="btn" type="button">Lokalen Ordner verbinden</button><button id="wbconnectcloud" class="btn" type="button">Cloud-Synchronisationsordner verbinden</button></div><div class="btnrow" style="margin-top:12px"><button id="wbsyncnow" class="btn primary" type="button">Jetzt synchronisieren</button><button id="wbregrant" class="btn" type="button">Ordnerzugriff erneut freigeben</button><button id="wbcompare" class="btn" type="button">Dateistände vergleichen</button><button id="wbretry" class="btn danger" type="button" hidden>Lokales Speichern erneut versuchen</button></div><div id="wbfolderdiagnostic" class="highlight" style="margin-top:12px" hidden role="status"></div><div id="wbconflict" class="highlight" hidden></div><div class="btnrow" style="margin-top:12px"><button id="wbfileload" class="btn" type="button">Vorhandenen Dateistand laden</button><button id="wbseparatesave" class="btn" type="button">Lokalen Stand separat sichern</button><button id="wbforce" class="btn danger" type="button">Lokalen Stand ausdrücklich übernehmen</button></div><div id="wbunpublished" class="msg error" hidden style="margin-top:14px"><strong>Wiederhergestellter Stand ist noch nicht veröffentlicht.</strong><div class="btnrow" style="margin-top:12px"><button id="wbpublish" class="btn primary" type="button">Prüfen und ausdrücklich veröffentlichen</button><button id="wbdiscardrestore" class="btn" type="button">Verwerfen und Ordnerstand laden</button></div></div><hr style="border:0;border-top:1px solid #dae2eb;margin:18px 0"><h3>Dateiimport und Gerätewechsel</h3><p class="hint">Auf Gerät A speichern und synchronisieren. Auf Gerät B dann die aktuelle Ordnerdatei laden. Ohne Ordnerzugriff: .db auf Gerät A herunterladen und auf Gerät B importieren. Unterschiedliche Dateikopien werden nicht automatisch zusammengeführt.</p><div class="btnrow"><button id="wbdbexport" class="btn primary" type="button">wochenberichte.db herunterladen</button><label class="btn">Datenbank importieren (.db)<input id="wbdbimport" type="file" accept=".db,.sqlite,application/vnd.sqlite3" hidden></label><label class="btn">Alte JSON-Daten importieren<input id="wblegacyimport" type="file" accept=".json,application/json" hidden></label></div><div class="btnrow" style="margin-top:11px"><button id="backup" class="btn" type="button">Zusätzlich JSON exportieren (V1.3)</button><label class="btn">Alte JSON-Sicherung einspielen<input id="restore" type="file" accept=".json,application/json" hidden></label><button id="exporttsv" class="btn" type="button">Aktuelle KW als TSV</button></div><p id="backupmessage" class="small"></p><hr style="border:0;border-top:1px solid #dae2eb;margin:18px 0"><h3>Geordnet schließen</h3><div class="btnrow"><button id="wbclose" class="btn primary" type="button">Speichern &amp; schließen …</button></div><p class="small" id="wbclosemessage"></p></div><div class="highlight" style="margin-top:18px"><h3>Beispieldaten KW 40/2026</h3><p class="hint">Die Originalvorlage kann zur Kontrolle geladen werden, wenn KW 40 noch leer ist.</p><button id="loadsample" class="btn" type="button">Beispielwoche KW 40 laden</button></div></article></section>
 <section class="page" id="backupspage"><article class="card"><h2>Backups</h2><p class="hint">Automatisch ca. 15 Sekunden nach der letzten Änderung und beim Start, wenn das letzte Backup älter als 24 Stunden ist. Außerdem vor Wiederherstellungen, ersetzenden Importen und beim geordneten Schließen. Automatische Backups laufen nur während die Anwendung geöffnet ist.</p><div class="row"><div class="field wide"><label for="wbbackupcomment">Optionaler Kommentar</label><input id="wbbackupcomment" placeholder="z. B. Vor Monatsabschluss"></div><button id="wbbackupnow" class="btn primary" type="button">Backup jetzt erstellen</button></div><p class="hint">Lokale Sicherungen in IndexedDB; bei zugänglichem Ordner zusätzlich in „Backup“. Bis zu 30 Sicherungen je Ablage; fremde Dateien bleiben unangetastet.</p><div id="wblist" aria-live="polite">Lade Sicherungen …</div></article></section><div id="profilemodal" class="wbmodal" hidden><div class="wbwizard card" role="dialog" aria-modal="true" aria-labelledby="profileformtitle"><h2 id="profileformtitle">Technikerprofil bearbeiten</h2><form id="profileform"><div class="row"><div class="field wide"><label for="pfname">Technikername</label><input id="pfname" maxlength="90" required autocomplete="off"></div><div class="field"><label for="pfnr">Personalnummer</label><input id="pfnr" maxlength="20" required autocomplete="off"></div></div><div class="row"><div class="field"><label for="pftarget">Wochen-Sollstunden</label><input id="pftarget" inputmode="decimal" value="40" required></div><div class="field"><label for="pfinitial">Anfangssaldo Freizeitausgleich (Stunden)</label><input id="pfinitial" inputmode="decimal" value="0" required></div></div><p id="profileformerror" class="msg error" role="alert"></p><div class="btnrow"><button class="btn primary" id="profilesubmit" type="submit">Profil speichern</button><button class="btn" id="profilecancel" type="button">Abbrechen</button></div></form></div></div><div id="wbstart" class="wbmodal" hidden><div class="wbwizard card" role="dialog" aria-modal="true" aria-labelledby="wbstarttitle">
 <h2 id="wbstarttitle">Wochenbericht <span id="wbversionwizard">Version …</span> einrichten</h2>
 <p class="setupsteps" id="wizardprogress">Schritt 1 von 3 · Datenbank auswählen</p>
@@ -369,7 +397,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 </script>
 <script>
 'use strict';
-const WB_APP_VERSION=Object.freeze({number:'2.9.0',date:'21.10.2026',cache:'wochenberichte-static-v2.9.0'});
+const WB_APP_VERSION=Object.freeze({number:'2.10.0',date:'21.10.2026',cache:'wochenberichte-static-v2.10.0'});
 
 
 /* SQLite single-record application database codec. Self-contained, offline.
@@ -399,7 +427,7 @@ return{encode,decode,validateApp};
 /* Offline SQLite snapshots, IndexedDB, File System Access sync queue (V2). */
 const WBStore=(()=>{
  const NAME='wochenbericht-lovrencic-v2',FILENAME='wochenberichte.db',LIMIT=30;
- let syncPaused=false;
+ let syncPaused=false;let folderAccess='unknown';
  let idb=null,dbData=null,device={mode:'browser_local',handle:null,baseId:null,baseDbId:null,syncedAt:null,name:'',pending:false},saveTail=Promise.resolve(),syncLoop=null,syncWanted=false,writeTail=Promise.resolve(),backupTimer=null,saveFailed=false,saving=0,lastError='',restoreUnpublished=false,lastRemote=null;
  const uuid=()=>typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():'a'+Date.now().toString(16)+Math.random().toString(16).slice(2);
  const now=()=>new Date().toISOString();
@@ -413,7 +441,7 @@ const WBStore=(()=>{
  function clone(x){return JSON.parse(JSON.stringify(x))}
  function withMeta(d){d._meta ||= newMeta();d.templates ||= {excelBase64:typeof TEMPLATE64==='string'?TEMPLATE64:'',rondoPrompt:typeof promptTemplate==='string'?promptTemplate:''};d.preferences ||= {quarterMinutes:15,reportFormat:'Originalvorlage KW',schemaVersion:2};return WBSqlite.validateApp(d)}
  function markRevision(d){withMeta(d);const m=d._meta;m.previous_revision_id=m.revision_id;m.revision_id=uuid();m.revision++;m.changed_at=now()}
- async function begin(legacyText){await open();device=Object.assign(device,(await txGet('kv','device'))||{});const b=await txGet('kv','snapshot');if(b){dbData=WBSqlite.decode(b);restoreUnpublished=!!(await txGet('kv','restoreUnpublished'));device.pending=device.mode!=='browser_local'&&dbData._meta.revision_id!==device.baseId;if(device.pending&&!restoreUnpublished)scheduleSync();return{data:clone(dbData),source:'indexeddb'}}
+ async function begin(legacyText){await open();const savedDevice=await txGet('kv','device');const hint=await txGet('kv','folderConnectionHint');device=Object.assign(device,savedDevice||{});if(!savedDevice&&hint&&hint.mode!=='browser_local'){device.mode=hint.mode;device.name=hint.name||'';device.baseId=hint.baseId||null;device.baseDbId=hint.baseDbId||null;device.syncedAt=hint.syncedAt||null;device.handle=null;device.pending=true;lastError='Gespeicherte Ordnerverknüpfung nicht verfügbar – denselben Ordner erneut auswählen. Lokale Daten sind weiterhin vorhanden.';}const b=await txGet('kv','snapshot');if(b){dbData=WBSqlite.decode(b);restoreUnpublished=!!(await txGet('kv','restoreUnpublished'));device.pending=device.mode!=='browser_local'&&dbData._meta.revision_id!==device.baseId;if(device.mode!=='browser_local'&&device.handle)await permission(false);if(device.pending&&!restoreUnpublished&&device.handle)scheduleSync();return{data:clone(dbData),source:'indexeddb'}}
   if(legacyText){let old;try{old=JSON.parse(legacyText);if(old?.version===1&&Array.isArray(old.profiles)&&old.profiles.length&&old.weeks&&typeof old.weeks==='object'){
     // Pre-migration backup: ORIGINAL JSON retained independently in IndexedDB.
     let raw=new TextEncoder().encode(legacyText);await keepBackup({id:uuid(),at:now(),kind:'Vor Migration V1.3',comment:'Originaldaten vor der Umstellung',location:'IndexedDB (Original-JSON)',name:'wochenberichte_v13_vor_migration_'+Date.now()+'.json',data:raw,mime:'application/json'},false);
@@ -430,26 +458,62 @@ const WBStore=(()=>{
  function bytes(){if(!dbData)throw Error('Keine Datenbank geöffnet');return WBSqlite.encode(dbData)}
  function download(data,name,mime='application/vnd.sqlite3'){let b=new Blob([data],{type:mime}),url=URL.createObjectURL(b);let a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),20000)}
  async function downloadDb(){await saveTail;download(bytes(),FILENAME)}
- async function setDevice(v){device={...device,...v};await txPut('kv','device',device);update()}
+ async function setDevice(v){
+  const candidate={...device,...v};
+  // Keep a handle-independent descriptor to diagnose lost browser permissions and connections.
+  await txPut('kv','device',candidate);
+  if(candidate.mode!=='browser_local'&&(candidate.name||candidate.handle)){
+   await txPut('kv','folderConnectionHint',{mode:candidate.mode,name:candidate.name,baseId:candidate.baseId,baseDbId:candidate.baseDbId,syncedAt:candidate.syncedAt});
+  }else if(candidate.mode==='browser_local')await txDel('kv','folderConnectionHint');
+  device=candidate;if(v.handle!==undefined)folderAccess=v.handle?'unknown':'unavailable';update();
+ }
  async function exportFolderRead(){return await txGet('kv','xlsxExportFolder')}
  async function exportFolderSave(handle){if(!handle||handle.kind!=='directory')throw Error('Bitte einen gültigen Ordner auswählen');const val={handle,name:handle.name||'Exportordner'};await txPut('kv','xlsxExportFolder',val);return val}
  async function exportFolderClear(){await txDel('kv','xlsxExportFolder')}
 
  function hasPicker(){return !!(window.isSecureContext&&typeof window.showDirectoryPicker==='function')}
  function classify(e){let name=String(e?.name||'');if(name==='NotAllowedError'||name==='SecurityError')return'permission_denied';if(name==='NotFoundError')return'missing';if(name==='DataError'||name==='TypeMismatchError'||name==='InvalidStateError')return'invalid_database';return'io_error'}
- async function permission(interactive=false){if(!device.handle)return false;try{let p=await device.handle.queryPermission({mode:'readwrite'});if(p==='granted')return true;if(interactive&&device.handle.requestPermission)p=await device.handle.requestPermission({mode:'readwrite'});return p==='granted'}catch(e){return false}}
- async function reauthorize(){if(!(await permission(true))){lastError='Ordnerzugriff erforderlich';update();return false}lastError='';update();return true}
+ async function permission(interactive=false){
+  if(!device.handle){folderAccess='unavailable';update();return false}
+  try{
+   let p=typeof device.handle.queryPermission==='function'?await device.handle.queryPermission({mode:'readwrite'}):'prompt';
+   if(p!=='granted'&&interactive&&device.handle.requestPermission)p=await device.handle.requestPermission({mode:'readwrite'});
+   folderAccess=p==='granted'?'granted':'needs_permission';update();return p==='granted';
+  }catch(e){folderAccess='needs_permission';update();return false}
+ }
+ async function reauthorize(){if(!(await permission(true))){lastError='Ordnerzugriff erforderlich';update();return false}lastError='';update();scheduleSync();return true}
  async function inspect(){if(!device.handle)return{status:'permission_denied',message:'Kein Ordner verbunden'};if(!(await permission()))return{status:'permission_denied',message:'Ordnerzugriff erforderlich'};try{let h=await device.handle.getFileHandle(FILENAME);let file=await h.getFile();let data=new Uint8Array(await file.arrayBuffer());let state;try{state=WBSqlite.decode(data)}catch(e){return{status:'invalid_database',message:e.message}}return{status:'ok',handle:h,state,data}}catch(e){return{status:classify(e),message:e.message||String(e)}}}
  async function connect(mode){if(!hasPicker())throw Error('Dieser Browser bietet keine dauerhafte Ordnerauswahl. Browser-Speicherung und .db-Export funktionieren weiterhin.'); // picker MUST be direct user gesture
    let handle=await window.showDirectoryPicker({mode:'readwrite',id:'wochenbericht-folder'});return connectHandle(mode,handle)}
-  async function connectHandle(mode,handle){if(!handle)throw Error('Kein gültiger Ordner ausgewählt');let old={...device};await setDevice({handle,mode,name:handle.name,baseId:null,baseDbId:null,syncedAt:null});const file=await inspect();if(file.status==='missing'){
+  async function connectHandle(mode,handle){if(!handle)throw Error('Kein gültiger Ordner ausgewählt');let old={...device};
+   if(mode===old.mode&&old.baseId&&dbData){
+    // Reconnect safely after browser revoked handle; inspect first, do not create missing database.
+    try{
+     if(await handle.queryPermission({mode:'readwrite'})!=='granted'){
+       if(typeof handle.requestPermission!=='function'||await handle.requestPermission({mode:'readwrite'})!=='granted')throw Error('Ordnerzugriff erforderlich');
+     }
+     const h=await handle.getFileHandle(FILENAME,{create:false}),remote=WBSqlite.decode(new Uint8Array(await(await h.getFile()).arrayBuffer())),m=remote._meta,l=dbData._meta;
+     if(m.database_id===l.database_id&&(m.revision_id===old.baseId||m.revision_id===l.revision_id)){
+      await setDevice({handle,mode,name:handle.name,baseId:m.revision_id,baseDbId:m.database_id,syncedAt:now(),pending:m.revision_id!==l.revision_id});
+      lastError='';if(m.revision_id!==l.revision_id)scheduleSync();return'reconnected';
+     }
+     // Divergent revisions: retain local stand, leave former anchor for the conflict dialog.
+     if(m.database_id===l.database_id){await setDevice({handle,mode,name:handle.name,baseId:old.baseId,baseDbId:old.baseDbId,pending:true});lastRemote={status:'ok',state:remote};lastError='Konflikt: Ordner und Browser haben unterschiedliche Revisionen';update();return'conflict'}
+     throw Error('Andere Datenbank im gewählten Ordner. Bitte diesen Ordner nicht überschreiben.');
+    }catch(e){
+     if(e.name==='NotFoundError')throw Error('Die früher verbundene wochenberichte.db fehlt. Sie wird nicht automatisch ersetzt.');
+     if(!/Ordnerzugriff erforderlich/.test(e.message))throw e;
+     lastError='Ordnerzugriff erneut freigeben: '+e.message;update();throw e;
+    }
+   }
+   await setDevice({handle,mode,name:handle.name,baseId:null,baseDbId:null,syncedAt:null});const file=await inspect();if(file.status==='missing'){
      if(!confirm('Im gewählten Ordner gibt es noch keine wochenberichte.db. Neue Datei dort ausdrücklich erstellen?')){await setDevice(old);return'cancel'}
      await saveTail;await folderLocked(async()=>{const second=await inspect();if(second.status!=='missing')throw Error('Der Ordnerinhalt hat sich verändert. Bitte erneut prüfen.');let fd=await device.handle.getFileHandle(FILENAME,{create:true});let current=clone(dbData);current._meta.last_confirmed_base={database_id:current._meta.database_id,revision_id:current._meta.revision_id,revision:current._meta.revision,confirmed_at:now()};let bs=WBSqlite.encode(current);await writeVerified(fd,bs,current._meta);if(dbData._meta.revision_id===current._meta.revision_id){dbData._meta.last_confirmed_base=current._meta.last_confirmed_base;await txPut('kv','snapshot',bs)}await setDevice({baseId:current._meta.revision_id,baseDbId:dbData._meta.database_id,syncedAt:now(),pending:false});});return'created';
    }
    if(file.status==='ok'){lastRemote=file;const msg=file.state._meta.database_id===dbData._meta.database_id?'Vorhandene Datenbank gefunden. Diesen Dateistand JETZT laden? (Abbrechen = nur verbinden; dann Konfliktprüfung)':'Andere Datenbank gefunden. Diesen Dateistand laden? (Abbrechen = Ordner nicht verbinden)';if(confirm(msg)){await loadRemote(file);return'loaded'}if(file.state._meta.database_id!==dbData._meta.database_id){await setDevice(old);return'cancel'}lastError='Verbundene Datei hat einen anderen Revisionsstand – Konfliktprüfung erforderlich.';update();return'conflict'}
    if(file.status==='permission_denied'){lastError='Ordnerzugriff erforderlich – bitte Freigabe über die sichtbare Schaltfläche erteilen.';update();return'permission_denied'}await setDevice(old);throw Error(file.status+': '+file.message)
  }
- async function setBrowserMode(){await setDevice({mode:'browser_local',handle:null,name:'',baseId:null,baseDbId:null,pending:false});lastError=''}
+ async function setBrowserMode(){await setDevice({mode:'browser_local',handle:null,name:'',baseId:null,baseDbId:null,pending:false});lastError='';folderAccess='unavailable'}
  async function writeVerified(h,b,expected){const stream=await h.createWritable();try{await stream.write(b);await stream.close()}catch(e){try{await stream.abort()}catch(_e){}throw e}const reread=new Uint8Array(await(await h.getFile()).arrayBuffer());const verified=WBSqlite.decode(reread);if(verified._meta.database_id!==expected.database_id||verified._meta.revision!==expected.revision||verified._meta.revision_id!==expected.revision_id)throw Error('Nachkontrolle der Datei fehlgeschlagen');return verified}
  function folderLocked(fn){const job=writeTail.catch(()=>{}).then(fn);writeTail=job.catch(()=>{});return job}
  function scheduleSync(){if(syncPaused||device.mode==='browser_local'||!device.handle||restoreUnpublished)return;clearTimeout(WBStore._syncTimer);WBStore._syncTimer=setTimeout(()=>queueSync('auto').catch(console.warn),250)}
@@ -495,7 +559,7 @@ const WBStore=(()=>{
  async function verifyPublished(){await flush();const local=dbData._meta,r=await inspect();if(r.status!=='ok')throw Error('Datei-Nachprüfung: '+r.status+' – '+(r.message||''));const m=r.state._meta;if(m.database_id!==local.database_id||m.revision_id!==local.revision_id||m.revision!==local.revision||device.baseId!==m.revision_id)throw Error('Dateistand nicht identisch mit lokal gespeicherter Revision');return true}
  async function syncAndClose(){await flush();await queueSync('close');await verifyPublished();return backup('Schließen','Synchronisiert und geprüft')}
  async function closeLocal(){pauseAutoSync();await flush();await waitActiveSync();await flush();return backup('Schließen','Nur lokal gespeichert',false)}
- function status(){return{mode:device.mode,name:device.name,hasPicker:hasPicker(),hasHandle:!!device.handle,baseId:device.baseId,pending:device.pending,saving:!!saving,saveFailed,lastError,syncedAt:device.syncedAt,syncing:!!syncLoop,paused:syncPaused,unpublished:restoreUnpublished,revision:dbData?dbData._meta.revision:0,entries:dbData?Object.values(dbData.weeks).reduce((n,w)=>n+w.entries.length,0):0}}
+ function status(){return{mode:device.mode,name:device.name,hasPicker:hasPicker(),hasHandle:!!device.handle,baseId:device.baseId,pending:device.pending,saving:!!saving,saveFailed,lastError,syncedAt:device.syncedAt,syncing:!!syncLoop,paused:syncPaused,folderAccess,unpublished:restoreUnpublished,revision:dbData?dbData._meta.revision:0,entries:dbData?Object.values(dbData.weeks).reduce((n,w)=>n+w.entries.length,0):0}}
  return{begin,create,save,retry,bytes,downloadDb,download,hasPicker,connect,connectHandle,setBrowserMode,permission,reauthorize,inspect,queueSync,backup,listBackups,downloadBackup,removeBackup,restoreBackup,applyRestore,loadRemote,forceLocal,publishRestored,importFile,importJsonFile,replaceState,startBackupCheck,syncAndClose,closeLocal,flush,pauseAutoSync,resumeAutoSync,waitActiveSync,verifyPublished,status,getData:()=>clone(dbData),getDevice:()=>({...device}),exportFolderRead,exportFolderSave,exportFolderClear};
 })();
 
@@ -820,7 +884,7 @@ function renderArchivedProfiles(){
 }
 
 function renderWeek(){let ds=weekDates(sel.year,sel.week),p=profile(),s=summary();$('year').value=sel.year;$('week').max=weeksInYear(sel.year);$('week').value=sel.week;$('weekrange').textContent=`${dayFmt(ds[0])} – ${dayFmt(ds[4])}  ·  ${p.name}  ·  Soll ${fmtD(p.target,2)} h / Woche`;$('edate').min=ds[0];$('edate').max=fullWeekDates(sel.year,sel.week)[6];$('opening').value=s.start;$('stat-total').textContent=fmtH(s.total);$('stat-hours').textContent=fmtD(s.total/60)+' Std.';$('stat-work').textContent=fmtH(s.work);$('stat-travel').textContent=fmtH(s.travel);$('stat-km').textContent=s.km.toLocaleString('de-DE')+' km';$('stat-balance').textContent=fmtD(s.balance)+' h';$('stat-balance').className='value '+(s.balance<0?'negative':'');$('stat-delta').textContent=`Wochenabweichung ${s.delta>=0?'+':''}${fmtD(s.delta)} h (Soll: ${fmtD(p.target)} h)`;$('stat-delta').className='sub '+(s.delta<0?'negative':'positive');$('extraNote').value=week().extraNote||'';renderEntries();renderPaper();renderHistory();renderDayStrip();renderDashboard()}
-function refresh(){renderProfiles();renderWeek()}
+function refresh(){renderProfiles();renderWeek();if($('excelprofile')&&db?.profiles?.length)$('excelprofile').textContent=profile().name+' (Personalnummer '+profile().personnel+')'}
 function newEntry(date=null){editing=null;const x=fullWeekDates(sel.year,sel.week);$('entryform').reset();$('edate').value=date&&x.includes(date)?date:(x.includes(dateISO(new Date()))?dateISO(new Date()):x[0]);$('etype').value='Einsatz';$('formtitle').textContent='Eintrag erfassen';$('saveentry').textContent='Eintrag speichern';$('formmessage').textContent='';$('entryduration').textContent='0:00 h';db.draft=null;persist();renderDayStrip();$('customerSuggestions').hidden=true;$('customerTransferBox').hidden=true;selectedCustomerEntry=null;showAllCustomerSuggestions=false;$('customerdetails').open=false}
 function formValues(){
  let type=$('etype').value,customer=$('ecustomer').value.trim();let start=ceilClock($('estart').value),end=ceilClock($('eend').value);
@@ -978,7 +1042,7 @@ function parseImport(src){
 }
 
 // V2.7 – M365-Import-Abgleich. Nichts wird verändert, bevor der Benutzer jede Zeile bestätigt.
-let importDecisions=[];let importRejected=[],importWarnings=[],importDuplicates=0;
+let importDecisions=[];let importRejected=[],importWarnings=[],importDuplicates=0;let importSourceMode='m365',importTargetProfileId=null,importProfileMismatch=false;
 function importCompareName(raw){
  return normalizeHistory(String(raw||'').replace(/ä/gi,'ae').replace(/ö/gi,'oe').replace(/ü/gi,'ue').replace(/ß/g,'ss'))
   .replace(/\b(gmbh|gbr|ug|mbh|kg|co|ag|gesellschaft|firma|filiale)\b/g,' ')
@@ -1042,7 +1106,7 @@ function importDiff(oldRow,newRow){
  diff.push(`Arbeitsende: ${oldRow.end||'–'} (bleibt erhalten)`);
  diff.push(`Datum: ${dayFmt(oldRow.date)} (bleibt erhalten)`);
  const fromPdf=noteWorkM(newRow.note);const own=oldRow.start&&oldRow.end?shiftMins(oldRow):null;
- if(fromPdf!==null&&own!==null&&fromPdf!==own)diff.push(`ACHTUNG: PDF-Arbeitsdauer ${fmtH(fromPdf)} h weicht von manuellen Uhrzeiten ${fmtH(own)} h ab. Manuelle Uhrzeiten haben Vorrang.`);
+ if(fromPdf!==null&&own!==null&&fromPdf!==own)diff.push(`ACHTUNG: Import-Arbeitsdauer ${fmtH(fromPdf)} h weicht von manuellen Uhrzeiten ${fmtH(own)} h ab. Manuelle Uhrzeiten haben Vorrang.`);
  return diff.join('\n');
 }
 function importDecisionRows(rows,existing){return rows.map((incoming,index)=>({incoming,index,candidates:importCandidateList(incoming,existing),action:'',targetId:''})).map(x=>({...x,action:x.candidates.length?'review':'create',targetId:x.candidates.length===1?x.candidates[0].entry.id:''}))}
@@ -1083,7 +1147,7 @@ function importApplyEdits(d){
  return out;
 }
 function importRowPreview(d){
- if(d.action==='skip')return 'Diese PDF-Zeile wird übersprungen. Es werden keine Daten geändert.';
+ if(d.action==='skip')return 'Diese Importzeile wird übersprungen. Es werden keine Daten geändert.';
  if(d.action==='review')return 'Bitte entscheiden: Einsatz aktualisieren, neu anlegen oder überspringen.';
  if(d.action==='update'&&!importChoice(d))return 'Bitte den richtigen vorhandenen Einsatz auswählen.';
  try{
@@ -1093,7 +1157,7 @@ function importRowPreview(d){
   let txt=meta+'\n'+(old?`${changed.length} Feld(er) abweichend vom bisherigen Eintrag.`:'Werte vor der Neuanlage kontrollieren.');
   if(old)txt+=`\nBeginn: ${result.start||'–'} · Ende: ${result.end||'–'} (manuell anpassbar; anfangs unverändert)`;
   const pdfWork=noteWorkM(d.incoming.note),manualWork=result.start&&result.end?shiftMins(result):null;
-  if(pdfWork!==null&&manualWork!==null&&pdfWork!==manualWork)txt+=`\nHinweis: PDF-Arbeitsdauer ${fmtH(pdfWork)} h, Uhrzeitdifferenz ${fmtH(manualWork)} h. Für die Stundenrechnung zählen die Uhrzeiten.`;
+  if(pdfWork!==null&&manualWork!==null&&pdfWork!==manualWork)txt+=`\nHinweis: Import-Arbeitsdauer ${fmtH(pdfWork)} h, Uhrzeitdifferenz ${fmtH(manualWork)} h. Für die Stundenrechnung zählen die Uhrzeiten.`;
   return txt;
  }catch(error){return 'Bitte Eingaben prüfen: '+error.message}
 }
@@ -1106,25 +1170,25 @@ function importEditRows(d,i){
   const isNote=key==='note',inputId=`import-edit-${i}-${key}`;
   const input=isNote?`<textarea id="${inputId}" rows="2" data-import-edit="${i}" data-import-field="${key}" aria-label="${esc(label)} korrigieren">${esc(chosen)}</textarea>`:
    `<input id="${inputId}" data-import-edit="${i}" data-import-field="${key}" value="${esc(chosen)}" ${key==='km'?'inputmode="numeric" type="number" min="0" max="10000" step="1"':key==='start'||key==='end'?'type="time" step="900"':key==='travel'?'inputmode="numeric" placeholder="130 → 1:30"':'type="text"'} aria-label="${esc(label)} korrigieren">`;
-  return `<div class="importeditrow"><label class="importeditlabel" for="${inputId}">${esc(label)}</label><div class="importeditold"><span class="importmobilecaption">Bisher</span>${esc(oldVal||'–')}</div><div class="importeditpdf"><span class="importmobilecaption">M365</span>${esc(pdfVal||'–')}</div><div class="importeditfinal">${input}</div></div>`;
+  return `<div class="importeditrow"><label class="importeditlabel" for="${inputId}">${esc(label)}</label><div class="importeditold"><span class="importmobilecaption">Bisher</span>${esc(oldVal||'–')}</div><div class="importeditpdf"><span class="importmobilecaption">${importSourceMode==='excel'?'Excel':'M365'}</span>${esc(pdfVal||'–')}</div><div class="importeditfinal">${input}</div></div>`;
  }).join('')}</div>`;
 }
 function importStatusReport(){
  const unhandled=importRejected.filter(r=>!r.skipped).length,skipped=importRejected.length-unhandled;
  const weeks=new Set(importDecisions.map(d=>importWeekLabel(d.incoming.date)));
  $('importresult').innerHTML=`<div class="msg ${unhandled?'error':'success'}"><strong>${importDecisions.length} verarbeitbare Einsatzzeilen · ${unhandled} nicht verarbeitete Zeile(n) · ${skipped} bewusst ausgelassen</strong><div class="small">${weeks.size} Kalenderwoche(n) · ${importDuplicates} identische Doppelzeile(n) übersprungen · ${importWarnings.length} Hinweise. ${unhandled?'Bitte jede fehlerhafte Zeile korrigieren oder ausdrücklich auslassen. Es wird noch nichts gespeichert.':'Alle erkannten Zeilen sind berücksichtigt. Noch nichts gespeichert.'}</div></div>${importWarnings.length?`<details style="margin:8px 0"><summary>Hinweise anzeigen (${importWarnings.length})</summary>${importWarnings.map(x=>`<p class="small">${esc(x)}</p>`).join('')}</details>`:''}`;
- $('doimport').disabled=!importDecisions.length||unhandled>0;
+ $('doimport').disabled=!importDecisions.length||unhandled>0||(importSourceMode==='excel'&&importProfileMismatch&&!$('excelprofileoverride').checked);
 }
 function renderImportRejected(){
  const wrap=$('importerrors');if(!wrap)return;
- wrap.innerHTML=importRejected.map((e,i)=>`<div class="importreviewcard importerrorcard" data-import-error="${i}"><h3>⚠ Zeile ${e.number}: nicht verarbeitet</h3><p class="msg error">${esc(e.reason)}</p><details ${e.skipped?'':'open'}><summary>Originaldaten kontrollieren und korrigieren</summary><div class="importerrorgrid">${IMPORT_COLUMNS.map((name,col)=>`<div class="field"><label for="imp-error-${i}-${col}">${esc(name)}</label>${col===8?`<textarea id="imp-error-${i}-${col}" data-error-index="${i}" data-error-field="${col}" rows="2">${esc(e.vals[col]||'')}</textarea>`:`<input id="imp-error-${i}-${col}" data-error-index="${i}" data-error-field="${col}" value="${esc(e.vals[col]||'')}" ${col===0?'placeholder="TT.MM.JJJJ"':''}>`}</div>`).join('')}</div></details><div class="btnrow" style="margin-top:10px"><button class="btn primary" type="button" data-error-fix="${i}">Korrigierte Zeile prüfen</button><button class="btn" type="button" data-error-skip="${i}">${e.skipped?'Wieder zur Prüfung öffnen':'Bewusst nicht importieren'}</button></div><p class="small">${e.skipped?'⚠ Diese Zeile wird ausdrücklich nicht importiert.':'Kein automatisches Überspringen: Die Zeile bleibt blockiert, bis sie korrigiert oder bewusst ausgelassen wird.'}</p></div>`).join('');
+ wrap.innerHTML=importRejected.map((e,i)=>`<div class="importreviewcard importerrorcard" data-import-error="${i}"><h3>⚠ ${esc(e.source||'')} Zeile ${e.number}: nicht verarbeitet</h3><p class="msg error">${esc(e.reason)}</p><details ${e.skipped?'':'open'}><summary>Originaldaten kontrollieren und korrigieren</summary><div class="importerrorgrid">${IMPORT_COLUMNS.map((name,col)=>`<div class="field"><label for="imp-error-${i}-${col}">${esc(name)}</label>${col===8?`<textarea id="imp-error-${i}-${col}" data-error-index="${i}" data-error-field="${col}" rows="2">${esc(e.vals[col]||'')}</textarea>`:`<input id="imp-error-${i}-${col}" data-error-index="${i}" data-error-field="${col}" value="${esc(e.vals[col]||'')}" ${col===0?'placeholder="TT.MM.JJJJ"':''}>`}</div>`).join('')}</div></details><div class="btnrow" style="margin-top:10px"><button class="btn primary" type="button" data-error-fix="${i}">Korrigierte Zeile prüfen</button><button class="btn" type="button" data-error-skip="${i}">${e.skipped?'Wieder zur Prüfung öffnen':'Bewusst nicht importieren'}</button></div><p class="small">${e.skipped?'⚠ Diese Zeile wird ausdrücklich nicht importiert.':'Kein automatisches Überspringen: Die Zeile bleibt blockiert, bis sie korrigiert oder bewusst ausgelassen wird.'}</p></div>`).join('');
 }
 function renderImportReview(){
  const box=$('importreview');if(!box)return;
  box.innerHTML=importDecisions.map((d,i)=>{
   const selection=d.action==='update',multiple=d.candidates.length>1;
-  return `<div class="importreviewcard" data-import-review="${i}"><h3>Zeile ${i+1}: ${esc(d.incoming.customer||'Kunde unbekannt')} · ${esc(dayFmt(d.incoming.date))} · ${esc(importWeekLabel(d.incoming.date))}</h3>
-   <div class="small">M365: ${esc(d.incoming.location||'Ort unbekannt')} · Ticket ${esc(d.incoming.ticket||'–')} · ${d.incoming.km==null?'km unbekannt':d.incoming.km+' km'} · ${d.incoming.travel==null?'Reise unbekannt':fmtH(d.incoming.travel)+' h'}</div>
+  return `<div class="importreviewcard" data-import-review="${i}"><h3>${esc(d.sourceLabel||'Zeile '+(i+1))}: ${esc(d.incoming.customer||'Kunde unbekannt')} · ${esc(dayFmt(d.incoming.date))} · ${esc(importWeekLabel(d.incoming.date))}</h3>
+   <div class="small">${importSourceMode==='excel'?'Excel':'M365'}: ${esc(d.incoming.location||'Ort unbekannt')} · Ticket ${esc(d.incoming.ticket||'–')} · ${d.incoming.km==null?'km unbekannt':d.incoming.km+' km'} · ${d.incoming.travel==null?'Reise unbekannt':fmtH(d.incoming.travel)+' h'}</div>
    <div class="${d.candidates.length?'importalert':'small'}">${d.candidates.length?`${d.candidates.length} mögliche(r) bestehende(r) Einsatz/Einsätze gefunden. Bitte Datensatz vergleichen.`:'Kein passender bestehender Einsatz an diesem Datum gefunden.'}</div>
    <div class="row"><div class="field"><label for="import-action-${i}">Aktion für diese Zeile</label><select id="import-action-${i}" data-import-action="${i}"><option value="review" ${d.action==='review'?'selected':''} disabled>Bitte Entscheidung treffen</option><option value="update" ${d.action==='update'?'selected':''} ${d.candidates.length?'':'disabled'}>Bestehenden Einsatz aktualisieren</option><option value="create" ${d.action==='create'?'selected':''}>Neuen Einsatz anlegen</option><option value="skip" ${d.action==='skip'?'selected':''}>Nicht übernehmen</option></select></div>
    ${d.candidates.length?`<div class="field"><label for="import-target-${i}">Welchen vorhandenen Einsatz?</label><select id="import-target-${i}" data-import-target="${i}" ${selection?'':'disabled'}><option value="">${multiple?'Bitte Einsatz auswählen':'Bestehenden Einsatz auswählen'}</option>${d.candidates.map(c=>`<option value="${esc(c.entry.id)}" ${d.targetId===c.entry.id?'selected':''}>${esc(c.entry.customer||'Kunde fehlt')} · ${esc(c.entry.location||'ohne Ort')} · ${esc(c.entry.ticket||'ohne Ticket')} · ${esc(c.entry.start||'–')}–${esc(c.entry.end||'–')} ${c.unassigned?'· bisher ohne Kundenname':c.nameScore<95?'· ähnlicher Name':''}</option>`).join('')}</select></div>`:''}</div>
@@ -1235,6 +1299,161 @@ async function permanentlyDeleteTechnicianProfile(id){
 }
 function sampleWeek(){let pid=db.selected,y=2026,w=40,k=wkKey(y,w,pid),prior=db.weeks[k];if(prior&&prior.entries.length){toast('KW 40 enthält schon Einsätze; Beispiel wird nicht darübergeschrieben.',true);return}const x=[['2026-09-28','90001','Demo Bäckerei A','BAD DRIBURG',418,300,'12:30','17:00','Einsatz'],['2026-09-29','90002','Demo Bäckerei B','KÖLN',106,90,'14:00','19:00','Einsatz'],['2026-09-29','','Homeoffice','',0,0,'08:30','12:00','Homeoffice'],['2026-09-30','','Homeoffice','',0,0,'08:30','12:30','Homeoffice'],['2026-10-01','','Demo Bäckerei C','Essen',108,120,'11:00','12:45','Einsatz'],['2026-10-01','','Homeoffice','',0,0,'14:00','16:30','Homeoffice'],['2026-10-02','','Homeoffice','',0,0,'08:30','12:30','Homeoffice']];db.weeks[k]={entries:x.map((v,i)=>({id:'sample'+i,date:v[0],ticket:v[1],customer:v[2],location:v[3],km:v[4],travel:v[5],start:v[6],end:v[7],type:v[8],note:''})),openingOverride:18.75,extraNote:''};switchWeek(y,w);toast('Beispielwoche KW 40 geladen. Abgleich: 33:45 Stunden, 632 km, Saldo 12,50 Std.')}
 function tsvExport(){const head='Datum\tTicket\tKunde\tOrt\tgef. km\tReisezeit\tBeginn\tEnde\tBemerkung';const rows=week().entries.map(e=>[dayFmt(e.date),e.ticket,e.customer,e.location,e.km,e.travel==null?'':fmtH(netTravelM(e)),e.start,e.end,e.note].map(v=>String(v??'').replace(/[\t\n\r]/g,' ')).join('\t'));download(new Blob(['\ufeff'+[head,...rows].join('\r\n')],{type:'text/tab-separated-values;charset=utf-8'}),`Einsatzdaten_KW${sel.week}_${sel.year}.tsv`)}
+
+/* V2.10 – Archivimport bereits fertiger Excel-Wochenberichte, ohne Excel-Makros auszuführen.
+   We reuse the confirmed M365 diff/transaction workflow, rather than silently writing rows. */
+function clearHistoricImportPreview(){
+ importSourceMode='m365';importTargetProfileId=null;importProfileMismatch=false;
+ pendingImport=[];importDecisions=[];importRejected=[];importWarnings=[];importDuplicates=0;
+ $('excelprofilewarn').hidden=true;$('excelprofileoverride').checked=false;
+ for(const id of ['importresult','importreview','importerrors'])$(id).innerHTML='';
+ $('doimport').disabled=true;
+}
+function historicExcelTextXml(xml,label){
+ const doc=new DOMParser().parseFromString(xml,'application/xml');
+ if(doc.getElementsByTagName('parsererror').length||!doc.documentElement)throw Error(label+': Excel-XML konnte nicht gelesen werden.');
+ return doc;
+}
+function historicExcelCells(xml,shared,fileLabel){
+ const doc=historicExcelTextXml(xml,fileLabel),nodes=Array.from(doc.getElementsByTagName('c'));
+ if(nodes.length>30000)throw Error('Zu viele Zellen im Excel-Blatt.');
+ const rows=new Map();
+ for(const c of nodes){
+  const pos=String(c.getAttribute('r')||'').match(/^([A-Z]{1,3})(\d{1,5})$/);if(!pos)continue;
+  let col=0;for(const ch of pos[1])col=col*26+ch.charCodeAt(0)-64;col--;
+  const row=Number(pos[2]);if(row>3000||col>100)continue;
+  let raw=c.getElementsByTagName('v')[0]?.textContent??'';
+  const t=c.getAttribute('t');
+  if(t==='s'){const ix=Number(raw);if(!Number.isInteger(ix)||ix<0||ix>=shared.length)throw Error('Ungültiger Verweis auf Excel-Texttabelle.');raw=shared[ix]}
+  else if(t==='inlineStr'){raw=Array.from(c.getElementsByTagName('is')[0]?.getElementsByTagName('t')||[]).map(t=>t.textContent).join('')}
+  else if(t==='str'){raw=String(raw)}
+  else if(t==='e'){throw Error('Excel-Zelle '+pos[0]+' enthält einen Formel-Fehler '+raw)}
+  if(!rows.has(row))rows.set(row,new Map());rows.get(row).set(col,String(raw??'').replace(/\u00a0/g,' ').trim());
+ }
+ return rows;
+}
+function historicExcelDate(cell){
+ let v=String(cell??'').trim();if(!v)return null;
+ if(/^\d{4,5}(?:\.0+)?$/.test(v))v=String(Math.round(+v));
+ return parseDate(v);
+}
+function historicExcelTime(v,clock=false){
+ const raw=String(v??'').trim();if(!raw)return '';
+ if(/^\d+(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(raw)){
+  const n=Number(raw);if(!Number.isFinite(n)||n<0||n>60)throw Error('Ungültiger Excel-Zeitwert: '+raw);
+  const minutes=Math.round(n*1440);
+  if(clock){if(minutes>=1440||minutes<0)throw Error('Excel-Uhrzeit außerhalb 00:00–23:59');return toClock(Math.ceil(minutes/15)*15%1440)}
+  return fmtH(Math.ceil(minutes/15)*15);
+ }
+ if(clock){const s=raw.match(/^(\d{1,2}):(\d\d)(?::\d\d)?$/);if(!s||+s[1]>23||+s[2]>59)throw Error('Unbekannte Excel-Uhrzeit '+raw);return ceilClock(`${s[1]}:${s[2]}`)}
+ return fmtH(travelM(raw));
+}
+function historicExcelSplitName(c){
+ const name=String(c||'').trim().replace(/\s+/g,' ');
+ const pos=name.lastIndexOf(' | ');
+ if(pos<1)return {customer:name,location:'',unsplit:Boolean(name&&!/^(homeoffice|urlaub|sonderurlaub|krankheit|feiertag|freizeitausgleich)$/i.test(name))};
+ return {customer:name.slice(0,pos).trim(),location:name.slice(pos+3).trim(),unsplit:false};
+}
+function historicExcelParseSheet(rows,filename,sheetName){
+ let header=0,found=[];
+ const cell=(row,col)=>rows.get(row)?.get(col)||'';
+ for(let i=1;i<=30;i++)if(/^datum$/i.test(cell(i,0))&&/ticket/i.test(cell(i,1))&&/km/i.test(cell(i,3))&&/zeit/i.test(cell(i,4))){header=i;break}
+ if(!header)return null;
+ const result={rows:[],warnings:[],rejected:[],technician:cell(header-3,0)||cell(2,0),personnel:cell(header-3,3)||cell(2,3)};
+ let currentDate=null;
+ const maxRow=Math.min(3000,Math.max(...rows.keys()));
+ for(let row=header+1;row<=maxRow;row++){
+  const a=cell(row,0),b=cell(row,1),c=cell(row,2),km=cell(row,3),travel=cell(row,4),start=cell(row,5),end=cell(row,6),work=cell(row,7);
+  if(/^(bemerkungen?|gesamt\s*:?|freizeitausgleich)/i.test(a)){
+   if(/^bemerkungen?/i.test(a))break;
+   continue;
+  }
+  if(a){
+   const parsed=historicExcelDate(a);
+   if(parsed)currentDate=parsed;
+   else{
+    currentDate=null;
+    if([b,c,km,travel,start,end,work].some(v=>String(v).trim()!=='')){
+     result.rejected.push({number:row,source:filename+' / '+sheetName,vals:[a,b,c,'','','','','',''],reason:'Datumswert „'+a+'“ ist ungültig. Bitte das richtige Datum vor dem Import eintragen.',skipped:false});
+     continue;
+    }
+   }
+  }
+  const hasData=[b,c,km,travel,start,end,work].some(v=>String(v).trim()!=='');
+  if(!hasData)continue;
+  const parts=historicExcelSplitName(c);
+  let vals=[currentDate?dayFmt(currentDate):'',b==='0'?'':b,parts.customer,parts.location,'','','','',''];
+  try{
+   if(!parts.customer&&!b&&!km&&!travel&&!start&&!end&&!work)continue;
+   if(km!==''){const parsed=Number(km.replace(',','.'));if(!Number.isInteger(parsed)||parsed<0||parsed>10000)throw Error('Kilometerwert ungültig');vals[4]=String(parsed)}
+   vals[5]=historicExcelTime(travel);
+   vals[6]=historicExcelTime(start,true);
+   vals[7]=historicExcelTime(end,true);
+   if(work!==''){
+    const d=historicExcelTime(work);
+    if(d&&!((vals[6]&&vals[7])&&shiftMins({date:currentDate||'2000-01-01',start:vals[6],end:vals[7]})===travelM(d)))
+     vals[8]='Arbeitszeit vor Ort: '+d;
+   }
+  }catch(error){result.rejected.push({number:row,source:filename+' / '+sheetName,vals,reason:error.message,skipped:false});continue}
+  if(parts.unsplit)result.warnings.push(`${filename} / ${sheetName}, Zeile ${row}: Kunde und Ort nicht eindeutig getrennt. Ortsangabe bitte in der Vorschau prüfen.`);
+  if(!currentDate)result.rejected.push({number:row,source:filename+' / '+sheetName,vals,reason:'Datum fehlt: Keine Datumsangabe für diese Einsatzzeile gefunden.',skipped:false});
+  else result.rows.push({vals,source:filename+' / '+sheetName+' / Zeile '+row,number:row});
+ }
+ if(!result.rows.length&&!result.rejected.length)result.warnings.push(filename+' / '+sheetName+': Keine ausgefüllten Einsatzzeilen gefunden.');
+ return result;
+}
+async function historicExcelReadFiles(files,chosenProfile){
+ const result={rows:[],labels:[],rejected:[],warnings:[],fatal:[],mismatches:[],filenames:files.map(f=>f.name),duplicates:0};
+ if(files.length>100){result.fatal.push('Maximal 100 Dateien je Importvorgang auswählen.');return result}
+ const seen=new Set();
+ for(const file of files){
+  try{
+   if(!/\.(?:xlsx|xlsm)$/i.test(file.name))throw Error('Nur .xlsx und .xlsm sind zulässig. Ältere .xls-Dateien bitte zuerst als .xlsx speichern.');
+   if(!file.size||file.size>12*1024*1024)throw Error('Datei ist leer oder größer als 12 MB.');
+   const bytes=await file.arrayBuffer();const head=new Uint8Array(bytes.slice(0,4));
+   if(head[0]!==0x50||head[1]!==0x4b)throw Error('Keine gültige Excel-ZIP-Datei.');
+   const zip=await JSZip.loadAsync(bytes,{checkCRC32:true});
+   if(!zip.file('[Content_Types].xml')||!zip.file('xl/workbook.xml'))throw Error('Excel-Dateistruktur fehlt oder ist beschädigt.');
+   let shared=[];
+   if(zip.file('xl/sharedStrings.xml')){
+    const ss=zip.file('xl/sharedStrings.xml');if(ss._data?.uncompressedSize>10*1024*1024)throw Error('Excel-Texttabelle zu groß.');
+    const doc=historicExcelTextXml(await ss.async('string'),file.name);
+    shared=Array.from(doc.getElementsByTagName('si')).map(si=>Array.from(si.getElementsByTagName('t')).map(t=>t.textContent).join(''));
+   }
+   const sheets=Object.keys(zip.files).filter(x=>/^xl\/worksheets\/sheet\d+\.xml$/.test(x)).sort((a,b)=>Number(a.match(/sheet(\d+)/)[1])-Number(b.match(/sheet(\d+)/)[1]));
+   if(!sheets.length||sheets.length>40)throw Error('Keine lesbaren Excel-Arbeitsblätter gefunden oder zu viele Blätter.');
+   let recognized=0;
+   for(const sheet of sheets){
+    const entry=zip.file(sheet);if(entry._data?.uncompressedSize>15*1024*1024)throw Error('Excel-Arbeitsblatt ist zu groß.');
+    const rows=historicExcelCells(await entry.async('string'),shared,file.name);
+    const content=historicExcelParseSheet(rows,file.name,sheet.split('/').at(-1));
+    if(!content)continue;
+    recognized++;
+    const name=String(content.technician||'').trim(),nr=String(content.personnel||'').trim();
+    const matchesName=name&&importCompareName(name)===importCompareName(chosenProfile.name);
+    const matchesNr=nr&&String(nr).replace(/^0+(?=\d)/,'')===String(chosenProfile.personnel||'').replace(/^0+(?=\d)/,'');
+    if((name||nr)&&!matchesName&&!matchesNr)result.mismatches.push(`${file.name}: ${name||'Name fehlt'} / P.Nr. ${nr||'–'} ≠ ${chosenProfile.name} / ${chosenProfile.personnel}`);
+    result.warnings.push(...content.warnings);
+    result.rejected.push(...content.rejected);
+    for(const item of content.rows){
+     const parsed=parseImport(item.vals.join('\t'));
+     if(parsed.rejected.length){for(const err of parsed.rejected)result.rejected.push({...err,number:item.number,source:item.source,skipped:false});continue}
+     result.warnings.push(...parsed.issues.map(s=>item.source+': '+s));
+     for(const row of parsed.rows){
+      const sig=[row.date,row.ticket,row.customer,row.location,row.km,row.travel,row.start,row.end,row.note].map(v=>String(v??'').toLowerCase().trim()).join('|');
+      if(seen.has(sig)){result.duplicates++;result.warnings.push(item.source+': Identische Excel-Einsatzzeile bereits in diesem Sammelimport vorhanden; einmal berücksichtigt.');continue}
+      seen.add(sig);result.rows.push(row);result.labels.push(item.source);
+     }
+    }
+   }
+   if(!recognized)throw Error('Die originale Wochenbericht-KW-Spaltenstruktur wurde nicht gefunden (Datum / Ticket / Kunde-Ort / km / Zeit).');
+  }catch(e){result.fatal.push(file.name+': '+e.message)}
+ }
+ if(result.rows.length>3000)result.fatal.push('Mehr als 3000 Einsätze erkannt. Bitte den Import auf mehrere Vorgänge aufteilen.');
+ if(!result.rows.length&&!result.rejected.length)result.fatal.push('Keine importierbaren Einsätze gefunden. Bitte ausgefüllte Wochenberichte auswählen.');
+ return result;
+}
+
 function init(){$('historymonth').value=historyMonth;$('historyyear').value=new Date().getFullYear();showHistoryPeriodFields();renderProfiles();renderWeek();const oldDraft=db.draft;if(oldDraft&&oldDraft.week===wkKey()&&oldDraft.values){editing=oldDraft.editing||null;Object.entries(oldDraft.values).forEach(([k,v])=>{if($(k))$(k).value=v});if(editing){$('formtitle').textContent='Eintrag bearbeiten';$('saveentry').textContent='Änderungen speichern'}calculatePreview()}else newEntry();$('prompttext').value=currentPrompt();
  document.querySelectorAll('.tab,#mobilemenu .mobilelink[data-tab]').forEach(x=>x.addEventListener('click',()=>setTab(x.dataset.tab)));
  $('mobilefinish').onclick=()=>{closeMobileMenu();wbOpenFinishDialog()};
@@ -1270,7 +1489,7 @@ function init(){$('historymonth').value=historyMonth;$('historyyear').value=new 
  $('historysearch').addEventListener('input',renderHistory);
  $('historylist').addEventListener('click',event=>{const btn=event.target.closest('button');if(!btn)return;if(btn.hasAttribute('data-history-reuse'))reuseFromHistory(Number(btn.dataset.historyReuse));else if(btn.hasAttribute('data-history-edit'))editFromHistory(Number(btn.dataset.historyEdit));else if(btn.hasAttribute('data-history-delete'))deleteFromHistory(Number(btn.dataset.historyDelete))});
  $('helppage').addEventListener('click',event=>{const btn=event.target.closest('button[data-help-tab]');if(btn){setTab(btn.dataset.helpTab);window.scrollTo({top:0,behavior:'smooth'})}});
- $('profile').addEventListener('change',e=>{db.selected=e.target.value;editing=null;persist();renderWeek();newEntry()});
+ $('profile').addEventListener('change',e=>{db.selected=e.target.value;editing=null;persist();renderWeek();if($('excelprofile'))$('excelprofile').textContent=profile().name+' (Personalnummer '+profile().personnel+')';newEntry()});
  $('addprofile').onclick=()=>askProfile(false);$('editprofile').onclick=()=>askProfile(true);$('deleteprofile').onclick=deleteTechnicianProfile;
  $('profileform').addEventListener('submit',saveProfileForm);$('profilecancel').onclick=closeProfileForm;
  $('profilemodal').addEventListener('click',e=>{if(e.target===$('profilemodal'))closeProfileForm()});
@@ -1288,7 +1507,35 @@ function init(){$('historymonth').value=historyMonth;$('historyyear').value=new 
  $('entryform').addEventListener('submit',async event=>{event.preventDefault();const btn=$('saveentry');if(btn.disabled)return;btn.disabled=true;try{const input=formValues();await storeEntry(input);newEntry();toast(input.start&&!input.end?'Laufender Einsatz dauerhaft gespeichert – Ende kannst du später ergänzen.':'Einsatz dauerhaft in der lokalen Datenbank gespeichert.');if(input.start&&!input.end){$('formmessage').className='msg success';$('formmessage').textContent='Begonnener Einsatz gespeichert. Unter „Erfasste Einsätze“ über „Jetzt stoppen“ beenden.'}}catch(er){$('formmessage').textContent=er.message;$('formmessage').className='msg error';toast('Speicherung nicht abgeschlossen: '+er.message,true)}finally{btn.disabled=false;wbRenderStatus()}});
  $('entrylist').addEventListener('click',event=>{let a=event.target.closest('button,a');if(!a)return;if(a.hasAttribute('data-day')){event.preventDefault();newEntry(a.dataset.day);document.getElementById('entryform').scrollIntoView({behavior:'smooth',block:'start'});return}let id=a.dataset.edit||a.dataset.delete||a.dataset.stop;if(!id)return;let e=week().entries.find(x=>x.id===id);if(!e)return;if(a.dataset.edit)fillEntry(e);else if(a.dataset.delete){if(confirm('Diesen Eintrag wirklich löschen?')){week().entries=week().entries.filter(x=>x.id!==id);persist();renderWeek();toast('Eintrag entfernt – lokale Speicherung läuft.')}}else if(a.dataset.stop){a.disabled=true;finishRunningEntry({entry:e,weekKey:wkKey()}).then(()=>toast('Einsatz beendet und gespeichert.')).catch(er=>{toast(er.message,true);a.disabled=false})}});
  $('copyprompt').onclick=async()=>{try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(currentPrompt())}else{$('prompttext').focus();$('prompttext').select();if(!document.execCommand('copy'))throw Error('Browser verweigert Kopieren')} $('copystatus').textContent='Kopiert ✓';toast('Copilot-Prompt kopiert.')}catch(e){$('copystatus').textContent='Text markieren und manuell kopieren';toast('Manuell mit Strg+C kopieren.',true)}};
+
+ $('excelcheck').addEventListener('click',async()=>{
+  const btn=$('excelcheck'),files=Array.from($('historicexcelfiles').files||[]);
+  if(!files.length){$('excelstatus').textContent='Bitte zuerst mindestens eine ausgefüllte Excel-Datei auswählen.';return}
+  btn.disabled=true;$('doimport').disabled=true;$('excelstatus').textContent='Excel-Dateien werden geprüft …';
+  try{
+   const result=await historicExcelReadFiles(files,profile());
+   if(result.fatal.length){
+    clearHistoricImportPreview();
+    $('excelstatus').innerHTML='<div class="msg error"><strong>Kein Import vorbereitet.</strong> '+result.fatal.map(esc).join('<br>')+'</div>';
+    return;
+   }
+   importSourceMode='excel';importTargetProfileId=db.selected;importProfileMismatch=Boolean(result.mismatches.length);
+   $('excelprofilewarn').hidden=!importProfileMismatch;$('excelprofileoverride').checked=false;
+   pendingImport=result.rows;
+   importDecisions=importDecisionRows(pendingImport,importAllCurrentEntries());
+   for(let i=0;i<importDecisions.length;i++)importDecisions[i].sourceLabel=result.labels[i];
+   importRejected=result.rejected;importWarnings=result.warnings;importDuplicates=result.duplicates;
+   $('excelstatus').innerHTML=`<div class="msg ${importProfileMismatch?'error':'success'}"><strong>${files.length} Datei(en) geprüft · ${result.rows.length} Einsatzzeilen erkannt · ${result.rejected.length} fehlerhafte Zeile(n).</strong><div class="small">${esc(result.filenames.join(', '))}</div>${importProfileMismatch?'<p><strong>Technikerzuordnung prüfen:</strong> '+result.mismatches.map(esc).join('; ')+'</p>':'<p>Technikerzuordnung bestätigt.</p>'}<p>Übernahmevorschau oberhalb prüfen. Noch nichts gespeichert.</p></div>`;
+   renderImportRejected();renderImportReview();
+   $('importreview').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){clearHistoricImportPreview();$('excelstatus').innerHTML=`<div class="msg error">Excel-Dateien nicht verarbeitet: ${esc(e.message)}</div>`}
+  finally{btn.disabled=false}
+ });
+ $('excelclear').addEventListener('click',()=>{$('historicexcelfiles').value='';clearHistoricImportPreview();$('excelstatus').textContent='Dateiauswahl entfernt. Es wurden keine Einsatzdaten verändert.'});
+ $('excelprofileoverride').addEventListener('change',importStatusReport);
+ $('historicexcelfiles').addEventListener('change',()=>{clearHistoricImportPreview();$('excelstatus').textContent=$('historicexcelfiles').files.length+' Datei(en) ausgewählt. Zum Einlesen auf „Excel-Dateien auslesen und prüfen“ tippen.'});
  $('checkimport').onclick=()=>{
+  importSourceMode='m365';importTargetProfileId=db.selected;importProfileMismatch=false;$('excelprofilewarn').hidden=true;
   const result=parseImport($('importtext').value);
   pendingImport=result.rows;importDecisions=importDecisionRows(pendingImport,importAllCurrentEntries());
   importRejected=result.rejected;importWarnings=result.issues;importDuplicates=result.duplicates;
@@ -1330,6 +1577,8 @@ function init(){$('historymonth').value=historyMonth;$('historyyear').value=new 
  },true);
  $('doimport').onclick=async()=>{
   if(!importDecisions.length||importRejected.some(row=>!row.skipped))return;
+  if(importTargetProfileId&&importTargetProfileId!==db.selected){toast('Das Zielprofil wurde gewechselt. Bitte Dateien erneut prüfen.',true);return}
+  if(importSourceMode==='excel'&&importProfileMismatch&&!$('excelprofileoverride').checked){toast('Bitte die abweichende Technikerzuordnung ausdrücklich bestätigen.',true);return}
   const btn=$('doimport');btn.disabled=true;
   const original=JSON.parse(JSON.stringify(db));
   try{
@@ -1347,18 +1596,18 @@ function init(){$('historymonth').value=historyMonth;$('historyyear').value=new 
     if(!proposed.modified.has(key+'|'+id))continue;
     const item=db.weeks[key]?.entries?.find(x=>x.id===id);
     if(!item)throw Error('Importziel nicht gefunden – Speicherung abgebrochen.');
-    const c=customerUpsert(item,{source:'M365-Import'});if(c)item.customerMasterId=c.id;
+    const c=customerUpsert(item,{source:importSourceMode==='excel'?'Excel-Archivimport':'M365-Import'});if(c)item.customerMasterId=c.id;
    }
    await WBStore.save(db);
    const discarded=importRejected.filter(r=>r.skipped).map(r=>r.number);pendingImport=[];importDecisions=[];importRejected=[];$('importreview').innerHTML='';$('importerrors').innerHTML='';
    renderWeek();renderCustomers();
    const affected=proposed.affected.map(k=>{const [,y,w]=k.split('|');return 'KW '+w+'/'+y;});
-   const label=`${proposed.updates} bestehende Einsätze aktualisiert, ${proposed.added} neu angelegt, ${proposed.skipped} ohne Änderung. ${discarded.length} fehlerhafte Zeilen bewusst ausgelassen${discarded.length?' (Zeilen '+discarded.join(', ')+')':''}. Betroffene Wochen: ${affected.join(', ')}. Die zuvor gewählte KW bleibt unverändert.`;
+   const label=`${importSourceMode==='excel'?'Excel-Archivimport: ':'M365-Import: '}${proposed.updates} bestehende Einsätze aktualisiert, ${proposed.added} neu angelegt, ${proposed.skipped} ohne Änderung. ${discarded.length} fehlerhafte Zeilen bewusst ausgelassen${discarded.length?' (Zeilen '+discarded.join(', ')+')':''}. Betroffene Wochen: ${affected.join(', ')}. Die zuvor gewählte KW bleibt unverändert.`;
    toast(label);$('importresult').innerHTML=`<div class="msg success">${esc(label)} Manuelle Zeiten blieben vorausgefüllt; deine Änderungen aus der Vorschau wurden übernommen.</div>`;
-  }catch(error){db=original;toast('M365-Import nicht gespeichert: '+error.message,true);$('importresult').innerHTML=`<div class="msg error">${esc(error.message)} Kein bestätigter Import abgeschlossen. Auswahl korrigieren und erneut versuchen.</div>`}
+  }catch(error){db=original;toast((importSourceMode==='excel'?'Excel-Import':'M365-Import')+' nicht gespeichert: '+error.message,true);$('importresult').innerHTML=`<div class="msg error">${esc(error.message)} Kein bestätigter Import abgeschlossen. Auswahl korrigieren und erneut versuchen.</div>`}
   finally{btn.disabled=!importDecisions.length}
  };
- $('importtext').oninput=()=>{$('doimport').disabled=true;pendingImport=[];importDecisions=[];importRejected=[];importWarnings=[];importDuplicates=0;$('importresult').innerHTML='';$('importreview').innerHTML='';$('importerrors').innerHTML=''};$('clearimport').onclick=()=>{$('importtext').value='';$('importtext').dispatchEvent(new Event('input'))};
+ $('importtext').oninput=()=>{importSourceMode='m365';importProfileMismatch=false;$('excelprofilewarn').hidden=true;$('doimport').disabled=true;pendingImport=[];importDecisions=[];importRejected=[];importWarnings=[];importDuplicates=0;$('importresult').innerHTML='';$('importreview').innerHTML='';$('importerrors').innerHTML=''};$('clearimport').onclick=()=>{$('importtext').value='';$('importtext').dispatchEvent(new Event('input'))};
  $('extraNote').addEventListener('change',()=>{week().extraNote=$('extraNote').value;persist();renderPaper()});
  $('printreport').onclick=()=>window.print();$('exportxlsx').onclick=async()=>{const btn=$('exportxlsx');btn.disabled=true;btn.textContent='Excel wird erstellt…';try{const {issues,omitted}=reportProblems();if(issues.length){setTab('previewpage');renderExportChecks();if(!confirm('Vor dem Export wurden '+issues.length+' Hinweise gefunden. Bitte die Exportprüfung beachten. Trotzdem exportieren?'))return}const r=await makeXLSX();const result=await wbExportFile(r.blob,r.filename);if(omitted.length){const supplement=extraReportFile(week().entries);await wbExportFile(supplement.blob,supplement.filename);toast('Original-Excel und vollständige Wochenübersicht exportiert. '+omitted.length+' Einsätze stehen nur in der Zusatzdatei.')}else toast(result==='folder'?'Wochenbericht im gewählten Exportordner gespeichert.':'Wochenbericht als Excel-Datei heruntergeladen.')}catch(e){toast('Excel-Export: '+e.message,true)}finally{btn.disabled=false;btn.textContent='Excel (.xlsx) exportieren'}};
  $('backup').onclick=()=>download(new Blob([JSON.stringify({...db,exportDate:new Date().toISOString()},null,2)],{type:'application/json'}),'Wochenbericht_Datensicherung_'+dateISO(new Date())+'.json');
@@ -1381,9 +1630,16 @@ let WB_SUSPEND_PERSIST=false;
 function wbRenderStatus(){const s=WBStore.status(),$x=id=>document.getElementById(id);if(!$x('wbmode'))return;
 const modes={browser_local:'Nur dieses Gerät (IndexedDB)',local_folder:'Lokaler Ordner',cloud:'Cloud-Synchronisationsordner'};
 $x('wbmode').textContent=modes[s.mode]||s.mode;$x('wbfolder').textContent=s.name||'Kein Ordner verbunden';$x('wblocal').textContent=s.saveFailed?'Speicherung fehlgeschlagen – erneut versuchen':s.saving?'Lokaler Speichervorgang läuft …':s.pending?'Lokal gespeichert · Änderungen warten auf Synchronisierung':'Lokal gespeichert';
-$x('wblocal').style.color=s.saveFailed?'#a53232':'#14794f';if($x('saved'))$x('saved').textContent=s.saveFailed?'Speicherung fehlgeschlagen':s.saving?'Speichere in IndexedDB …':'Lokal gespeichert';$x('wbsync').textContent=s.unpublished?'Wiederhergestellter Stand ist noch nicht veröffentlicht':s.syncing?'Synchronisierung läuft …':s.lastError|| (s.mode==='browser_local'?'Keine automatische Ordnersynchronisierung':s.pending?'Lokale Änderungen warten auf Synchronisierung':'Zuletzt erfolgreich synchronisiert: '+(s.syncedAt?new Date(s.syncedAt).toLocaleString('de-DE'):'noch nie'));
+$x('wblocal').style.color=s.saveFailed?'#a53232':'#14794f';if($x('saved'))$x('saved').textContent=s.saveFailed?'Speicherung fehlgeschlagen':s.saving?'Speichere in IndexedDB …':'Lokal gespeichert';$x('wbsync').textContent=s.mode!=='browser_local'&&!s.hasHandle?'Ordnerverknüpfung fehlt – bitte erneut verbinden (Browserdaten bleiben erhalten)':s.mode!=='browser_local'&&s.folderAccess==='needs_permission'?'Ordnerzugriff erneut freigeben – nur lokal gespeichert':s.unpublished?'Wiederhergestellter Stand ist noch nicht veröffentlicht':s.syncing?'Synchronisierung läuft …':s.lastError|| (s.mode==='browser_local'?'Keine automatische Ordnersynchronisierung':s.pending?'Lokale Änderungen warten auf Synchronisierung':'Zuletzt erfolgreich synchronisiert: '+(s.syncedAt?new Date(s.syncedAt).toLocaleString('de-DE'):'noch nie'));
 $x('wbsync').style.color=s.lastError?'#a53232':'';$x('wbheadsaved').textContent=s.saveFailed?'Speicherfehler':s.saving?'Speicherung läuft …':s.pending?'Lokal gespeichert · Datei ausstehend':'Lokal gespeichert';$x('wbretry').hidden=!s.saveFailed;
 $x('wbregrant').hidden=!s.hasHandle;$x('wbsetupregrant').hidden=!s.hasHandle;
+ const diag=$x('wbfolderdiagnostic');if(diag){
+  const unavailable=s.mode!=='browser_local'&&!s.hasHandle,needsPermission=s.mode!=='browser_local'&&s.hasHandle&&s.folderAccess==='needs_permission';
+  diag.hidden=!(unavailable||needsPermission);
+  if(unavailable)diag.innerHTML='<strong>Ordnerverknüpfung nicht mehr verfügbar.</strong> Deine Einträge sind weiterhin lokal gespeichert. Bitte den <strong>gleichen</strong> Ordner mit „Cloud-Synchronisationsordner verbinden“ oder „Lokalen Ordner verbinden“ erneut auswählen. Es darf keine neue Datenbank erstellt werden. Auf Smartphones ohne Ordnerzugriff ist stattdessen ein manueller .db-Dateiaustausch nötig.';
+  else if(needsPermission)diag.innerHTML='<strong>Ordner noch verbunden, Browserberechtigung fehlt.</strong> Bitte auf „Ordnerzugriff erneut freigeben“ tippen. Die lokalen Daten sind erhalten; die Ordnerdatei wurde noch nicht aktualisiert.';
+ }
+
 $x('wbconnectlocal').disabled=!s.hasPicker;$x('wbconnectcloud').disabled=!s.hasPicker;
 $x('wbunpublished').hidden=!s.unpublished;
 $x('wbtechinfo').textContent='Dateiformat: SQLite · wochenberichte.db · Datenbankrevision '+s.revision; if($x('helpdbrev'))$x('helpdbrev').textContent=String(s.revision);
