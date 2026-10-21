@@ -1,42 +1,41 @@
-# Wochenbericht Lovrencic – Version 2.11.0
+# Wochenbericht Lovrencic – Version 2.13.0
 
-Standalone-HTML-Anwendung für Servicetechniker mit IndexedDB, SQLite-Datei `wochenberichte.db`, Import von M365-Ergebnissen und historischen Excel-Wochenberichten sowie Excel-Export in der ursprünglichen Wochenberichtvorlage.
+Offlinefähige HTML-Anwendung für die mobile Erfassung von Fahrten, Pausen, Arbeitszeit und Wochenberichten im ursprünglichen Excel-Format.
 
-## Neu in 2.11.0
+## Neu: Fahrten- und Einsatzassistent
 
-- **Automatischer Importabgleich:** Bei mehreren alten Excel-Wochenberichten bzw. M365-Zeilen werden bereits identische Einsätze ohne weitere Abfrage übersprungen. Neue Einträge werden gesammelt vorgemerkt. Nur bei echten Abweichungen oder unsicheren Kundenzuordnungen wird nachgefragt.
-- **Sammelauswahl:** Eindeutige Abweichungen gesammelt zur Aktualisierung auswählen; offene Prüffälle gesammelt überspringen oder zurücksetzen. Unklare Filialen werden nicht automatisch zugeordnet.
-- **Korrekte Vergleichsdaten:** „Bisher gespeichert“ bezeichnet stets den konkret gewählten Datensatz aus der lokalen Arbeitsdatenbank des aktuellen Technikers. Der Cloud-Dateistand wird dadurch nicht unmittelbar abgefragt; dafür zuvor synchronisieren bzw. den aktuellen Ordnerstand laden.
-- **Altdaten bleiben:** Unverändertes `wochenberichte.db`-Datenbankformat und identischer Excel-Export; vorhandene Daten werden nicht neu erstellt oder überschrieben.
+**Dashboard → „Neuen Einsatz erfassen“** öffnet einen mobilen Schritt-für-Schritt-Assistenten:
 
-## Funktionen aus Version 2.10.0
+1. Hinfahrt starten. Kilometer und Reisezeit sind einzeln erfassbar; der Fahrt-Zeitstempel wird dauerhaft gespeichert.
+2. Bei Ankunft die Hinfahrt abschließen. Die Zeit wird aus dem Zeitstempel vorgeschlagen und kann korrigiert werden.
+3. Kunde/Ort eintragen und mit **„Arbeitszeit starten“** die Uhrzeit speichern.
+4. Während einer laufenden Fahrt oder Arbeit mit **„Pause starten“** unterbrechen und mit **„Pause beenden / Fortsetzen“** weiterarbeiten. Unterbrechungen werden getrennt mit Zeitstempeln gespeichert und von der jeweiligen Zeit abgezogen.
+5. **„Arbeit beenden“** speichert die Endzeit. Anschließend zwischen **„Rückfahrt starten“** und **„Zum nächsten Kunden fahren“** wählen.
+6. Auf der Rückfahrt werden Kilometer und Zeit der Hinfahrt als Vorschlag übernommen. Erst **nach der ausdrücklichen Bestätigung** gehen sie in die Gesamtwerte ein. Alternativ kann die tatsächlich gemessene Fahrtzeit übernommen werden.
+7. **„Zum nächsten Kunden fahren“** beendet den bisherigen Einsatz ohne erfundene Rückfahrt und beginnt die neue Hinfahrt als eigenständigen Einsatz.
 
-- **Excel-Archivimport**: Im Reiter **M365 & Datenimport** lassen sich mehrere fertig ausgefüllte Wochenberichte `.xlsx` und `.xlsm` gemeinsam auswählen und auslesen – unabhängig von Kalenderwoche und Jahr. Unterstützt ist die Originalspaltenfolge Datum/Ticket/Kunde–Ort/km/Reisezeit/Beginn/Ende/Arbeitszeit. Ältere `.xls`-Dateien vorher als `.xlsx` speichern.
-- **Vergleich vor Speicherung**: Der Excel-Import verwendet denselben bestätigungspflichtigen Dublettenabgleich wie M365. Bestehende manuelle Uhrzeiten werden nicht ungefragt ersetzt, können in der Vorschau aber korrigiert werden. Zusammenfassungs- und Tagessummenzeilen werden nicht als Einsätze übernommen.
-- **Kundenstamm**: Aus den Berichtszellen auslesbare Kunden, Einsatzorte, Kilometer und Reisezeiten werden nach bestätigter Speicherung in den Kundenstamm übernommen. Nicht im Excel-Bericht vorhandene Anschriften oder Kundennummern werden nicht erfunden.
-- **Kompaktere Erfassungsoberfläche**: Weniger Beschreibungstexte direkt unter Eingabefeldern. Die Hinweise stehen im Hilfe-Reiter.
-- **Cloud-Ordnerdiagnose**: Beim Start wird der gespeicherte Dateihandle ohne Berechtigungsdialog geprüft. Ist er noch vorhanden, aber der Zugriff verweigert, wird „Ordnerzugriff erneut freigeben“ angeboten. Ist die Verknüpfung verloren, den **gleichen** Ordner neu auswählen. Revisions- und Datenbank-ID-Abgleich verhindert ein stilles Überschreiben bei abweichenden Datenständen.
+Beim Schließen des Assistenten bleiben **bestätigte Schritte** und eine gerade aktive Pause erhalten; im Dashboard ist der Einsatz wieder aufrufbar.
 
-## Einrichtung und Veröffentlichung
+## PDF-Abgleich und Reisezeit-Abweichungen
 
-Die Anwendung kann als `index.html` und `sw.js` auf GitHub Pages veröffentlicht werden. `index.html` ist eine vollständige Anwendung und braucht keine CDN-Abhängigkeiten. Die Datei `.nojekyll` aktiviert die direkte Bereitstellung ohne Jekyll.
+Im vorhandenen Reiter **Datenimport** bleiben PDF-, M365- und Excel-Import erhalten. Vorhandene Einsätze werden abgeglichen. Wenn die PDF-Reisezeit vom manuell erfassten Wert abweicht, erscheint ein Hinweis zur Überprüfung auf Stau/Umleitung und gegebenenfalls zur internen Klärung der Kundenabrechnung. Es wird **kein Ticket automatisch erzeugt** und kein vorhandener Wert ohne Auswahl aktualisiert.
 
-Für GitHub-Updates `index.html`, `sw.js`, `README.md` und `.nojekyll` im Stammverzeichnis des Repositories aktualisieren und Pages unter **Settings → Pages → Deploy from a branch → main / root** aktiv lassen.
+## Datenmodell und Kompatibilität
 
-Die lokale Datenbank wird unter derselben Browser-Origin in IndexedDB gespeichert. Bitte vor dem Update die `wochenberichte.db` herunterladen. Die `wochenberichte.db` wird **nicht** mit dem öffentlichen GitHub-Repository hochgeladen.
+Die zusätzlichen Angaben liegen im optionalen Feld `entry.trip` und enthalten Phase, Fahrtdaten, Start-/Endzeitstempel und Pausenintervalle. `entry.km` und `entry.travel` behalten die bisherige Bedeutung als **bestätigte Gesamtkilometer bzw. Reisezeit**. Nicht abgeschlossene Rückfahrten werden nicht als Gesamtwert addiert. Die bestehende `wochenberichte.db` bleibt lesbar, frühere Einträge ohne `trip` bleiben unverändert, das Excel-Layout bleibt erhalten.
 
-## Cloud-Ordner: wichtig
+Die neue Fahrt-zum-Kunden-Bedienung ist eine Ergänzung zur weiterhin vorhandenen regulären manuellen Erfassungsmaske.
 
-Browser-Ordnerberechtigungen können nach dem Neustart erneut erforderlich sein. Ein synchronisierter OneDrive-/Google-Drive-Ordner ist nicht dasselbe wie der Zugriff über die Cloud-App: Der Browser muss diesen Ordner tatsächlich öffnen dürfen. Gerade auf Android ist eine dauerhafte Ordneranbindung häufig nicht unterstützt. Verwende dann Download und Import der `.db` zwischen Geräten.
+## GitHub Pages
 
-Browser-Speicher ist ursprungsabhängig: Die HTML-Datei als `file://`, `github.io`, private Tabs und andere Domains teilen ihre IndexedDB-Daten und Ordnerverknüpfungen nicht. Website-Daten löschen kann lokale Daten und gespeicherte Ordnerhandles entfernen. Für automatische Cloud-Ordnersynchronisation zuerst auf dem einen Gerät synchronisieren und dann auf dem anderen den aktuellen Dateistand laden. Es gibt keine serverseitige Gleichzeitigkeitssperre.
+`index.html`, `sw.js`, `README.md` und `.nojekyll` ins Stammverzeichnis des Repositorys hochladen; unter **Settings → Pages** `main` und `/ (root)` auswählen. Cache wird über `wochenberichte-static-v2.13.0` aktualisiert.
 
-## Sicherheit und Grenzen
+## Wichtige Grenzen
 
-Die Excel-Dateien werden lokal eingelesen und nicht verändert. Makros aus `.xlsm` werden nicht ausgeführt. Unbekannte Tabellenformate und beschädigte Dateien werden abgewiesen; die Anwendung prüft vor dem Import alle Dateien und erzeugt erst nach ausdrücklicher Bestätigung neue Einsätze.
+- Auf dem Smartphone kann der Browser seine Ordner-Berechtigung beim Neustart verlieren; zunächst lokal speichern, Ordner ggf. erneut freigeben.
+- Dateisynchronisation ist keine serverseitig atomare Mehrgerätesynchronisation.
+- Im Assistenten zählen bestätigte Schritte. Erst erfasste, noch nicht bestätigte Felder gelten nicht als fertig gespeichert.
+- Die Rundung erfolgt auf Viertelstunden, aktive Pausen enthalten rohe Zeitstempel.
+- Die tatsächliche Öffnung in Android Chrome, Excel Mobile und ein Cloud-Abgleich auf zwei physischen Geräten wurden hier **nicht getestet**.
 
-Die Original-Excel-Ausgabe bildet weiterhin Montag bis Freitag und maximal sechs Tageszeilen ab. Zusätzliche Wochenend- oder Überlaufeinsätze erscheinen in der ergänzenden Datenübersicht. Diese Begrenzung gilt nicht für die Datenbank.
-
-## Tests
-
-Siehe `TESTPROTOKOLL.md`. Ein echter Android-, OneDrive- oder Google-Drive-Mehrgeräte-Funktionstest wurde hier nicht durchgeführt.
+Vor dem Aktualisieren der Anwendung bitte `wochenberichte.db` sichern.
