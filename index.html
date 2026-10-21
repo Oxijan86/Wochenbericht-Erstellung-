@@ -218,6 +218,14 @@ body.is-dashboard .config,body.is-dashboard .stats{display:none}
 #excelprofilewarn:not([hidden]){display:block;border:1px solid #d1a455;background:#fff9e9;padding:12px;border-radius:9px;margin:12px 0}
 #excelarchivepanel button{min-height:44px}
 @media(max-width:640px){#excelarchivepanel .btnrow{flex-direction:column}#excelarchivepanel .btnrow button{width:100%;min-height:50px}}
+
+/* V2.11 – kurze Sammelvorschau statt einer vollständigen Vergleichstabelle je identischer Zeile. */
+.importbulk{background:#eef6fb;border:1px solid #bcd5e6;border-radius:12px;padding:14px}
+.importbulktop{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;margin-bottom:10px}
+.importcompactlist{display:grid;gap:7px;margin-top:12px}
+.importcompactrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px;border-bottom:1px solid #d9e3ec}
+.importcompactrow select{max-width:170px;flex:0 0 auto}
+@media(max-width:650px){.importcompactrow{flex-wrap:wrap}.importcompactrow select{width:100%;max-width:none}.importbulk .btn{width:100%}}
 </style></head><body>
 <header><div class="wrap brand"><button id="mobilemenutoggle" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mobilemenu">☰</button><div class="wbbrandname"><h1>Wochenbericht Lovrencic <span id="wbversionhead" class="wbversion">Version …</span></h1><p>Erfassung, M365-Übernahme und Excel-Export nach Originalvorlage</p></div><button class="btn wbheaderclose" id="wbcloseheader" type="button" title="Eingaben speichern, synchronisieren oder lokal schließen">Speichern / Synchronisieren / Schließen</button><span class="offline">● Offline · SQLite + IndexedDB</span></div></header>
 <main class="wrap"><section class="card config"><div class="bar" style="justify-content:space-between;margin-bottom:12px"><h2 style="margin:0">Techniker &amp; Kalenderwoche</h2><span class="small" id="saved">Automatisch gespeichert</span></div>
@@ -257,7 +265,7 @@ body.is-dashboard .config,body.is-dashboard .stats{display:none}
 <section class="page" id="customerspage"><article class="card"><div class="bar" style="justify-content:space-between;align-items:center"><div><h2>Kunden – gespeicherte Standorte</h2><p class="hint">Zentraler Kundenstamm aus manuellen Einsätzen und M365-Importen. Die <b>zuletzt gespeicherten</b> Kilometer und Reisezeiten stehen hier für neue Einsätze bereit. Vergangene Wochenberichte bleiben unverändert. Gleichnamige Filialen werden nach Standort unterschieden.</p></div><span class="badge" id="customerscount">0 Kunden</span></div>
 <div class="row"><div class="field wide"><label for="customerssearch">Kunden und Standorte durchsuchen</label><input id="customerssearch" type="search" placeholder="Name, Kundennummer, Ort, Filiale …"></div><div class="field"><label for="customerssort">Sortieren</label><select id="customerssort"><option value="latest">Zuletzt aktualisiert</option><option value="name">Kundenname A–Z</option><option value="place">Ort A–Z</option></select></div></div>
 <p class="small">„Für neuen Einsatz“ öffnet die bewährte Übernahmevorschau. Der alte Eintrag wird nicht verändert; Ticket, Bemerkung und Uhrzeiten bleiben leer.</p><div id="customerslist" aria-live="polite"></div></article></section>
-<section class="page" id="importpage"><div class="split"><article class="card"><h2>Serviceberichte in Microsoft 365 auswerten</h2><p class="hint">Kopiere den folgenden Prompt und füge ihn in Microsoft 365 Copilot zusammen mit deinen Serviceberichten ein. Anschließend das Ergebnis rechts einfügen.</p><textarea id="prompttext" readonly spellcheck="false" style="min-height:340px"></textarea><div class="btnrow" style="margin-top:10px"><button class="btn primary" id="copyprompt" type="button">Prompt kopieren</button><span id="copystatus" class="small"></span></div><p class="footnote">Copilot arbeitet außerhalb dieser Anwendung. Unbekannte Daten sollen leer bleiben und nicht erfunden werden.</p></article><article class="card"><h2>Einsatzdaten aus Copilot übernehmen</h2><p class="hint">Kopiere den vollständigen Codeblock aus Copilot hier hinein. Pro Einsatz genau eine TAB-getrennte Zeile mit neun Spalten, ohne Tabellenkopf. Die Codeblock-Markierungen werden entfernt. <strong>Mehrere Berichte aus verschiedenen Kalenderwochen oder Jahren können gemeinsam importiert werden</strong>; die aktuell gewählte Woche spielt beim Import keine Rolle. Nach „Daten prüfen“ bitte für jeden möglichen Treffer entscheiden, ob der vorhandene Einsatz ergänzt oder ein neuer angelegt werden soll.</p><div class="small" style="margin-bottom:7px"><strong>Datum | Ticket | Kunde | Ort | gef. km | Reisezeit | Beginn | Ende | Bemerkung</strong></div><textarea id="importtext" placeholder="```text&#10;19.10.2026&#9;90001&#9;Beispielbäckerei&#9;Köln&#9;125&#9;1:30&#9;&#9;&#9;Arbeitszeit vor Ort: 2:30&#10;```"></textarea><div class="btnrow" style="margin-top:12px"><button class="btn" id="checkimport" type="button">Daten prüfen</button><button class="btn primary" id="doimport" disabled type="button">Auswahl bestätigen und speichern</button><button class="btn" id="clearimport" type="button">Text leeren</button></div><div id="importresult" style="margin-top:12px" aria-live="polite"></div><div id="importerrors" class="importreview" aria-live="polite"></div><div id="importreview" class="importreview" aria-live="polite"></div></article></div>
+<section class="page" id="importpage"><div class="split"><article class="card"><h2>Serviceberichte in Microsoft 365 auswerten</h2><p class="hint">Kopiere den folgenden Prompt und füge ihn in Microsoft 365 Copilot zusammen mit deinen Serviceberichten ein. Anschließend das Ergebnis rechts einfügen.</p><textarea id="prompttext" readonly spellcheck="false" style="min-height:340px"></textarea><div class="btnrow" style="margin-top:10px"><button class="btn primary" id="copyprompt" type="button">Prompt kopieren</button><span id="copystatus" class="small"></span></div><p class="footnote">Copilot arbeitet außerhalb dieser Anwendung. Unbekannte Daten sollen leer bleiben und nicht erfunden werden.</p></article><article class="card"><h2>Einsatzdaten aus Copilot übernehmen</h2><p class="hint">Kopiere den vollständigen Codeblock aus Copilot hier hinein. Pro Einsatz genau eine TAB-getrennte Zeile mit neun Spalten, ohne Tabellenkopf. Die Codeblock-Markierungen werden entfernt. <strong>Mehrere Berichte aus verschiedenen Kalenderwochen oder Jahren können gemeinsam importiert werden</strong>; die aktuell gewählte Woche spielt beim Import keine Rolle. Identische Einsätze werden automatisch übersprungen, eindeutige neue Einsätze zur Neuanlage vorgemerkt. Nur Abweichungen und unsichere Treffer benötigen eine Entscheidung.</p><div class="small" style="margin-bottom:7px"><strong>Datum | Ticket | Kunde | Ort | gef. km | Reisezeit | Beginn | Ende | Bemerkung</strong></div><textarea id="importtext" placeholder="```text&#10;19.10.2026&#9;90001&#9;Beispielbäckerei&#9;Köln&#9;125&#9;1:30&#9;&#9;&#9;Arbeitszeit vor Ort: 2:30&#10;```"></textarea><div class="btnrow" style="margin-top:12px"><button class="btn" id="checkimport" type="button">Daten prüfen</button><button class="btn primary" id="doimport" disabled type="button">Auswahl bestätigen und speichern</button><button class="btn" id="clearimport" type="button">Text leeren</button></div><div id="importresult" style="margin-top:12px" aria-live="polite"></div><div id="importbulk" hidden class="importbulk" style="margin-top:12px"></div><div id="importerrors" class="importreview" aria-live="polite"></div><div id="importreview" class="importreview" aria-live="polite"></div></article></div>
 <article class="card"><h3>Wichtig für den Import</h3><p class="hint">Import über beliebige Kalenderwochen und Jahre in einem Durchgang, unabhängig von der aktuell ausgewählten KW. Jeder Einsatz wird anhand seines Datums seiner eigenen ISO-KW zugeordnet; beliebig viele Einsätze pro Tag. Wochenend-Einsätze werden gespeichert und sind in der Einsatzhistorie sichtbar, können aber in der Original-Excel-Vorlage (Montag–Freitag) nicht ausgegeben werden. Fehlen echte Beginn-/Endeuhrzeiten, bleiben diese leer. Steht in der Bemerkung „Arbeitszeit vor Ort: hh:mm“, wird diese nachgewiesene Dauer für die Stundensumme auf die nächste Viertelstunde gerundet. Ticketnummern sind bei sämtlichen Einsätzen und Tätigkeitsarten optional. Fehlende Kunden und Zeitangaben werden zur Prüfung markiert, nicht erfunden. <strong>Fehlende oder ungültige Datumsangaben, beschädigte Zeilen und andere Importfehler werden vor der Übernahme einzeln angezeigt.</strong> Jede solche Zeile muss korrigiert oder ausdrücklich als nicht importiert markiert werden; nichts wird stillschweigend verworfen.</p></article>
 <article class="card" id="excelarchivepanel" style="margin-top:16px">
  <div class="bar"><div><h2>Fertige Excel-Wochenberichte nachträglich einlesen</h2>
@@ -283,7 +291,7 @@ body.is-dashboard .config,body.is-dashboard .stats{display:none}
 <p class="hint">Aktuelle Bedienungsanleitung für PC und Smartphone. Alle beschriebenen Funktionen beziehen sich auf die tatsächlich laufende Anwendung.</p>
 <div class="highlight"><p><strong>Anwendungsversion:</strong> <strong id="wbversionhelp">–</strong> · <strong>Veröffentlichung:</strong> <span id="wbreleasedate">–</span></p>
 <p><strong>Datenbankrevision:</strong> <span id="helpdbrev">–</span> – der Stand deiner gespeicherten Daten; nicht die Programmversion.</p></div>
-<h3>Neu in Version 2.10</h3>
+<h3>Neu in Version 2.11</h3><p><strong>Schnellabgleich beim Excel-/M365-Sammelimport:</strong> Bereits identische Einsätze werden automatisch übersprungen. Neue Einsätze sind gesammelt vorgemerkt. Nur tatsächlich abweichende oder mehrdeutige Treffer erscheinen zur Prüfung; Sammelaktionen sind verfügbar. „Bisher gespeichert“ bezieht sich auf den konkret ausgewählten Einsatz der lokalen Datenbank, nicht auf den Kundenstamm oder eine noch nicht geladene Cloud-Version.</p><h3>Aus Version 2.10</h3>
 <ul><li><strong>Historische Excel-Wochenberichte:</strong> Eine oder mehrere ausgefüllte .xlsx/.xlsm-Dateien unter „M365 &amp; Datenimport“ auslesen. Datum, Ticket, Kunde/Ort, Kilometer, Reisezeiten und Uhrzeiten werden erkannt; Summenzeilen übersprungen. Vor dem Speichern werden Dubletten und Profilabweichungen geprüft. Kunden und Kilometer gehen nach Bestätigung auch in den Kundenstamm ein.</li>
 <li><strong>Vereinfachte Erfassung:</strong> Die Eingabemaske zeigt weniger Erklärungen; Details stehen hier in der Hilfe.</li>
 <li><strong>Cloud-Ordner:</strong> Browserberechtigungen können ablaufen. Ist nur die Freigabe verloren, diese ausdrücklich erneut erteilen. Ist die Ordnerverknüpfung nicht mehr verfügbar, denselben Ordner erneut auswählen. Die lokale Datenbank bleibt bestehen; ein abweichender Dateistand wird nicht unbemerkt überschrieben.</li></ul>
@@ -320,9 +328,9 @@ body.is-dashboard .config,body.is-dashboard .stats{display:none}
 <p>Im Reiter <strong>M365 &amp; Datenimport</strong> den RONDO-Prompt kopieren, mit den PDF-Serviceberichten in M365 Copilot ausführen und den gesamten Ergebnis-Codeblock einfügen. Pro Einsatz werden <strong>neun TAB-getrennte Felder</strong> erwartet: Datum, Ticket, Kunde, Ort, gef. km, Reisezeit, Beginn, Ende und Bemerkung. Auch leere Felder müssen ihre Spaltenposition behalten.</p>
 <p><strong>Kalenderwoche:</strong> Alle Einsätze aus verschiedenen Wochen oder Jahren zusammen importieren. Das Einsatzdatum bestimmt automatisch die Ziel-ISO-KW, <strong>unabhängig von der oben ausgewählten KW</strong>. Auch Wochenend-Einsätze werden gespeichert.</p>
 <p>Nach <strong>„Daten prüfen“</strong> werden verarbeitbare Einsätze und die <strong>nicht verarbeiteten Zeilen getrennt</strong> angezeigt. Fehlt das Datum oder stimmt die Spaltenzahl nicht, siehst du die betroffene Zeile und den Grund. Datum und andere Felder in der Fehlerkarte berichtigen und „Korrigierte Zeile prüfen“ drücken. Alternativ bewusst „Nicht importieren“ wählen. <strong>Unbehandelte Fehler blockieren die gesamte Übernahme.</strong></p>
-<p>Bei möglichen Doppelungen oder ähnlich geschriebenen Kunden erscheinen passende alte Einsätze. Wähle je Importzeile <strong>Aktualisieren, Neu anlegen oder Überspringen</strong>. Vor dem Überschreiben kannst du gespeicherte, aus M365 erkannte und endgültig zu speichernde Werte vergleichen und bearbeiten, einschließlich <strong>Beginn und Ende</strong>. Deine manuell erfassten Uhrzeiten bleiben zunächst voreingestellt. Erst „Auswahl bestätigen und speichern“ führt die bestätigten Änderungen aus. Die PDF wird von Copilot außerhalb dieser Offline-Anwendung ausgewertet.</p>
-<p><strong>Fertige Excel-Wochenberichte nachtragen (V2.10):</strong> Im selben Reiter bei „Fertige Excel-Wochenberichte nachträglich einlesen“ eine oder mehrere ausgefüllte <code>.xlsx</code>/<code>.xlsm</code>-Dateien auswählen. Die App liest die Originalspalten und ordnet Datum und Einsätze automatisch den jeweiligen Kalenderwochen zu. Kunde/Ort, Kilometer, Reisezeit, Beginn/Ende und vorhandene Arbeitsdauer werden übernommen; die Kundendaten erscheinen nach dem bestätigten Import im Kundenstamm.</p>
-<p>Bitte vor dem Einlesen das richtige <strong>Technikerprofil</strong> auswählen. Weicht der Name oder die Personalnummer im Excel-Bericht ab, ist eine ausdrückliche Bestätigung nötig. Die Excel-Dateien werden nicht verändert und Makros werden nicht gestartet. Fehlende Daten, unklare Tabellen und Dubletten werden gemeldet; vor dem Speichern entscheidet die gemeinsame Vergleichsvorschau über <strong>Aktualisieren, Neuanlage oder Überspringen</strong>. Ohne Beginn/Ende übernimmt die App nur die nachgewiesene Arbeitsdauer, ohne Uhrzeiten zu erfinden. Freizeitausgleichs-Altbestände aus der Bemerkungszeile werden nicht automatisch in neue Anfangssalden verwandelt.</p>
+<p>Identische Einsätze werden automatisch übersprungen und neue Einsätze gesammelt vorgemerkt. Bei abweichenden Daten oder ähnlichen Kundennamen prüfst du nur die markierten Problemfälle. Eindeutige Abweichungen kannst du per Sammelauswahl aktualisieren oder gesammelt überspringen. Vor dem Überschreiben kannst du gespeicherte, aus M365 erkannte und endgültig zu speichernde Werte vergleichen und bearbeiten, einschließlich <strong>Beginn und Ende</strong>. Deine manuell erfassten Uhrzeiten bleiben zunächst voreingestellt. Erst „Auswahl bestätigen und speichern“ führt die bestätigten Änderungen aus. Die PDF wird von Copilot außerhalb dieser Offline-Anwendung ausgewertet.</p>
+<p><strong>Fertige Excel-Wochenberichte nachtragen (ab V2.10):</strong> Im selben Reiter bei „Fertige Excel-Wochenberichte nachträglich einlesen“ eine oder mehrere ausgefüllte <code>.xlsx</code>/<code>.xlsm</code>-Dateien auswählen. Die App liest die Originalspalten und ordnet Datum und Einsätze automatisch den jeweiligen Kalenderwochen zu. Kunde/Ort, Kilometer, Reisezeit, Beginn/Ende und vorhandene Arbeitsdauer werden übernommen; die Kundendaten erscheinen nach dem bestätigten Import im Kundenstamm.</p>
+<p>Bitte vor dem Einlesen das richtige <strong>Technikerprofil</strong> auswählen. Weicht der Name oder die Personalnummer im Excel-Bericht ab, ist eine ausdrückliche Bestätigung nötig. Die Excel-Dateien werden nicht verändert und Makros werden nicht gestartet. Fehlende Daten, unklare Tabellen und Dubletten werden gemeldet; vor dem Speichern zeigt die App nur <strong>tatsächliche Abweichungen und unklare Zuordnungen</strong>. Gleiche Einträge werden übersprungen; neue Einsätze sind vorgemerkt. Ohne Beginn/Ende übernimmt die App nur die nachgewiesene Arbeitsdauer, ohne Uhrzeiten zu erfinden. Freizeitausgleichs-Altbestände aus der Bemerkungszeile werden nicht automatisch in neue Anfangssalden verwandelt.</p>
 <button class="btn tiny" type="button" data-help-tab="importpage">Zum M365- und Excel-Import</button></section>
 <section class="helpsection"><h3>Cloud-Ordner und Browserberechtigungen</h3><p>Die Datenbank bleibt lokal in IndexedDB gespeichert. Ein Cloud-Ordner wird nur über einen tatsächlichen Browser-Ordnerzugriff verbunden. Browser können die Zugriffsberechtigung beim Neustart zurücksetzen: Dann im Reiter „Speicherung &amp; Sync“ auf „Ordnerzugriff erneut freigeben“ tippen. Ist die Verknüpfung nicht mehr vorhanden, denselben Ordner erneut verbinden; dabei nie eine neue leere Datenbank erstellen. Bei Google Drive auf Android ohne dauerhafte Ordnerfreigabe erfolgt der Gerätewechsel durch Download und Import von <code>wochenberichte.db</code>. Die Website-Adresse und der Browser müssen gleich bleiben – verschiedene Domains, private Tabs und geleerte Websitedaten haben getrennte Speicherbereiche.</p></section>
 <section class="helpsection"><h3>6. Wochenbericht, Exportprüfung &amp; Freizeitausgleich</h3>
@@ -397,7 +405,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 </script>
 <script>
 'use strict';
-const WB_APP_VERSION=Object.freeze({number:'2.10.0',date:'21.10.2026',cache:'wochenberichte-static-v2.10.0'});
+const WB_APP_VERSION=Object.freeze({number:'2.11.0',date:'21.10.2026',cache:'wochenberichte-static-v2.11.0'});
 
 
 /* SQLite single-record application database codec. Self-contained, offline.
@@ -1062,21 +1070,60 @@ function importNameScore(left,right){
 }
 function importLocation(raw){return importCompareName(String(raw||'').replace(/^\s*[a-z]{0,3}\s*\d{4,6}\s+/i,''))}
 function importCandidateList(input,entries){
- if(input.type!=='Einsatz')return [];
+ if(input.type!=='Einsatz'){
+  return entries.filter(e=>e.date===input.date&&e.type===input.type).filter(e=>
+   (e.start||'')===(input.start||'')&&(e.end||'')===(input.end||'')&&
+   importCompareName(e.customer)===importCompareName(input.customer)).map(e=>({
+    entry:e,score:110,nameScore:100,unassigned:false,ticketEqual:true,ticketConflict:false,
+    locationMissing:false,placeConflict:false,placeEqual:true}));
+ }
  return entries.filter(e=>e.date===input.date&&e.type===input.type).map(e=>{
   const existingLoc=importLocation(e.location||e.city),incomingLoc=importLocation(input.location);
-  const samePlace=!existingLoc||!incomingLoc||existingLoc===incomingLoc||importNameScore(existingLoc,incomingLoc)>=86;
-  if(!samePlace)return null; // unterschiedliche, bekannte Filialen NIEMALS automatisch anbieten
+  const placeEqual=Boolean(existingLoc&&incomingLoc&&existingLoc===incomingLoc);
+  const placeConflict=Boolean(existingLoc&&incomingLoc&&!placeEqual&&importNameScore(existingLoc,incomingLoc)<86);
   const nameScore=importNameScore(input.customer,e.customer);
   const ticketsEqual=Boolean(e.ticket&&input.ticket&&String(e.ticket).trim().toLowerCase()===String(input.ticket).trim().toLowerCase());
   const ticketsConflict=Boolean(e.ticket&&input.ticket&&!ticketsEqual);
   const unassigned=!String(e.customer||'').trim()&&!String(e.ticket||'').trim()&&Boolean(e.start||e.end);
+  // Gleiche Ticketnummer am selben Datum auch bei Ortskonflikt ZUR PRÜFUNG vorschlagen.
+  // Nie trotz Ortskonflikt automatisch aktualisieren.
+  if(placeConflict&&!ticketsEqual)return null;
   if(ticketsConflict&&!nameScore&&!unassigned)return null;
-  // Auch ein begonnener, noch unbenannter Einsatz darf als Treffer angeboten werden, niemals automatisch.
   if(!ticketsEqual&&nameScore<75&&!unassigned)return null;
-  const score=(ticketsEqual?110:0)+nameScore+(existingLoc&&incomingLoc?12:0)-(ticketsConflict?50:0);
-  return{entry:e,score,nameScore,unassigned,ticketEqual:ticketsEqual,ticketConflict:ticketsConflict,locationMissing:!existingLoc||!incomingLoc};
+  const score=(ticketsEqual?110:0)+nameScore+(placeEqual?12:0)-(ticketsConflict?50:0)-(placeConflict?35:0);
+  return {entry:e,score,nameScore,unassigned,ticketEqual:ticketsEqual,ticketConflict:ticketsConflict,locationMissing:!existingLoc||!incomingLoc,placeConflict,placeEqual};
  }).filter(Boolean).sort((a,b)=>b.score-a.score||String(b.entry.createdAt||'').localeCompare(String(a.entry.createdAt||'')));
+}
+function importStrictName(raw){
+ return String(raw||'').toLocaleLowerCase('de-DE').replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
+}
+function importComparableValue(key,value){
+ if(value===undefined||value===null||String(value).trim()==='')return '';
+ if(key==='km'||key==='travel'){
+  if(key==='travel'&&typeof value==='string'&&value.includes(':')){
+   try{return String(travelM(value))}catch{}
+  }
+  const number=Number(value);return Number.isFinite(number)?String(number):String(value).trim();
+ }
+ if(key==='customer')return importCompareName(value);
+ if(key==='location')return importLocation(value);
+ if(key==='note')return String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim().toLowerCase();
+ return String(value).trim().toLowerCase();
+}
+function importActualChanges(oldRow,merged){
+ return ['customer','location','ticket','km','travel','start','end','note'].filter(key=>importComparableValue(key,oldRow?.[key])!==importComparableValue(key,merged?.[key]));
+}
+function importIncomingClockConflicts(oldRow,incoming){
+ return ['start','end'].filter(key=>Boolean(oldRow?.[key]&&incoming?.[key])&&oldRow[key]!==incoming[key]);
+}
+function importStoredSnapshot(row){
+ // Alle zeitrelevanten und sichtbaren Werte; Änderungen während offener Vorschau erkennen.
+ return JSON.stringify(['id','date','type','customer','location','ticket','km','travel','start','end','endDate','pause','pauseTarget','note'].map(key=>row?.[key]??null));
+}
+function importSingleReliableCandidate(candidate,incoming){
+ if(!candidate||candidate.unassigned||candidate.ticketConflict||candidate.placeConflict||candidate.locationMissing)return false;
+ // Namensabweichungen, gleichlautende Filialen oder fehlende Ticketidentität nie ungeprüft aktualisieren.
+ return candidate.nameScore>=96&&importStrictName(candidate.entry.customer)===importStrictName(incoming.customer)&&(candidate.ticketEqual||(!candidate.entry.ticket&&!incoming.ticket));
 }
 function importMergeEntry(oldRow,newRow){
  // Kein Überschreiben der manuell erfassten Uhrzeiten, des Datums und der Historienkennung.
@@ -1109,11 +1156,50 @@ function importDiff(oldRow,newRow){
  if(fromPdf!==null&&own!==null&&fromPdf!==own)diff.push(`ACHTUNG: Import-Arbeitsdauer ${fmtH(fromPdf)} h weicht von manuellen Uhrzeiten ${fmtH(own)} h ab. Manuelle Uhrzeiten haben Vorrang.`);
  return diff.join('\n');
 }
-function importDecisionRows(rows,existing){return rows.map((incoming,index)=>({incoming,index,candidates:importCandidateList(incoming,existing),action:'',targetId:''})).map(x=>({...x,action:x.candidates.length?'review':'create',targetId:x.candidates.length===1?x.candidates[0].entry.id:''}))}
+function importDecisionRows(rows,existing){
+ const taken=new Set(),keysSeen=new Set();
+ return rows.map((incoming,index)=>{
+  const candidates=importCandidateList(incoming,existing);
+  const reliable=candidates.length===1&&importSingleReliableCandidate(candidates[0],incoming);
+  const candidate=candidates[0]?.entry||null;
+  let action='create',category='new',targetId='',reason='Kein gespeicherter Einsatz passt sicher.';
+  if(reliable){
+   targetId=candidate.id;
+   const differences=[...new Set([...importActualChanges(candidate,importMergeEntry(candidate,incoming)),...importIncomingClockConflicts(candidate,incoming)])];
+   if(!differences.length){action='skip';category='unchanged';reason='Alle relevanten Werte bereits gespeichert.'}
+   else {action='review';category='changed';reason='Abweichung: '+differences.map(k=>importEditableFields.find(f=>f[0]===k)?.[1]||k).join(', ')}
+  }else if(candidates.length){
+   action='review';category='ambiguous';
+   targetId=candidates.length===1?candidates[0].entry.id:'';
+   reason=candidates.length>1?'Mehrere mögliche Einsätze vorhanden. Zuordnung prüfen.':
+      candidates[0].placeConflict?'Gleiche Ticketnummer, aber abweichender Einsatzort. Bitte Filiale prüfen.':
+      candidates[0].ticketConflict?'Abweichende Ticketnummer – keine automatische Zuordnung.':
+      candidates[0].locationMissing?'Ort unvollständig – mögliche Verwechslung von Filialen.':'Ähnlicher Kundenname – Zuordnung bestätigen.';
+  }
+  // Ein Sammelimport darf denselben vorhandenen Einsatz nicht zweimal ohne Prüfung ändern.
+  if(targetId&&category!=='unchanged'){
+   if(taken.has(targetId)){action='review';category='ambiguous';reason='Mehrere Importzeilen beziehen sich möglicherweise auf denselben gespeicherten Einsatz.'}
+   taken.add(targetId);
+  }
+  const sourceIdentity=[incoming.date,incoming.ticket,importCompareName(incoming.customer),importLocation(incoming.location)].join('|');
+  if(category==='new'&&keysSeen.has(sourceIdentity)){
+   action='review';category='ambiguous';reason='Mehrere neue Zeilen mit gleicher Zuordnung – Doppelanlage prüfen.';
+  }
+  keysSeen.add(sourceIdentity);
+  return {incoming,index,candidates,action,targetId,category,reason,
+    sourceSnapshot:targetId?importStoredSnapshot(candidate):null,edits:null};
+ });
+}
 function importWeekOf(date){const {year,week}=isoInfo(dateFromISO(date));return {year,week,key:wkKey(year,week,db.selected)}}
 function importWeekLabel(date){const w=importWeekOf(date);return `KW ${w.week}/${w.year}`}
 function importAllCurrentEntries(){return allStoredEntries(db.selected).map(({entry})=>entry)}
-function importChoice(d){return d.candidates.find(c=>c.entry.id===d.targetId)?.entry||null}
+function importChoice(d){
+ const target=d.candidates.find(c=>c.entry.id===d.targetId)?.entry;
+ if(!target)return null;
+ // Immer die ORIGINALWERTE des konkret gewählten Einsatzes aus der aktuellen lokalen Arbeitskopie lesen.
+ const stored=db?.weeks?.[importWeekOf(d.incoming.date).key]?.entries?.find(e=>e.id===target.id);
+ return stored||null;
+}
 // Drei-Spalten-Vorschau: gespeicherter Wert | M365-Wert | endgültig bearbeitbarer Wert.
 const importEditableFields=[
  ['customer','Kunde'],['location','Ort'],['ticket','Ticket (optional)'],
@@ -1122,7 +1208,7 @@ const importEditableFields=[
 ];
 function importDisplayField(row,key){
  const v=row?.[key];if(v===undefined||v===null||v==='')return '';
- if(key==='travel')return fmtH(v);return String(v);
+ if(key==='travel'){if(typeof v==='string'&&v.includes(':')){try{return fmtH(travelM(v))}catch{return String(v)}}return Number.isFinite(Number(v))?fmtH(Number(v)):String(v)}return String(v);
 }
 function importEditableInitial(d){
  const base=d.action==='update'&&importChoice(d)?importMergeEntry(importChoice(d),d.incoming):d.incoming;
@@ -1164,7 +1250,7 @@ function importRowPreview(d){
 function importEditRows(d,i){
  const existing=d.action==='update'?importChoice(d):null,edits=importEnsureEdits(d);
  return `<div class="importedittable" role="group" aria-label="Werte vor dem Speichern vergleichen und bearbeiten">
- <div class="importeditheader"><span>Feld</span><span>Bisher gespeichert</span><span>Aus M365</span><span>Wird übernommen – editierbar</span></div>
+ <div class="importeditheader"><span>Feld</span><span>Bisher gespeichert</span><span>${importSourceMode==='excel'?'Aus Excel':'Aus M365'}</span><span>Wird übernommen – editierbar</span></div>
  ${importEditableFields.map(([key,label])=>{
   const oldVal=importDisplayField(existing,key),pdfVal=importDisplayField(d.incoming,key),chosen=edits[key]??'';
   const isNote=key==='note',inputId=`import-edit-${i}-${key}`;
@@ -1173,11 +1259,23 @@ function importEditRows(d,i){
   return `<div class="importeditrow"><label class="importeditlabel" for="${inputId}">${esc(label)}</label><div class="importeditold"><span class="importmobilecaption">Bisher</span>${esc(oldVal||'–')}</div><div class="importeditpdf"><span class="importmobilecaption">${importSourceMode==='excel'?'Excel':'M365'}</span>${esc(pdfVal||'–')}</div><div class="importeditfinal">${input}</div></div>`;
  }).join('')}</div>`;
 }
+function importCategoryCounts(){return {
+ total:importDecisions.length,
+ unchanged:importDecisions.filter(d=>d.category==='unchanged').length,
+ created:importDecisions.filter(d=>d.action==='create').length,
+ review:importDecisions.filter(d=>d.action==='review').length,
+ update:importDecisions.filter(d=>d.action==='update').length,
+ skipped:importDecisions.filter(d=>d.action==='skip'&&d.category!=='unchanged').length,
+ warnings:importRejected.filter(r=>!r.skipped).length
+}}
 function importStatusReport(){
- const unhandled=importRejected.filter(r=>!r.skipped).length,skipped=importRejected.length-unhandled;
+ const c=importCategoryCounts(),skipped=importRejected.length-c.warnings;
  const weeks=new Set(importDecisions.map(d=>importWeekLabel(d.incoming.date)));
- $('importresult').innerHTML=`<div class="msg ${unhandled?'error':'success'}"><strong>${importDecisions.length} verarbeitbare Einsatzzeilen · ${unhandled} nicht verarbeitete Zeile(n) · ${skipped} bewusst ausgelassen</strong><div class="small">${weeks.size} Kalenderwoche(n) · ${importDuplicates} identische Doppelzeile(n) übersprungen · ${importWarnings.length} Hinweise. ${unhandled?'Bitte jede fehlerhafte Zeile korrigieren oder ausdrücklich auslassen. Es wird noch nichts gespeichert.':'Alle erkannten Zeilen sind berücksichtigt. Noch nichts gespeichert.'}</div></div>${importWarnings.length?`<details style="margin:8px 0"><summary>Hinweise anzeigen (${importWarnings.length})</summary>${importWarnings.map(x=>`<p class="small">${esc(x)}</p>`).join('')}</details>`:''}`;
- $('doimport').disabled=!importDecisions.length||unhandled>0||(importSourceMode==='excel'&&importProfileMismatch&&!$('excelprofileoverride').checked);
+ $('importresult').innerHTML=`<div class="msg ${c.warnings?'error':'success'}"><strong>${c.total} Einsätze erkannt: ${c.unchanged} unverändert · ${c.created} neu vorgemerkt · ${c.review} zu prüfen · ${c.update} Aktualisierungen gewählt</strong><div class="small">${weeks.size} Kalenderwoche(n) · ${importDuplicates} doppelte Importzeilen entfernt · ${c.warnings} fehlerhafte Zeilen${skipped?', '+skipped+' bewusst ausgelassen':''}. ${c.review?'Nur die Prüffälle unten benötigen eine Entscheidung.':'Keine offenen Abgleichentscheidungen.'} ${c.warnings?'Bitte Fehler korrigieren oder bewusst auslassen.':'Noch nichts gespeichert.'}</div></div>${importWarnings.length?`<details style="margin:8px 0"><summary>Hinweise anzeigen (${importWarnings.length})</summary>${importWarnings.map(x=>`<p class="small">${esc(x)}</p>`).join('')}</details>`:''}`;
+ const bulk=$('importbulk');if(bulk){bulk.hidden=!importDecisions.length;
+  bulk.innerHTML=`<div class="importbulktop"><strong>Sammelauswahl</strong><span class="small">Nur eindeutige Änderungen automatisch aktualisieren; unklare Treffer bleiben zur Kontrolle.</span></div><div class="btnrow"><button class="btn" type="button" data-import-bulk="update">Eindeutige Abweichungen aktualisieren</button><button class="btn" type="button" data-import-bulk="skip">Alle offenen Prüffälle überspringen</button><button class="btn" type="button" data-import-bulk="reset">Prüfentscheidungen zurücksetzen</button></div>`;
+ }
+ $('doimport').disabled=!importDecisions.length||c.review>0||c.warnings>0||(importSourceMode==='excel'&&importProfileMismatch&&!$('excelprofileoverride').checked);
 }
 function renderImportRejected(){
  const wrap=$('importerrors');if(!wrap)return;
@@ -1185,21 +1283,26 @@ function renderImportRejected(){
 }
 function renderImportReview(){
  const box=$('importreview');if(!box)return;
- box.innerHTML=importDecisions.map((d,i)=>{
+ // Erfolgreich erkannte und identische Zeilen nicht mit dutzenden Vergleichsformularen überfrachten.
+ const visible=importDecisions.map((d,i)=>({d,i})).filter(({d})=>d.category!=='unchanged'&&d.action!=='create'&&d.category!=='new');
+ box.innerHTML=visible.map(({d,i})=>{
   const selection=d.action==='update',multiple=d.candidates.length>1;
-  return `<div class="importreviewcard" data-import-review="${i}"><h3>${esc(d.sourceLabel||'Zeile '+(i+1))}: ${esc(d.incoming.customer||'Kunde unbekannt')} · ${esc(dayFmt(d.incoming.date))} · ${esc(importWeekLabel(d.incoming.date))}</h3>
-   <div class="small">${importSourceMode==='excel'?'Excel':'M365'}: ${esc(d.incoming.location||'Ort unbekannt')} · Ticket ${esc(d.incoming.ticket||'–')} · ${d.incoming.km==null?'km unbekannt':d.incoming.km+' km'} · ${d.incoming.travel==null?'Reise unbekannt':fmtH(d.incoming.travel)+' h'}</div>
-   <div class="${d.candidates.length?'importalert':'small'}">${d.candidates.length?`${d.candidates.length} mögliche(r) bestehende(r) Einsatz/Einsätze gefunden. Bitte Datensatz vergleichen.`:'Kein passender bestehender Einsatz an diesem Datum gefunden.'}</div>
-   <div class="row"><div class="field"><label for="import-action-${i}">Aktion für diese Zeile</label><select id="import-action-${i}" data-import-action="${i}"><option value="review" ${d.action==='review'?'selected':''} disabled>Bitte Entscheidung treffen</option><option value="update" ${d.action==='update'?'selected':''} ${d.candidates.length?'':'disabled'}>Bestehenden Einsatz aktualisieren</option><option value="create" ${d.action==='create'?'selected':''}>Neuen Einsatz anlegen</option><option value="skip" ${d.action==='skip'?'selected':''}>Nicht übernehmen</option></select></div>
-   ${d.candidates.length?`<div class="field"><label for="import-target-${i}">Welchen vorhandenen Einsatz?</label><select id="import-target-${i}" data-import-target="${i}" ${selection?'':'disabled'}><option value="">${multiple?'Bitte Einsatz auswählen':'Bestehenden Einsatz auswählen'}</option>${d.candidates.map(c=>`<option value="${esc(c.entry.id)}" ${d.targetId===c.entry.id?'selected':''}>${esc(c.entry.customer||'Kunde fehlt')} · ${esc(c.entry.location||'ohne Ort')} · ${esc(c.entry.ticket||'ohne Ticket')} · ${esc(c.entry.start||'–')}–${esc(c.entry.end||'–')} ${c.unassigned?'· bisher ohne Kundenname':c.nameScore<95?'· ähnlicher Name':''}</option>`).join('')}</select></div>`:''}</div>
-   ${d.action==='update'&&importChoice(d)||d.action==='create'?`<p class="small"><strong>Vergleich und Korrektur:</strong> Die letzte Spalte ist vor dem Speichern frei bearbeitbar. Vorhandene Uhrzeiten werden vorausgefüllt, auch wenn M365 keine kennt. Das Datum des Einsatzes bleibt bestehen.</p>${importEditRows(d,i)}`:''}
+  return `<div class="importreviewcard" data-import-review="${i}"><h3>⚠ ${esc(d.sourceLabel||'Zeile '+(i+1))}: ${esc(d.incoming.customer||'Kunde unbekannt')} · ${esc(dayFmt(d.incoming.date))} · ${esc(importWeekLabel(d.incoming.date))}</h3>
+   <p class="importalert">${esc(d.reason||'Unklarer Abgleich')} · ${d.candidates.length} mögliche(r) bestehende(r) Einsatz/Einsätze.</p>
+   <div class="row"><div class="field"><label for="import-action-${i}">Was soll passieren?</label><select id="import-action-${i}" data-import-action="${i}"><option value="review" ${d.action==='review'?'selected':''} disabled>Bitte Entscheidung treffen</option><option value="update" ${d.action==='update'?'selected':''} ${d.candidates.length?'':'disabled'}>Bestehenden Einsatz aktualisieren</option><option value="create" ${d.action==='create'?'selected':''}>Bewusst neuen Einsatz anlegen</option><option value="skip" ${d.action==='skip'?'selected':''}>Diesen Einsatz überspringen</option></select></div>
+   ${d.candidates.length?`<div class="field"><label for="import-target-${i}">Welcher gespeicherte Einsatz?</label><select id="import-target-${i}" data-import-target="${i}" ${selection?'':'disabled'}><option value="">${multiple?'Bitte genau auswählen':'Einsatz auswählen'}</option>${d.candidates.map(c=>`<option value="${esc(c.entry.id)}" ${d.targetId===c.entry.id?'selected':''}>${esc(c.entry.customer||'Kunde fehlt')} · ${esc(c.entry.location||'ohne Ort')} · ${esc(c.entry.ticket||'ohne Ticket')} · ${esc(c.entry.start||'–')}–${esc(c.entry.end||'–')} ${c.placeConflict?'· ANDERER ORT':c.nameScore<95?'· ähnlicher Name':''}</option>`).join('')}</select></div>`:''}</div>
+   ${d.action==='update'&&importChoice(d)||d.action==='create'?`<p class="small"><strong>Bisher gespeichert = lokaler Datenbankeintrag, nicht Kundenstamm oder Cloud-Datei.</strong> Bei Unstimmigkeiten zuerst den ausgewählten Einsatz kontrollieren. In der letzten Spalte kannst du Werte korrigieren, einschließlich Beginn und Ende.</p>${importEditRows(d,i)}`:''}
    <div class="importpreview" id="import-preview-${i}">${esc(importRowPreview(d))}</div></div>`;
  }).join('');
+ const short=importDecisions.map((d,i)=>({d,i})).filter(({d})=>d.category==='new'||d.category==='unchanged');
+ if(short.length){const newly=short.filter(x=>x.d.category==='new'),unchanged=short.filter(x=>x.d.category==='unchanged');
+  box.innerHTML+=`<details class="importreviewcard" style="background:#edf6f5"><summary><strong>${newly.length} neue Einsatzzeilen vorgemerkt · ${unchanged.length} identische übersprungen</strong> – bei Bedarf anzeigen</summary><div class="importcompactlist">${short.map(({d,i})=>`<div class="importcompactrow"><div><strong>${esc(dayFmt(d.incoming.date))} · ${esc(d.incoming.customer||'Kunde unbekannt')}</strong><div class="small">${esc(d.incoming.location||'')} · Ticket ${esc(d.incoming.ticket||'–')} · ${d.category==='unchanged'?'Bereits vollständig vorhanden':'Noch nicht gespeichert'}</div></div>${d.category==='new'?`<select aria-label="Importaktion für Einsatz" data-import-action="${i}"><option value="create" ${d.action==='create'?'selected':''}>Neu anlegen</option><option value="skip" ${d.action==='skip'?'selected':''}>Überspringen</option></select>`:`<span class="small">Automatisch übersprungen</span>`}</div>`).join('')}</div></details>`;
+ }
  importStatusReport();
 }
 function importApplyPlan(decisions,existing){
  let output=existing.map(e=>({...e})),updates=0,added=0,skipped=0,claimed=new Set(),newSignatures=new Set(),modifiedIds=[];
- const fullSignature=e=>[e.date,e.type,e.ticket,e.customer,e.location,e.km??'',e.travel??'',e.start,e.end,e.note].map(x=>String(x??'').trim().toLocaleLowerCase('de-DE')).join('|');
+ const fullSignature=e=>[e.date,e.type,e.ticket,importComparableValue('customer',e.customer),importComparableValue('location',e.location),importComparableValue('km',e.km),importComparableValue('travel',e.travel),e.start,e.end,importComparableValue('note',e.note)].join('|');
  for(const d of decisions){
   if(d.action==='review')throw Error('Bitte für jede erkannte Übereinstimmung eine Entscheidung treffen.');
   if(d.action==='skip'){skipped++;continue}
@@ -1208,8 +1311,9 @@ function importApplyPlan(decisions,existing){
    if(claimed.has(target.id))throw Error('Mehrere Importzeilen sollen denselben Einsatz verändern. Bitte Zeilen getrennt prüfen.');
    const i=output.findIndex(x=>x.id===target.id);
    if(i<0||output[i].date!==d.incoming.date)throw Error('Bestehender Einsatz wurde zwischenzeitlich verändert. Bitte erneut prüfen.');
+   if(d.sourceSnapshot&&importStoredSnapshot(output[i])!==d.sourceSnapshot)throw Error('Der bisher gespeicherte Einsatz wurde nach der Vorschau verändert. Bitte Import erneut prüfen.');
    claimed.add(target.id);const merged=importApplyEdits(d);
-   if(fullSignature(merged)===fullSignature(output[i])){skipped++;continue}
+   if(!importActualChanges(output[i],merged).length){skipped++;continue}
    output[i]=merged;updates++;modifiedIds.push(merged.id);
   }else if(d.action==='create'){
    const created=importApplyEdits(d);const sig=fullSignature(created);
@@ -1559,8 +1663,31 @@ function init(){$('historymonth').value=historyMonth;$('historyyear').value=new 
  });
  $('importreview').addEventListener('change',event=>{
   const action=event.target.dataset.importAction,target=event.target.dataset.importTarget;
-  if(action!==undefined){const d=importDecisions[Number(action)];if(!d)return;d.action=event.target.value;d.edits=null;if(d.action!=='update')d.targetId='';else if(d.candidates.length===1)d.targetId=d.candidates[0].entry.id;renderImportReview()}
-  if(target!==undefined){const d=importDecisions[Number(target)];if(!d)return;d.targetId=event.target.value;d.edits=null;renderImportReview()}
+  if(action!==undefined){const d=importDecisions[Number(action)];if(!d)return;d.action=event.target.value;d.edits=null;
+   if(d.action==='update'){if(d.candidates.length===1)d.targetId=d.candidates[0].entry.id;const selected=importChoice(d);d.sourceSnapshot=selected?importStoredSnapshot(selected):null}
+   else if(d.action==='review')d.targetId=d.candidates.length===1?d.candidates[0].entry.id:'';
+   renderImportReview()}
+  if(target!==undefined){const d=importDecisions[Number(target)];if(!d)return;d.targetId=event.target.value;d.edits=null;const selected=importChoice(d);d.sourceSnapshot=selected?importStoredSnapshot(selected):null;renderImportReview()}
+ });
+ $('importbulk').addEventListener('click',event=>{
+  const mode=event.target.closest('button[data-import-bulk]')?.dataset.importBulk;
+  if(!mode)return;
+  if(mode==='update'){
+   let count=0;
+   importDecisions.forEach(d=>{
+    if(d.action!=='review'||d.category!=='changed'||d.candidates.length!==1||!importSingleReliableCandidate(d.candidates[0],d.incoming))return;
+    d.action='update';d.targetId=d.candidates[0].entry.id;d.sourceSnapshot=importStoredSnapshot(importChoice(d));d.edits=null;count++;
+   });toast(count+' eindeutig zugeordnete Änderung(en) zur Aktualisierung ausgewählt. Bitte vor dem Speichern kontrollieren.');
+  }else if(mode==='skip'){
+   const count=importDecisions.filter(d=>d.action==='review').length;
+   importDecisions.forEach(d=>{if(d.action==='review'){d.action='skip';d.edits=null}});
+   toast(count+' Prüffall/-fälle als übersprungen markiert.');
+  }else if(mode==='reset'){
+   const labels=importDecisions.map(d=>d.sourceLabel);
+   importDecisions=importDecisionRows(pendingImport,importAllCurrentEntries());
+   importDecisions.forEach((d,i)=>d.sourceLabel=labels[i]);
+  }
+  renderImportReview();
  });
  $('importreview').addEventListener('input',event=>{
   const index=event.target.dataset.importEdit,field=event.target.dataset.importField;

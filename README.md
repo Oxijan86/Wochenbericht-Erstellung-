@@ -1,8 +1,15 @@
-# Wochenbericht Lovrencic – Version 2.10.0
+# Wochenbericht Lovrencic – Version 2.11.0
 
 Standalone-HTML-Anwendung für Servicetechniker mit IndexedDB, SQLite-Datei `wochenberichte.db`, Import von M365-Ergebnissen und historischen Excel-Wochenberichten sowie Excel-Export in der ursprünglichen Wochenberichtvorlage.
 
-## Neu in 2.10.0
+## Neu in 2.11.0
+
+- **Automatischer Importabgleich:** Bei mehreren alten Excel-Wochenberichten bzw. M365-Zeilen werden bereits identische Einsätze ohne weitere Abfrage übersprungen. Neue Einträge werden gesammelt vorgemerkt. Nur bei echten Abweichungen oder unsicheren Kundenzuordnungen wird nachgefragt.
+- **Sammelauswahl:** Eindeutige Abweichungen gesammelt zur Aktualisierung auswählen; offene Prüffälle gesammelt überspringen oder zurücksetzen. Unklare Filialen werden nicht automatisch zugeordnet.
+- **Korrekte Vergleichsdaten:** „Bisher gespeichert“ bezeichnet stets den konkret gewählten Datensatz aus der lokalen Arbeitsdatenbank des aktuellen Technikers. Der Cloud-Dateistand wird dadurch nicht unmittelbar abgefragt; dafür zuvor synchronisieren bzw. den aktuellen Ordnerstand laden.
+- **Altdaten bleiben:** Unverändertes `wochenberichte.db`-Datenbankformat und identischer Excel-Export; vorhandene Daten werden nicht neu erstellt oder überschrieben.
+
+## Funktionen aus Version 2.10.0
 
 - **Excel-Archivimport**: Im Reiter **M365 & Datenimport** lassen sich mehrere fertig ausgefüllte Wochenberichte `.xlsx` und `.xlsm` gemeinsam auswählen und auslesen – unabhängig von Kalenderwoche und Jahr. Unterstützt ist die Originalspaltenfolge Datum/Ticket/Kunde–Ort/km/Reisezeit/Beginn/Ende/Arbeitszeit. Ältere `.xls`-Dateien vorher als `.xlsx` speichern.
 - **Vergleich vor Speicherung**: Der Excel-Import verwendet denselben bestätigungspflichtigen Dublettenabgleich wie M365. Bestehende manuelle Uhrzeiten werden nicht ungefragt ersetzt, können in der Vorschau aber korrigiert werden. Zusammenfassungs- und Tagessummenzeilen werden nicht als Einsätze übernommen.
