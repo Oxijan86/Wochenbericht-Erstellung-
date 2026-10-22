@@ -296,7 +296,7 @@ html,body{max-width:100%;overflow-x:clip}.split>*{min-width:0}.tablewrap{max-wid
 @media(max-width:540px){.dayopenslots{gap:5px}.dayemptylink{font-size:12px;flex:1 1 45%}}
 </style>
 <style>
-/* V2.18 – kompakte Synchronisation statt Dauerleiste */
+/* V2.19 – kompakte Synchronisation statt Dauerleiste */
 .wbquickbar{display:none!important}
 .wbglobalstatus{min-width:40px;min-height:36px;font-size:16px;padding:5px 11px;border-radius:10px;white-space:nowrap}
 .wbglobalstatus[data-state="error"]{background:#77391e;border-color:#f3c094;color:#fff;font-size:12px}
@@ -535,7 +535,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 </script>
 <script>
 'use strict';
-const WB_APP_VERSION=Object.freeze({number:'2.18.0',date:'22.10.2026',cache:'wochenberichte-static-v2.18.0'});
+const WB_APP_VERSION=Object.freeze({number:'2.19.0',date:'22.10.2026',cache:'wochenberichte-static-v2.19.0'});
 
 
 /* SQLite single-record application database codec. Self-contained, offline.
@@ -566,7 +566,7 @@ return{encode,decode,validateApp};
 const WBStore=(()=>{
  const NAME='wochenbericht-lovrencic-v2',FILENAME='wochenberichte.db',LIMIT=30;
  let syncPaused=false;let folderAccess='unknown';
- let idb=null,dbData=null,device={mode:'browser_local',handle:null,baseId:null,baseDbId:null,syncedAt:null,name:'',pending:false,conflictBlocked:false},saveTail=Promise.resolve(),syncLoop=null,syncWanted=false,writeTail=Promise.resolve(),backupTimer=null,saveFailed=false,saving=0,lastError='',restoreUnpublished=false,lastRemote=null;
+ let idb=null,dbData=null,device={mode:'browser_local',handle:null,baseId:null,baseDbId:null,syncedAt:null,name:'',pending:false,conflictBlocked:false},saveTail=Promise.resolve(),syncLoop=null,syncWanted=false,writeTail=Promise.resolve(),backupTimer=null,saveFailed=false,saving=0,lastError='',restoreUnpublished=false,lastRemote=null,receivingRemote=false,lastSyncAction='none';
  const uuid=()=>typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():'a'+Date.now().toString(16)+Math.random().toString(16).slice(2);
  const now=()=>new Date().toISOString();
  const update=()=>{try{if(typeof wbRenderStatus==='function')wbRenderStatus()}catch(e){console.error(e)}};
@@ -587,6 +587,7 @@ const WBStore=(()=>{
   }}catch(e){throw Error('Vorhandene V1.x-Daten konnten nicht sicher migriert werden: '+e.message+'. Alte Daten wurden nicht verändert.')}}return{data:null,source:'new'}}
  async function create(d){if(dbData)throw Error('Vorhandene Datenbank darf nicht überschrieben werden');withMeta(d);const bytes=WBSqlite.encode(d);await txPut('kv','snapshot',bytes);dbData=clone(d);return clone(d)}
  function save(d){ // Always enqueue COMPLETE snapshots; status changes only after commit.
+   if(receivingRemote)return Promise.reject(Error('Cloud-Datenstand wird gerade eingelesen. Bitte den Eintrag anschließend erneut prüfen.'));
    try{markRevision(d)}catch(e){lastError=e.message;saveFailed=true;update();return Promise.reject(e)}
    const snap=clone(d);saving++;saveFailed=false;lastError='';update();
    const job=saveTail.catch(()=>{}).then(async()=>{const bytes=WBSqlite.encode(snap);await txPut('kv','snapshot',bytes);dbData=snap;device.pending=device.mode!=='browser_local';saving=Math.max(0,saving-1);saveFailed=false;lastError='';update();scheduleSync();scheduleBackup();return true});
@@ -631,8 +632,8 @@ const WBStore=(()=>{
        if(typeof handle.requestPermission!=='function'||await handle.requestPermission({mode:'readwrite'})!=='granted')throw Error('Ordnerzugriff erforderlich');
      }
      const h=await handle.getFileHandle(FILENAME,{create:false}),remote=WBSqlite.decode(new Uint8Array(await(await h.getFile()).arrayBuffer())),m=remote._meta,l=dbData._meta;
-     if(m.database_id===l.database_id&&(m.revision_id===old.baseId||m.revision_id===l.revision_id)){
-      await setDevice({handle,mode,name:handle.name,baseId:m.revision_id,baseDbId:m.database_id,syncedAt:now(),pending:m.revision_id!==l.revision_id,conflictBlocked:false});
+     if(m.database_id===l.database_id&&(m.revision_id===old.baseId||m.revision_id===l.revision_id||l.revision_id===old.baseId||m.previous_revision_id===l.revision_id||l.previous_revision_id===m.revision_id)){
+      await setDevice({handle,mode,name:handle.name,baseId:(m.revision_id===l.revision_id||m.revision_id===old.baseId)?m.revision_id:old.baseId,baseDbId:m.database_id,syncedAt:now(),pending:m.revision_id!==l.revision_id,conflictBlocked:false});
       lastError='';if(m.revision_id!==l.revision_id)scheduleSync();return'reconnected';
      }
      // Divergent revisions: retain local stand, leave former anchor for the conflict dialog.
@@ -653,17 +654,98 @@ const WBStore=(()=>{
  }
  async function setBrowserMode(){await setDevice({mode:'browser_local',handle:null,name:'',baseId:null,baseDbId:null,pending:false,conflictBlocked:false});lastError='';folderAccess='unavailable'}
  async function writeVerified(h,b,expected){const stream=await h.createWritable();try{await stream.write(b);await stream.close()}catch(e){try{await stream.abort()}catch(_e){}throw e}const reread=new Uint8Array(await(await h.getFile()).arrayBuffer());const verified=WBSqlite.decode(reread);if(verified._meta.database_id!==expected.database_id||verified._meta.revision!==expected.revision||verified._meta.revision_id!==expected.revision_id)throw Error('Nachkontrolle der Datei fehlgeschlagen');return verified}
+ // A revision number or changed_at alone is NOT proof of ancestry.
+ function decideSync(local,remote,baseId=device.baseId,baseDbId=device.baseDbId){
+  if(!local||!remote||local.database_id!==remote.database_id)return 'different_database';
+  if(local.revision_id===remote.revision_id)return 'equal';
+  const trustedBase=!!baseId&&baseDbId===local.database_id;
+  if(trustedBase&&local.revision_id===baseId&&remote.revision_id!==baseId)return 'pull';
+  if(trustedBase&&remote.revision_id===baseId&&local.revision_id!==baseId)return 'push';
+  // An explicitly recorded, immediate parent is also a provable safe direction.
+  if(remote.previous_revision_id===local.revision_id)return 'pull';
+  if(local.previous_revision_id===remote.revision_id)return 'push';
+  return 'diverged';
+ }
+ function unsafeToReloadUI(){
+  if(saving||receivingRemote||restoreUnpublished)return true;
+  // Do not mistake the new-entry form default (e.g. pause target "work") for user input.
+  try{
+   if(typeof wbFinishCurrentDraft==='function'&&typeof db!=='undefined'&&db?.selected){
+    const current=wbFinishCurrentDraft(),draft=db.draft||null;
+    if(current){
+     if(draft?.week===current.week&&JSON.stringify(draft.values||{})!==JSON.stringify(current.values))return true;
+     if(!draft&&(current.editing||Object.entries(current.values).some(([key,value])=>!['edate','etype','epausetarget','epause'].includes(key)&&String(value||'').trim()!=='')))return true;
+    }
+    if(JSON.stringify(draft)!==JSON.stringify(dbData?.draft||null))return true;
+   }
+  }catch(_e){return true}
+  try{if(typeof importDecisions!=='undefined'&&importDecisions.length)return true}catch(_e){}
+  try{if(typeof rondoPdfStaging!=='undefined'&&rondoPdfStaging.length)return true}catch(_e){}
+  return false;
+ }
+ // Called only with folderLocked, never call backup() here (it tries to lock the folder again).
+ async function receiveRemoteUnlocked(inspection,expectedLocalRevision){
+  if(unsafeToReloadUI()||dbData._meta.revision_id!==expectedLocalRevision){
+   lastError='Der Ordnerstand ist neuer, aber es gibt noch offene Eingaben oder einen laufenden Import. Bitte sichern und die Ansicht prüfen.';
+   await setDevice({conflictBlocked:true,pending:true});throw Error(lastError);
+  }
+  const checked=await inspect();
+  if(checked.status!=='ok'||checked.state._meta.revision_id!==inspection.state._meta.revision_id||checked.state._meta.database_id!==inspection.state._meta.database_id){
+   lastError='Ordnerdatei wurde während des Ladens erneut verändert. Bitte wiederholen.';throw Error(lastError);
+  }
+  const localBytes=bytes(),at=now(),id=uuid();
+  receivingRemote=true;
+  try{
+   // Durable independent local recovery copy BEFORE replacing the browser snapshot.
+   await keepBackup({id,at,kind:'Vor automatischem Cloud-Laden',comment:'Lokaler Stand vor gesichertem Cloud-Abgleich',location:'IndexedDB (dieses Gerät)',size:localBytes.byteLength,name:'wochenberichte_vor_cloudladen_'+at.slice(0,19).replace(/[-:]/g,'')+'_'+id+'.db',data:localBytes,mime:'application/vnd.sqlite3'},false);
+   if(dbData._meta.revision_id!==expectedLocalRevision||saving)throw Error('Lokale Eingaben wurden während des Ladens verändert; Daten bleiben erhalten.');
+   await txPut('kv','snapshot',checked.data);
+   dbData=clone(checked.state);restoreUnpublished=false;
+   await txPut('kv','restoreUnpublished',false);
+   await setDevice({baseId:dbData._meta.revision_id,baseDbId:dbData._meta.database_id,syncedAt:now(),pending:false,conflictBlocked:false});
+   lastError='';lastSyncAction='download';
+   // Refresh global app state too: IndexedDB alone would leave the visible week stale.
+   if(typeof wbRefreshFromStore==='function'&&typeof db!=='undefined'&&db?.profiles?.length)wbRefreshFromStore(clone(dbData));
+   update();return 'download';
+  }finally{receivingRemote=false}
+ }
+ async function reconcile(reason='manual'){
+  if(device.mode==='browser_local')return{status:'local_only'};
+  if(!device.handle)return{status:'no_folder'};
+  if(restoreUnpublished)return{status:'unpublished'};
+  await saveTail;
+  if(syncLoop){try{const outcome=await syncLoop;return{status:outcome||'equal'}}catch(_e){/* inspect below */}}
+  const r=await inspect();
+  if(r.status!=='ok')return{status:r.status,message:r.message};
+  const dir=decideSync(dbData._meta,r.state._meta);
+  if(dir==='diverged'||dir==='different_database'){
+   lastRemote=r;lastError=dir==='different_database'?'Konflikt: Es handelt sich um verschiedene Datenbanken.':'Konflikt: Beide Datenstände wurden unabhängig verändert.';
+   await setDevice({conflictBlocked:true,pending:true});return{status:'conflict',kind:dir};
+  }
+  if(dir==='pull'&&unsafeToReloadUI()){
+   lastRemote=r;lastError='Im Ordner liegt ein neuerer Datenstand. Bitte offene Eingaben bzw. PDF-Prüfung sichern und den Vergleich öffnen.';
+   await setDevice({conflictBlocked:true,pending:true});return{status:'conflict',kind:'open_input'};
+  }
+  if(device.conflictBlocked)await setDevice({conflictBlocked:false});
+  try{const status=await queueSync(reason);return{status:status||'equal'}}
+  catch(error){return{status:'conflict',message:error.message}}
+ }
  function folderLocked(fn){const job=writeTail.catch(()=>{}).then(fn);writeTail=job.catch(()=>{});return job}
  function scheduleSync(){if(syncPaused||device.conflictBlocked||device.mode==='browser_local'||!device.handle||restoreUnpublished)return;clearTimeout(WBStore._syncTimer);WBStore._syncTimer=setTimeout(()=>queueSync('auto').catch(console.warn),250)}
  async function queueSync(reason='manual'){if(device.mode==='browser_local')throw Error('Keine Ordnersynchronisierung im Browser-Modus');if(syncPaused&&reason==='auto')return false;if(device.conflictBlocked){if(reason==='auto')return false;throw Error('Synchronisation zum Schutz der Daten angehalten: Unterschiedliche Dateistände. Unter „Speicherung & Sync“ bitte vergleichen und ausdrücklich entscheiden.')}if(restoreUnpublished)throw Error('Wiederhergestellter Stand ist noch nicht veröffentlicht');syncWanted=true;if(syncLoop)return syncLoop;
-   syncLoop=(async()=>{while(syncWanted){syncWanted=false;await saveTail;await folderLocked(async()=>{const local=clone(dbData);const r=await inspect();if(r.status!=='ok'){lastError=r.status+': '+r.message;update();throw Error(lastError)}let file=r.state,m=local._meta,remote=file._meta;
-    if(m.database_id!==remote.database_id){lastRemote=r;await setDevice({conflictBlocked:true,pending:true});lastError='Konflikt: unterschiedliche Datenbankidentität. Automatische Synchronisation gestoppt.';update();throw Error(lastError)}
-    if(remote.revision_id===m.revision_id){await setDevice({baseId:remote.revision_id,baseDbId:remote.database_id,syncedAt:now(),pending:false,conflictBlocked:false});lastError='';return}
-    if(!device.baseId||remote.revision_id!==device.baseId||device.baseDbId!==m.database_id){lastRemote=r;await setDevice({conflictBlocked:true,pending:true});lastError='Konflikt: Datei und Browser wurden unabhängig verändert. Automatische Synchronisation gestoppt.';update();throw Error(lastError)}
+   syncLoop=(async()=>{let result='equal';while(syncWanted){syncWanted=false;await saveTail;result=await folderLocked(async()=>{const local=clone(dbData);const r=await inspect();if(r.status!=='ok'){lastError=r.status+': '+r.message;update();throw Error(lastError)}let file=r.state,m=local._meta,remote=file._meta;
+    const direction=decideSync(m,remote);
+    if(direction==='equal'){await setDevice({baseId:remote.revision_id,baseDbId:remote.database_id,syncedAt:now(),pending:false,conflictBlocked:false});lastError='';lastSyncAction='equal';return 'equal'}
+    if(direction==='pull')return await receiveRemoteUnlocked(r,m.revision_id);
+    if(direction!=='push'){
+     lastRemote=r;await setDevice({conflictBlocked:true,pending:true});
+     lastError=direction==='different_database'?'Konflikt: Verschiedene Datenbankidentitäten – niemals automatisch ersetzen.':'Konflikt: Beide Datenstände wurden unabhängig geändert – automatische Synchronisation angehalten.';
+     update();throw Error(lastError)
+    }
     const confirmed={database_id:m.database_id,revision_id:m.revision_id,revision:m.revision,confirmed_at:now()};local._meta.last_confirmed_base=confirmed;const published=WBSqlite.encode(local);await writeVerified(r.handle,published,m);
     if(dbData._meta.revision_id===m.revision_id){dbData._meta.last_confirmed_base=confirmed;await txPut('kv','snapshot',published)}else{dbData._meta.last_confirmed_base=confirmed}
-    await setDevice({baseId:m.revision_id,baseDbId:m.database_id,syncedAt:now(),pending:dbData._meta.revision_id!==m.revision_id});lastError='';if(dbData._meta.revision_id!==m.revision_id)syncWanted=true;
-   })}})().finally(()=>{syncLoop=null;update();if(syncWanted&&!syncPaused&&!device.conflictBlocked&&device.mode!=='browser_local'&&device.handle&&!restoreUnpublished)scheduleSync()});update();return syncLoop}
+    await setDevice({baseId:m.revision_id,baseDbId:m.database_id,syncedAt:now(),pending:dbData._meta.revision_id!==m.revision_id});lastError='';lastSyncAction='upload';if(dbData._meta.revision_id!==m.revision_id)syncWanted=true;return 'upload';
+   })||result;}return result;})().finally(()=>{syncLoop=null;update();if(syncWanted&&!syncPaused&&!device.conflictBlocked&&device.mode!=='browser_local'&&device.handle&&!restoreUnpublished)scheduleSync()});update();return syncLoop}
  async function backupToFolder(data,name){if(device.mode==='browser_local'||!(await permission()))return false;return folderLocked(async()=>{let dir=await device.handle.getDirectoryHandle('Backup',{create:true});let h=await dir.getFileHandle(name,{create:true});await writeVerified(h,data,WBSqlite.decode(data)._meta);let children=[];for await(const [fn,entry] of dir.entries())if(entry.kind==='file'&&/^wochenberichte_backup_\d{8}T\d{6}_[a-f0-9-]+\.db$/i.test(fn))children.push(fn);children.sort().reverse();for(const old of children.slice(LIMIT))await dir.removeEntry(old);return true})}
  async function keepBackup(record,prune=true){await txPut('backups',record.id,record);if(prune){let all=(await getAll('backups')).filter(b=>b.location===record.location).sort((a,b)=>b.at.localeCompare(a.at)||b.id.localeCompare(a.id));for(let b of all.slice(LIMIT))await txDel('backups',b.id)}}
  async function backup(kind='Manuell',comment='',alsoFolder=true){await saveTail;const data=bytes(),id=uuid(),at=now(),name='wochenberichte_backup_'+at.slice(0,19).replace(/[-:]/g,'').replace('T','T')+'_'+id+'.db';let base={id,at,kind,comment,location:'IndexedDB (dieses Gerät)',size:data.byteLength,name,data,mime:'application/vnd.sqlite3'};await keepBackup(base);let folderSaved=false,folderError='';if(alsoFolder&&device.mode!=='browser_local'&&!device.conflictBlocked){try{if(await backupToFolder(data,name)){folderSaved=true;await keepBackup({...base,id:uuid(),location:'Verbunden/Backup',data})}else folderError='Ordner-Backup nicht möglich: Keine Schreibberechtigung.'}catch(e){folderError='Ordner-Backup fehlgeschlagen: '+e.message;lastError=folderError;update()}}await txPut('kv','lastBackupAt',at);return {...base,folderSaved,folderError}}
@@ -697,8 +779,8 @@ const WBStore=(()=>{
  async function verifyPublished(){await flush();const local=dbData._meta,r=await inspect();if(r.status!=='ok')throw Error('Datei-Nachprüfung: '+r.status+' – '+(r.message||''));const m=r.state._meta;if(m.database_id!==local.database_id||m.revision_id!==local.revision_id||m.revision!==local.revision||device.baseId!==m.revision_id)throw Error('Dateistand nicht identisch mit lokal gespeicherter Revision');return true}
  async function syncAndClose(){await flush();await queueSync('close');await verifyPublished();return backup('Schließen','Synchronisiert und geprüft')}
  async function closeLocal(){pauseAutoSync();await flush();await waitActiveSync();await flush();return backup('Schließen','Nur lokal gespeichert',false)}
- function status(){return{mode:device.mode,name:device.name,hasPicker:hasPicker(),hasHandle:!!device.handle,baseId:device.baseId,pending:device.pending,saving:!!saving,saveFailed,lastError,syncedAt:device.syncedAt,syncing:!!syncLoop,paused:syncPaused,conflictBlocked:!!device.conflictBlocked,folderAccess,unpublished:restoreUnpublished,revision:dbData?dbData._meta.revision:0,entries:dbData?Object.values(dbData.weeks).reduce((n,w)=>n+w.entries.length,0):0}}
- return{begin,create,save,retry,bytes,downloadDb,download,hasPicker,connect,connectHandle,setBrowserMode,permission,reauthorize,inspect,queueSync,backup,listBackups,downloadBackup,removeBackup,restoreBackup,applyRestore,loadRemote,forceLocal,publishRestored,importFile,importJsonFile,replaceState,startBackupCheck,syncAndClose,closeLocal,flush,pauseAutoSync,resumeAutoSync,waitActiveSync,verifyPublished,status,getData:()=>clone(dbData),getDevice:()=>({...device}),exportFolderRead,exportFolderSave,exportFolderClear};
+ function status(){return{mode:device.mode,name:device.name,hasPicker:hasPicker(),hasHandle:!!device.handle,baseId:device.baseId,pending:device.pending,saving:!!saving,saveFailed,lastError,syncedAt:device.syncedAt,syncing:!!syncLoop,paused:syncPaused,conflictBlocked:!!device.conflictBlocked,folderAccess,lastSyncAction,unpublished:restoreUnpublished,revision:dbData?dbData._meta.revision:0,entries:dbData?Object.values(dbData.weeks).reduce((n,w)=>n+w.entries.length,0):0}}
+ return{begin,create,save,retry,reconcile,decideSync,bytes,downloadDb,download,hasPicker,connect,connectHandle,setBrowserMode,permission,reauthorize,inspect,queueSync,backup,listBackups,downloadBackup,removeBackup,restoreBackup,applyRestore,loadRemote,forceLocal,publishRestored,importFile,importJsonFile,replaceState,startBackupCheck,syncAndClose,closeLocal,flush,pauseAutoSync,resumeAutoSync,waitActiveSync,verifyPublished,status,getData:()=>clone(dbData),readyForRemote:()=>!unsafeToReloadUI(),getDevice:()=>({...device}),exportFolderRead,exportFolderSave,exportFolderClear};
 })();
 
 
@@ -2026,6 +2108,9 @@ function resetPdfImportAfterSave(){
   if(!importDecisions.length||importRejected.some(row=>!row.skipped))return;
   if(importTargetProfileId&&importTargetProfileId!==db.selected){toast('Das Zielprofil wurde gewechselt. Bitte Dateien erneut prüfen.',true);return}
   if(importSourceMode==='excel'&&importProfileMismatch&&!$('excelprofileoverride').checked){toast('Bitte die abweichende Technikerzuordnung ausdrücklich bestätigen.',true);return}
+  const pre=await wbPeriodicReconcile('Vor Importabschluss');
+  if(pre?.status==='conflict'){toast('Speicherung ausgesetzt: Cloud-Datenstand prüfen, danach PDFs erneut abgleichen.',true);setTab('backuppage');return}
+  if(pre?.status==='download'){toast('Neuer Cloud-Datenstand geladen. Bitte den PDF-Abgleich zur Sicherheit erneut starten.',true);pendingImport=[];importDecisions=[];importRejected=[];$('importreview').innerHTML='';$('doimport').disabled=true;return}
   const btn=$('doimport');btn.disabled=true;
   const original=JSON.parse(JSON.stringify(db));
   try{
@@ -2136,13 +2221,49 @@ if($x('dashboardpage')?.classList.contains('active')&&typeof renderDashboard==='
 function wbError(e){console.error(e);toast(e?.message||String(e),true);wbRenderStatus()}
 function wbRefreshFromStore(data){WB_SUSPEND_PERSIST=true;try{db=data;const migrated=customerMigrateIfNeeded();if(migrated)WBStore.save(db).catch(wbError);if(db.draft?.week){const f=db.draft.week.split('|');if(f.length>=3&&Number(f[1])&&Number(f[2]))sel={year:Number(f[1]),week:Number(f[2])}}editing=null;refresh();const dr=db.draft;if(dr?.week===wkKey()&&dr.values){Object.entries(dr.values).forEach(([id,v])=>{if($(id))$(id).value=v});editing=dr.editing||null;$('formtitle').textContent=editing?'Eintrag bearbeiten':'Eintrag erfassen';$('saveentry').textContent=editing?'Änderungen speichern':'Eintrag speichern';calculatePreview()}else newEntry()}finally{WB_SUSPEND_PERSIST=false}wbRenderStatus()}
 const wbBtn=(id,cb)=>document.getElementById(id).addEventListener('click',async()=>{try{await cb()}catch(e){wbError(e)}finally{wbRenderStatus();wbListBackups().catch(console.warn)}});
-async function wbConflict(){const r=await WBStore.inspect(),s=WBStore.getData(),d=document.getElementById('wbconflict');const details=x=>{const m=x?._meta;return !m?'Kein lesbarer Datenstand':`Geändert ${new Date(m.changed_at).toLocaleString('de-DE')} · Revision ${m.revision} · ${m.revision_id} · ${Object.values(x.weeks||{}).reduce((a,w)=>a+(w.entries?.length||0),0)} Einsätze · ${Object.keys(x.weeks||{}).length} Wochenberichte`};
- const count=x=>Object.values(x?.weeks||{}).reduce((sum,w)=>sum+(w.entries?.length||0),0);
- const localCount=count(s),remoteCount=count(r.state);
- const guidance=r.status==='ok'&&localCount>remoteCount?`<p class="msg error"><strong>Der lokale Stand enthält ${localCount} Einsätze, der Ordnerstand nur ${remoteCount}.</strong> Beide Stände zuerst separat sichern. Wenn der umfangreichere lokale Stand vollständig und korrekt ist, kann er nach ausdrücklicher Bestätigung über „Lokalen Stand ausdrücklich übernehmen“ veröffentlicht werden; die bisherige Ordnerdatei wird vorher gesichert. „Vorhandenen Dateistand laden“ ersetzt dagegen deine aktuelle Arbeitskopie.</p>`:'';
- d.hidden=false;d.innerHTML=`<h3>Vergleich der Datenstände</h3><p><b>Lokal:</b> ${esc(details(s))}</p><p><b>Ordner:</b> ${esc(details(r.state))}</p><p class="small">Dateistatus: ${esc(r.status)}${r.message?' – '+esc(r.message):''}</p><p class="small">Unterschiedliche Revisionszweige werden niemals automatisch überschrieben. Bitte ausdrücklich entscheiden.</p>${guidance}`}
+function wbEntryDiff(local,remote){
+ const collect=data=>{const x=new Map();for(const [wk,w]of Object.entries(data?.weeks||{}))for(const e of (w.entries||[]))x.set(wk+'|'+e.id,JSON.stringify(e));return x};
+ const l=collect(local),r=collect(remote);let onlyLocal=0,onlyRemote=0,changed=0,identical=0;
+ for(const [k,v]of l){if(!r.has(k))onlyLocal++;else if(r.get(k)!==v)changed++;else identical++;}
+ for(const k of r.keys())if(!l.has(k))onlyRemote++;
+ return{onlyLocal,onlyRemote,changed,identical,local:l.size,remote:r.size};
+}
+function wbConflictAdvice(local,remote,baseId,baseDbId){
+ if(!remote)return{kind:'unreadable',title:'Ordnerdatei derzeit nicht lesbar',text:'Keine Version übernehmen. Zuerst den Ordnerzugriff bzw. das Dateiformat überprüfen.'};
+ const decision=WBStore.decideSync(local?._meta,remote?._meta,baseId,baseDbId);
+ if(decision==='equal')return{kind:'equal',title:'Stände stimmen überein',text:'Kein Konflikt: Die beiden Datenbanken enthalten dieselbe bestätigte Revision.'};
+ if(decision==='pull')return{kind:'pull',title:'Empfehlung: Ordnerstand laden',text:'Der Browserstand ist nachweislich unverändert, während die Ordnerdatei weitergeschrieben wurde. Automatisches Laden ist nach Sicherung möglich, sofern keine offenen Eingaben vorliegen.'};
+ if(decision==='push')return{kind:'push',title:'Empfehlung: Lokale Änderungen synchronisieren',text:'Die Ordnerdatei entspricht dem letzten bestätigten Stand; nur der Browser wurde geändert. Der lokale Stand kann nach erneuter Dateiprüfung sicher veröffentlicht werden.'};
+ if(decision==='different_database')return{kind:'manual',title:'Unterschiedliche Datenbanken: keine automatische Übernahme',text:'Beide Dateien unabhängig sichern. Danach prüfen, ob versehentlich ein anderer Techniker oder eine andere Datenbank verbunden wurde.'};
+ const diff=wbEntryDiff(local,remote);
+ if(diff.changed||diff.onlyLocal&&diff.onlyRemote)return{kind:'manual',title:'Empfehlung: Beide Stände zunächst sichern und Unterschiede prüfen',text:`${diff.changed} Einsatz-/Uhrzeitwerte weichen ab, ${diff.onlyLocal} Einsätze gibt es nur lokal und ${diff.onlyRemote} nur im Ordner. Kein Stand darf ungeprüft den anderen ersetzen.`};
+ if(diff.onlyRemote&&!diff.onlyLocal)return{kind:'pull_suggested',title:'Empfehlung: Ordnerstand wahrscheinlich vollständiger',text:`Der Ordner enthält ${diff.onlyRemote} zusätzliche Einsätze und keine lokal vorhandene Einsatz-ID fehlt im Ordner. Bitte trotzdem Profil-, Kunden- und Wochenwerte prüfen und beide Stände sichern. Danach gegebenenfalls „Vorhandenen Dateistand laden“ auswählen.`};
+ if(diff.onlyLocal&&!diff.onlyRemote)return{kind:'push_suggested',title:'Empfehlung: Lokaler Stand wahrscheinlich vollständiger',text:`Lokal sind ${diff.onlyLocal} zusätzliche Einsätze enthalten. Beide Stände sichern und prüfen. Nur wenn der lokale Stand richtig ist, „Lokalen Stand ausdrücklich übernehmen“ wählen; der Ordnerstand wird vorher gesichert.`};
+ return{kind:'manual',title:'Empfehlung: Unterschiede manuell prüfen',text:'Die Einsatzlisten sind gleich, aber die Datenbankrevisionen nicht. Änderungen an Kundenstamm, Wochenwerten oder Einstellungen sind möglich. Beide Stände sichern und prüfen.'};
+}
+async function wbConflict(){
+ const r=await WBStore.inspect(),s=WBStore.getData(),d=document.getElementById('wbconflict'),state=WBStore.status();
+ const details=x=>{const m=x?._meta;return !m?'Kein lesbarer Datenstand':`Geändert ${new Date(m.changed_at).toLocaleString('de-DE')} · Revision ${m.revision} · ${m.revision_id} · ${Object.values(x.weeks||{}).reduce((a,w)=>a+(w.entries?.length||0),0)} Einsätze · ${Object.keys(x.weeks||{}).length} Wochenberichte`};
+ const advice=wbConflictAdvice(s,r.status==='ok'?r.state:null,state.baseId,WBStore.getDevice().baseDbId);
+ const diff=r.status==='ok'?wbEntryDiff(s,r.state):null;
+ d.hidden=false;d.innerHTML=`<h3>Vergleich der Datenstände</h3><p><b>Lokal:</b> ${esc(details(s))}</p><p><b>Ordner:</b> ${esc(details(r.state))}</p><p class="small">Dateistatus: ${esc(r.status)}${r.message?' – '+esc(r.message):''}</p><div class="msg"><strong>${esc(advice.title)}</strong><p>${esc(advice.text)}</p></div>${diff?`<p class="small">Unterschiede bei Einsatz-IDs: nur lokal <strong>${diff.onlyLocal}</strong>, nur im Ordner <strong>${diff.onlyRemote}</strong>, unterschiedliche Werte <strong>${diff.changed}</strong>, übereinstimmende Einsätze <strong>${diff.identical}</strong>.</p>`:''}<p class="small"><strong>Wichtig:</strong> Mehr Einsätze, eine höhere Revisionsnummer oder ein neueres Änderungsdatum beweisen allein nicht, dass sämtliche Daten enthalten sind. Im echten Konflikt wird niemals automatisch überschrieben. Vor einer Entscheidung beide Versionen sichern.</p>`;
+}
+let wbLastReconcileAt=0,wbReconcileBusy=false;
+async function wbPeriodicReconcile(reason='Prüfung'){
+ const s=WBStore.status();if(s.mode==='browser_local'||!s.hasHandle||s.unpublished||wbReconcileBusy)return null;
+ if(!reason.startsWith('Vor ')&&Date.now()-wbLastReconcileAt<12000)return null;
+ wbReconcileBusy=true;wbLastReconcileAt=Date.now();
+ try{const result=await WBStore.reconcile(reason);
+  if(result.status==='download')toast('Aktueller Ordnerstand wurde automatisch geladen.');
+  if(result.status==='conflict'){
+   await wbConflict();if(reason==='Vor PDF-Import')setTab('backuppage');
+  }
+  wbRenderStatus();return result;
+ }catch(e){console.warn('Sync-Vorabprüfung:',e);return{status:'error',message:e.message}}
+ finally{wbReconcileBusy=false}
+}
 async function wbListBackups(){const all=await WBStore.listBackups(),box=$('wblist');box.innerHTML=all.length?all.map(r=>`<div class="historyitem" style="align-items:start"><div class="historycore"><strong>${esc(new Date(r.at).toLocaleString('de-DE'))} · ${esc(r.kind)}</strong><div class="small">${esc(r.comment||'Ohne Kommentar')} · ${(r.size||r.data?.length||0).toLocaleString('de-DE')} Byte</div><div class="small">${esc(r.location)} · ${esc(r.name)}</div></div><div class="btnrow"><button class="btn tiny" data-wbdownload="${esc(r.id)}">Herunterladen</button><button class="btn tiny" data-wbrestore="${esc(r.id)}">Wiederherstellen</button><button class="btn tiny danger" data-wbdelete="${esc(r.id)}">Löschen</button></div></div>`).join(''):'<p class="hint">Noch keine Sicherungen vorhanden.</p>'}
-async function wbStart(){let legacy=null;try{legacy=localStorage.getItem(KEY)}catch(e){}try{const initial=await WBStore.begin(legacy);await wbExportInit();if(initial.data){db=initial.data;const needsCustomerMigration=customerMigrateIfNeeded();if(needsCustomerMigration){await WBStore.backup('Vor Migration','Kundenstamm V2.6 – Sicherheitskopie des vorherigen Datenstands',false);await WBStore.save(db);}if(initial.source==='migration'){try{localStorage.removeItem(KEY)}catch(e){} }if(db.draft?.week){let f=db.draft.week.split('|');if(f.length>=3)sel={year:Number(f[1]),week:Number(f[2])}}WB_SUSPEND_PERSIST=true;try{init()}finally{WB_SUSPEND_PERSIST=false}wbActivate();wbRenderStatus();wbListBackups();WBStore.startBackupCheck().then(wbListBackups).catch(wbError);if(initial.source==='migration')toast('Vorhandene V1.3-Daten übernommen – Original-JSON als Backup gesichert.');return}
+async function wbStart(){let legacy=null;try{legacy=localStorage.getItem(KEY)}catch(e){}try{const initial=await WBStore.begin(legacy);await wbExportInit();if(initial.data){db=initial.data;const needsCustomerMigration=customerMigrateIfNeeded();if(needsCustomerMigration){await WBStore.backup('Vor Migration','Kundenstamm V2.6 – Sicherheitskopie des vorherigen Datenstands',false);await WBStore.save(db);}if(initial.source==='migration'){try{localStorage.removeItem(KEY)}catch(e){} }if(db.draft?.week){let f=db.draft.week.split('|');if(f.length>=3)sel={year:Number(f[1]),week:Number(f[2])}}WB_SUSPEND_PERSIST=true;try{init()}finally{WB_SUSPEND_PERSIST=false}wbActivate();wbRenderStatus();wbListBackups();setTimeout(()=>wbPeriodicReconcile('Startprüfung'),900);WBStore.startBackupCheck().then(wbListBackups).catch(wbError);if(initial.source==='migration')toast('Vorhandene V1.3-Daten übernommen – Original-JSON als Backup gesichert.');return}
 $('wbstart').hidden=false;wizardPage('choice');wbRenderStatus()}
 catch(e){$('wbstart').hidden=false;wizardPage('choice');wizardError(new Error('Startfehler: '+e.message+'. Vorhandene Daten wurden nicht überschrieben. Bitte Browser-Speicherberechtigungen prüfen.'));wbError(e)}}
 function wbActivate(){if(WBStore.hasPicker())$('wbpickerhint').textContent='Ordnerauswahl wird unterstützt. Wähle für OneDrive den tatsächlich auf diesem Gerät synchronisierten OneDrive-Ordner.';else $('wbpickerhint').textContent='Dieser Browser unterstützt hier keine dauerhafte Ordnerauswahl. Du kannst weiterhin vollständig im Browser arbeiten und .db-Dateien exportieren und importieren.';
@@ -2154,8 +2275,10 @@ function wbActivate(){if(WBStore.hasPicker())$('wbpickerhint').textContent='Ordn
  wbBtn('wbregrant',async()=>{if(await WBStore.reauthorize())toast('Ordnerzugriff erneut freigegeben')});
  wbBtn('wbsetupregrant',async()=>{if(await WBStore.reauthorize())toast('Ordnerzugriff freigegeben')});
  
- wbBtn('wbsyncnow',async()=>{try{await WBStore.queueSync('manual');await WBStore.verifyPublished();toast('Ordnerdatei geschrieben und nachgeprüft')}catch(e){await wbConflict();toast('Lokal gesichert – Ordnerabgleich nicht bestätigt: '+e.message)}});
+ wbBtn('wbsyncnow',async()=>{try{await WBStore.queueSync('manual');await WBStore.verifyPublished();toast('Ordnerabgleich erfolgreich: Cloud-Stand geladen oder Änderungen veröffentlicht und nachgeprüft.')}catch(e){await wbConflict();toast('Lokal gesichert – Ordnerabgleich nicht bestätigt: '+e.message)}});
 
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)wbPeriodicReconcile('App wieder geöffnet').catch(console.warn)});
+ window.addEventListener('focus',()=>{wbPeriodicReconcile('Fenster aktiv').catch(console.warn)});
  wbBtn('wbquickdetails',async()=>setTab('backuppage'));
  wbBtn('wbglobalstatus',async()=>{
   const s=WBStore.status();
@@ -2751,6 +2874,9 @@ function rondoPdfLaunchReview(){
 function rondoPdfInit(){
  $('rondopdfcheck')?.addEventListener('click',async()=>{
   const files=Array.from($('rondopdffiles').files||[]);if(!files.length){rondoPdfStatus('Bitte PDF-Dateien auswählen.',true);return}
+  const pre=await wbPeriodicReconcile('Vor PDF-Import');
+  if(pre?.status==='conflict'){rondoPdfStatus('Die Datenstände weichen voneinander ab. Bitte unter „Speicherung & Sync“ die Empfehlung prüfen, bevor weitere PDFs eingelesen werden.',true);return}
+  if(pre?.status==='error'){rondoPdfStatus('Cloud-Prüfung nicht möglich: '+pre.message+'. Du kannst weiterhin lokal arbeiten; die Veröffentlichung benötigt später eine Synchronisierung.',true)}
   const btn=$('rondopdfcheck');btn.disabled=true;rondoPdfStaging=[];rondoPdfErrors=[];rondoPdfTargetProfileId=db.selected;
   // Never reuse earlier preview decisions with freshly selected source files.
   pendingImport=[];importDecisions=[];importRejected=[];$('importreview').innerHTML='';$('importerrors').innerHTML='';$('importresult').innerHTML='';$('doimport').disabled=true;

@@ -1,8 +1,8 @@
-# Wochenbericht Lovrencic – Version 2.18.0
+# Wochenbericht Lovrencic – Version 2.19.0
 
 Offlinefähige HTML-Anwendung für Servicetechniker, basierend auf Version 2.15. Datenbank, Kundenstamm, RONDO-PDF-Import, optionale Sonderfunktionen, Backups, Synchronisation und originalgetreuer Excel-Export bleiben erhalten.
 
-## Änderungen in V2.18
+## Änderungen in V2.19
 
 - **Zeitstempel:** Im Einsatzassistenten sind Beginn und Ende der Hinfahrt, Arbeitszeit und Rückfahrt einsehbar und korrigierbar. Der Assistent speichert die tatsächlichen Zeitstempel. Für den Excel-Wochenbericht werden die Arbeitszeiten weiterhin wie bisher auf Viertelstunden aufgerundet.
 - **Hinfahrt:** Reisezeit aus Start-/Ankunftszeit automatisch berechnen, bereits erfasste Fahrpausen abziehen. Optional Reisezeit manuell eintragen oder (bei bekannten Kunden) den früheren Wert als Vorschlag auswählen.
@@ -22,7 +22,7 @@ Offlinefähige HTML-Anwendung für Servicetechniker, basierend auf Version 2.15.
 
 ## Bestehende Daten und Sicherheit
 
-Die interne Datensatzstruktur `version:1` und die bisherigen Felder bleiben kompatibel. Neue Zeitstempel und Auswahlmodi sind zusätzliche optionale Felder. Vor dem Versionswechsel **ein Datenbankbackup** erstellen; danach V2.18 mit der bisherigen Datenbank öffnen. Alte Einsätze und Serviceberichte werden nicht automatisch umgeschrieben. Ein PDF-Vergleich ist niemals Exportvoraussetzung.
+Die interne Datensatzstruktur `version:1` und die bisherigen Felder bleiben kompatibel. Neue Zeitstempel und Auswahlmodi sind zusätzliche optionale Felder. Vor dem Versionswechsel **ein Datenbankbackup** erstellen; danach V2.19 mit der bisherigen Datenbank öffnen. Alte Einsätze und Serviceberichte werden nicht automatisch umgeschrieben. Ein PDF-Vergleich ist niemals Exportvoraussetzung.
 
 Der Datenbank-Speicherort (lokal/Cloud) ist von der Programmversion unabhängig. Eine lokale DB-Speicherung garantiert noch keinen abgeschlossenen Cloud-Abgleich; hierfür den Status unter „Speicherung & Sync“ prüfen. Bei einer GitHub Pages-Veröffentlichung `index.html` und `sw.js` gemeinsam ersetzen, damit auch Offline-Nutzer die neue Cache-Version laden.
 
@@ -31,7 +31,7 @@ Der Datenbank-Speicherort (lokal/Cloud) ist von der Programmversion unabhängig.
 `test_v216.py` enthält reproduzierbare Chromium-Tests der neuen Reise-/Zeit- und Abbruchabläufe. `test_regression.py` führt bestehende interne Selbsttests aus. `TESTPROTOKOLL.md` führt den Umfang auf. Für die Tests sind Python, BeautifulSoup, Playwright und Chromium erforderlich. Eine echte Cloud-Zwei-Geräte-Synchronisation und sämtliche PDF-Arten wurden hier nicht neu physisch geprüft.
 
 
-## Version 2.18.0 – Ergänzungen
+## Version 2.19.0 – Ergänzungen
 
 - Unter „Einsätze erfassen“ zeigen Kundeneinsätze den Status **rot: Nicht abgeglichen** oder **grün: PDF abgeglichen**. Nur ungeprüfte Einträge haben die Aktion „Service abgleichen“, welche die PDF-Auswahl im Reiter Servicebericht-Import öffnet. Der PDF-Abgleich bleibt freiwillig.
 - „Eintrag anlegen“ hat keinen Zähler der freien Zeilen mehr. Zusätzliche Einträge am selben Tag sind weiterhin möglich.
@@ -44,7 +44,7 @@ Der Datenbank-Speicherort (lokal/Cloud) ist von der Programmversion unabhängig.
 Vor dem Update eine Datenbanksicherung exportieren.
 
 
-## Version 2.18.0 – Bedienung und Datenintegrität
+## Version 2.19.0 – Bedienung und Datenintegrität
 
 - Cloud-Symbol im Kopfbereich statt Dauerleiste: Ordnerzugriff und manuelle Synchronisation sind unter einem Symbol gebündelt; deutliche Warnhinweise erscheinen nur bei Fehlern oder Konflikten.
 - Ordner- und Browserstände mit abweichenden Revisionen werden nicht überschrieben. Der Konfliktzustand blockiert weitere automatische Schreibversuche auch nach zusätzlichen lokalen Speichervorgängen; Auflösung nur durch bewusste Entscheidung unter „Speicherung & Sync“.
@@ -56,3 +56,16 @@ Vor dem Update eine Datenbanksicherung exportieren.
 - Unter dem Servicebericht-Import wird kurz erklärt: regelbasierte Textauswertung ohne KI, Einsätze vergleichen, Stammdaten/Adressen übernehmen, Navigation öffnen und mit vorhandenen Kundendaten neuen Einsatz starten.
 
 **Wichtig:** Vor Versionswechsel eine .db-Kopie außerhalb des Browser-Speichers sichern. Bei 199 lokalen Einsätzen gegenüber nur 7 in der Ordnerdatei niemals unkontrolliert den Ordnerstand laden. Cloud-Konflikte auf zwei realen Geräten wurden nicht end-to-end geprüft.
+
+
+## Version 2.19.0 – automatische Einweg-Synchronisation und Konfliktempfehlung
+
+- Bei eindeutigem gemeinsamem Revisionsanker und ausschließlich fortgeschriebener Ordnerdatei wird die aktuellere Datei automatisch in den Browser geladen. Davor wird die bisherige lokale SQLite-Datei als unabhängiges IndexedDB-Backup gesichert. Die Wochenansicht wird anschließend aktualisiert.
+- Bei ausschließlich lokal fortgeschriebenem Stand bleibt das vorhandene sichere Verhalten erhalten: Ordnerdatei vor dem Schreiben nochmals einlesen und verifizieren, danach lokalen Stand hochladen.
+- Die Prüfung läuft beim Start, beim Wiederöffnen der Anwendung und vor PDF-Sammelimporten; außerdem bei manueller Synchronisation. Vor der endgültigen PDF-Übernahme wird erneut geprüft.
+- Bei offenen Eingaben oder einer unbestätigten PDF-Vorschau wird kein automatischer Cloud-Import durchgeführt. Bei nicht eindeutig bestimmbarer Änderungsrichtung bleibt die Synchronisation gesperrt.
+- Die Konfliktansicht vergleicht lokal und in der Ordnerdatei tatsächlich enthaltene Einsatz-IDs sowie abweichende Datensätze und zeigt eine bedingte Empfehlung: Ordnerstand laden, lokalen Stand übernehmen oder beide getrennt sichern und Unterschiede prüfen. Eine größere Einsatzanzahl oder Revisionsnummer allein autorisiert niemals ein automatisches Überschreiben.
+- Frühere Konfliktsperren können sich bei der Prüfung automatisch auflösen, wenn zweifelsfrei feststeht, dass nur ein Datenstand weitergeschrieben wurde. Die Datei wird gegen zwischenzeitliche Änderungen geprüft.
+- Für eine Cloud-Übertragung zwischen Geräten ist weiterhin ein tatsächlicher Cloud-Sync des ausgewählten Ordners nötig. Auf Browsern ohne dauerhaften Ordnerzugriff funktioniert die lokale Datenbank mit separatem .db-Import/Export, nicht die automatische Dateisynchronisierung.
+
+**Unbedingt zuerst eine externe .db-Sicherung erstellen, insbesondere falls auf einem Gerät 7 und auf dem anderen 201 Einsätze angezeigt werden.** Die App führt divergierende Einsätze nicht automatisch zusammen.
