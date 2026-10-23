@@ -22,3 +22,9 @@ Die Original-Excel-Vorlage bietet sechs Einsatzzeilen pro Wochentag (Mo–Fr); w
 ## GitHub Pages
 
 `index.html`, `sw.js`, `README.md` und `.nojekyll` aus dem Schnellupload in das Wurzelverzeichnis der GitHub-Pages-Quelle hochladen. Cache-Kennung `wochenberichte-static-v2.21.0`. Bei alter Darstellung Seite neu laden; Browserdatenbank **nicht** löschen.
+
+
+## V2.22
+- KW-Konfiguration und Stundenübersicht nur bei „Einsätze erfassen“ und „Wochenbericht / Export“.
+- PDF-Endzeitvorschlag nach Eingabe Arbeitsbeginn: netto PDF-Arbeitsdauer plus Arbeitspause.
+- Vorschlag bleibt bis zum Speichern ausdrücklich gekennzeichnet; bestehende Endzeiten werden nicht überschrieben.
