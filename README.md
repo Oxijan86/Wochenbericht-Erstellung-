@@ -1,8 +1,20 @@
-# Wochenbericht Lovrencic – V2.21.0 (22.10.2026)
+# Wochenbericht Lovrencic – V2.23.0 (23.10.2026)
 
 Die Anwendung funktioniert im Browser auf PC und Smartphone. Einsatzdaten bleiben in der bestehenden lokalen Datenbank (IndexedDB), mit optionaler Ordnersynchronisation unter „Speicherung & Sync“. **Vor der Aktualisierung bitte eine separate Datenbanksicherung erstellen.**
 
-## Neu in V2.21
+## Neu in V2.23
+
+- **PDF-Import pro Datei steuern:** Jede erfolgreich ausgelesene PDF erhält die beiden Möglichkeiten „Positionen übernehmen und abgleichen“ und „Diesen Bericht vollständig überspringen“ – auch bei eindeutig erkannten Technikern.
+- **Kein zusätzlicher Techniker-Bestätigungshaken:** Bei gemischten Serviceberichten die eigenen Arbeits-, Reisezeit- und Kilometerpositionen auswählen. Der Klick auf „Berichtsauswahl prüfen und Einsätze vergleichen“ bestätigt die jeweilige Auswahl für die Vorschau. Die Daten werden erst beim abschließenden „Auswahl bestätigen und speichern“ dauerhaft übernommen.
+- **Überspringen ohne erneute Dateiauswahl:** Die übrigen PDFs bleiben im Stapel. Wenn alle PDFs übersprungen werden, kehrt die Anwendung ohne Datenänderung zur PDF-Auswahl zurück.
+- **Sicherheitsprüfung bleibt erhalten:** Ohne markierte Positionen kann ein Bericht nur übersprungen, nicht als leerer Einsatz übernommen werden. Kaputte PDFs müssen weiterhin ausdrücklich ausgeschlossen werden.
+
+## Aus V2.22
+
+- Kalenderwoche und Stundenübersicht nur in „Einsätze erfassen“ und „Wochenbericht / Export“.
+- Nach Eingabe des Arbeitsbeginns erscheint ein automatisch berechneter Vorschlag zum Arbeitsende anhand der PDF-Dauer und einer möglichen Pause; manuelle Endzeiten werden nicht überschrieben.
+
+## Aus V2.21
 
 - **PDF-Arbeitsdauerabweichungen sind nur noch Kontrollhinweise.** 15–29 Minuten werden als Hinweis angezeigt; ab 30 Minuten erscheint ein deutlicher Warnhinweis mit den beiden Dauern und der Differenz. Der Excel-Export ist deswegen **nicht** gesperrt und es ist keine Ausnahmebegründung erforderlich.
 - **Fehlende tatsächliche Beginn-/Enduhrzeiten** sind weiterhin eine eigene Vollständigkeitsprüfung: Zunächst den Einsatz nachtragen oder eine begründete Ausnahme bestätigen. Ungültige Pausen können weiterhin blockieren.
@@ -11,7 +23,7 @@ Die Anwendung funktioniert im Browser auf PC und Smartphone. Einsatzdaten bleibe
 
 ## Benutzung
 
-1. Servicebericht-Import öffnen, mehrere aktuelle oder ältere PDFs einlesen, Zuordnungen prüfen und „Auswahl bestätigen und speichern“ betätigen.
+1. Servicebericht-Import öffnen und mehrere aktuelle oder ältere PDFs einlesen. Pro PDF entweder die passenden Technikerpositionen kontrollieren oder „Diesen Bericht vollständig überspringen“ wählen. Danach „Berichtsauswahl prüfen und Einsätze vergleichen“ und abschließend „Auswahl bestätigen und speichern“ betätigen.
 2. Unter „Wochenbericht / Export“ die Exportprüfung lesen. Bei PDF-Stundenabweichungen wird die Differenz gezeigt und der Einsatz kann direkt kontrolliert werden, der Export bleibt möglich.
 3. Bei fehlenden Uhrzeiten über „Einsatz korrigieren“ nachtragen oder ausdrücklich eine begründete Ausnahme zulassen.
 
@@ -21,7 +33,7 @@ Die Original-Excel-Vorlage bietet sechs Einsatzzeilen pro Wochentag (Mo–Fr); w
 
 ## GitHub Pages
 
-`index.html`, `sw.js`, `README.md` und `.nojekyll` aus dem Schnellupload in das Wurzelverzeichnis der GitHub-Pages-Quelle hochladen. Cache-Kennung `wochenberichte-static-v2.21.0`. Bei alter Darstellung Seite neu laden; Browserdatenbank **nicht** löschen.
+`index.html`, `sw.js`, `README.md` und `.nojekyll` aus dem Schnellupload in das Wurzelverzeichnis der GitHub-Pages-Quelle hochladen. Cache-Kennung `wochenberichte-static-v2.23.0`. Bei alter Darstellung Seite neu laden; Browserdatenbank **nicht** löschen.
 
 
 ## V2.22
