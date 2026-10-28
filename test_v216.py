@@ -52,7 +52,7 @@ with sync_playwright() as p:
  page.locator('#tripreturnstartat').fill('2026-10-22T10:35');act('saveTimes')
  state=snapshot();check('correct return start recalculates measured return',state['rows'][0]['trip']['returnMinutes']==60) # ceil 60 minutes from 10:35 to 11:50 -15=60
  # Persist PDF marker when manually changed
- page.evaluate('''()=>{const e=allStoredEntries().find(x=>x.entry.trip)?.entry;e.serviceReportCheck={filename:'RONDO_Bericht.pdf',status:'identisch',reviewed:true,changed:false,checkedAt:new Date().toISOString()};renderWeek()}''')
+ page.evaluate('''()=>{const e=allStoredEntries().find(x=>x.entry.trip)?.entry;e.serviceReportCheck={filename:'RONDO_Bericht.pdf',status:'identisch',reviewed:true,changed:false,checkedAt:new Date().toISOString()};const w=isoInfo(dateFromISO(e.date));switchWeek(w.year,w.week)}''')
  check('green pdf marker in week', '✓ PDF abgeglichen' in page.locator('#entrylist').inner_text())
  page.locator('#tripdepartat').fill('2026-10-22T07:50');act('saveTimes')
  check('pdf remains verified after edit',page.evaluate('allStoredEntries().find(x=>x.entry.trip).entry.serviceReportCheck.reviewed===true') and 'Erneut prüfen' not in page.locator('#historylist').inner_text())

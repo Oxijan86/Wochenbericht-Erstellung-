@@ -1,36 +1,35 @@
+# V2.24.1 – 28.10.2026
+
+- Interaktive Kundensuche im Einsatzassistenten: Namens- und Nummern-Fragmente, Standorte und Adressen, mobile Tastatur, getrennte Filialen.
+- Übergreifender Uhrzeitkorrektur-Dialog für alle sechs Zeitstempel; Zeitfolgen und Pausen validiert; automatische Reisezeitberechnung nach Korrektur, PDF-Prüfnachweise bleiben unverändert bzw. nur als nachbearbeitet markiert.
+- V2.24-Mehrtagelogik an den tatsächlichen PDF-Direktimport angebunden. Bei M365-Import nicht mehr irrtümlich ausgelöst.
+- PDF-Enddatum, maximal 14 Tage Rückschau, gemeinsamer Gesamtstunden-/Reisezeit-/Kilometervergleich; Zustimmung für den Gesamt-Abgleich ausdrücklich erforderlich. Alle Tageswerte werden unverändert gelassen; PDF-Nachweise für alle Tage.
+- Service-Worker-Cacheversion V2.24.1 und `index.html`-Registrierung synchronisiert; Hilfetext aktualisiert, keine Datenbankmigration.
+
+# V2.24 – Mehrtägiger PDF-Gesamtabgleich (Vorversion)
+
+- Erste Implementierung für mehrere Tage gleicher Ticketnummer und passendem Kunden.
+- PDF-Werte als Gesamtwerte, Tageswerte bleiben erhalten, gemeinsam geprüfte Tage.
+
 # V2.23.0 – 23.10.2026
 
-- Pro RONDO-PDF ist unabhängig von der Technikerzuordnung ausdrücklich wählbar: „Positionen übernehmen und abgleichen“ oder „Diesen Bericht vollständig überspringen“.
-- Zusätzliche Pflicht-Checkbox „Ich habe die Positionen geprüft…“ aus der Technikerzuordnung entfernt. Übernahme und Abgleich bleiben separate, bewusste Schritte.
-- Übersprungene PDFs werden von Einsatzvorschau und PDF-Nachweisspeicherung ausgeschlossen. Übrige PDFs desselben Stapels bleiben erhalten.
-- Wenn alle PDFs übersprungen werden: zurück zur neuen Dateiauswahl, keine Änderungen an der Datenbank.
-- Sicherheitsprüfung: Ein Bericht mit null ausgewählten Positionen wird nicht leer importiert; fehlerhafte PDFs erfordern weiterhin den expliziten Ausschluss.
-- In der Hilfe neue Bedienung erklärt. Versionskennung und Offline-Cache aktualisiert. Datenbankformat unverändert.
+- Pro RONDO-PDF „Positionen übernehmen und abgleichen“ oder „Diesen Bericht vollständig überspringen“.
+- Technikerzuordnung ohne zusätzlichen Pflicht-Bestätigungshaken.
+- Übersprungene PDFs werden nicht als Einsätze oder Nachweise gespeichert; übrige PDFs bleiben im Stapel.
+- Fehlerhafte PDFs und leere Positionsauswahl können nicht unbemerkt importiert werden.
 
 # V2.22 – 22.10.2026
 
-- Kontextabhängige Anzeige der KW- und Stundenübersicht nur in Eingabe- und Exportansicht.
-- Automatischer Endzeitvorschlag nach Eingabe des Beginns mit PDF-Nettozeit und Arbeitspause.
-- Neu berechnen bei Änderung des vorgeschlagenen Beginns/Pause, ohne manuell gespeicherte Endzeiten zu überschreiben.
-- Vor dem Speichern sichtbar als nicht überprüfter Vorschlag gekennzeichnet.
+- Kalenderwoche und Stundenübersicht auf Eingabe- und Exportansicht begrenzt.
+- PDF-Arbeitsdauer plus Pause als automatisch berechneter Enduhrzeitvorschlag; kein Überschreiben gespeicherter manueller Zeiten.
 
-# Änderungsprotokoll
+# V2.21 – 22.10.2026
 
-## V2.21.0 – 22.10.2026
-- PDF-Abweichung ab 30 Minuten: deutliche, aber nicht sperrende Exportwarnung. 15–29 Minuten einfacher Hinweis.
-- Korrektur des Exports: Begründete Ausnahme nur für fehlende echte Uhrzeiten erforderlich, nicht für die PDF-Dauerabweichung.
-- Hinweis auf Differenz und direkte Einsatzkontrolle im Bereich „Wochenbericht / Export“.
-- Sondermodus „Nur Kundenstamm ergänzen“ entfernt; historische PDFs landen wieder regulär in der Einsatzhistorie, mit Dubletten-/Zuordnungsprüfung.
-- Anleitung und Hilfebereich aktualisiert; Datenschema und Synchronisationslogik unverändert.
+- PDF-Arbeitsdauer-Differenzen ab 15 Minuten als Hinweis, ab 30 Minuten deutliche Warnung ohne Export-Sperre.
+- Vollständigkeitsprüfung für echte Uhrzeiten von PDF-Dauerabweichungsprüfung getrennt.
+- Historische Serviceberichte werden wieder regulär mit Dublettenprüfung in die Historie aufgenommen.
 
-## V2.20.0 – 22.10.2026
-- PDF-Arbeitsdauer und tatsächliche Zeit unter dem Eingabefeld vergleichen; übernehmbarer Endzeitvorschlag inklusive Pause.
-- Rücksprung in die Wochenansicht nach Korrektur, ursprüngliche Uhrzeiten und PDF-Nachweise bleiben bestehen.
-- Exportprüfung auf fehlende Uhrzeiten, dokumentierte Ausnahmen und deutliche PDF-Dauerabweichung.
+# V2.20 – 22.10.2026
 
-
-## V2.24 – Mehrtägiger PDF-Gesamtabgleich
-- Erkennt mehrere gespeicherte Einsatztage mit gleicher Ticketnummer und passendem Kunden bis zum PDF-Enddatum (maximal 14 Tage).
-- PDF-Zeiten und Kilometer als Gesamtsummen; keine Überschreibung der Tagesbuchungen.
-- Nach Abschluss werden alle zugehörigen Einsatztage als PDF-geprüft dokumentiert.
-- Bestehender PDF-Import für einzeltägige Einsätze bleibt erhalten.
+- Netto-Arbeitsdauer im PDF mit manuellen Zeiten vergleichen und Endzeitvorschlag berechnen.
+- Korrektur ohne Verlust des PDF-Nachweises und Rücksprung in die Wochenansicht.

@@ -265,6 +265,18 @@ body.is-dashboard .config,body.is-dashboard .stats{display:none}
 #entrylist .srcheck{display:inline-block;max-width:100%;overflow-wrap:anywhere}
 @media(max-width:580px){.tripclockgrid{grid-template-columns:1fr}.tripclock{padding:10px}}
 
+/* V2.24.1 – mobile-first search, no native scrolling select. */
+.tripcustomerresults{max-height:min(40vh,300px);overflow:auto;overscroll-behavior:contain;background:white;border:1px solid #b9cfe0;border-radius:10px;box-shadow:0 7px 20px #1234;margin:5px 0 10px;}
+.tripcustomerresults[hidden]{display:none}
+.tripcustomerresults button{width:100%;min-height:50px;text-align:left;background:white;color:#183a53;border:0;border-bottom:1px solid #e4edf2;padding:11px 12px;display:block;font-size:15px;cursor:pointer;white-space:normal;}
+.tripcustomerresults button:hover,.tripcustomerresults button:focus{background:#e8f3fb;outline:2px solid #1f719a;outline-offset:-2px}
+.tripcustomerresults .tripcustomernoresults{padding:14px;color:#526e7b;font-size:14px}
+.tripcustomerresults .tripcustomersub{display:block;font-size:12px;color:#526474;margin-top:2px}
+#tripcustomerquery{font-size:16px;min-height:48px;width:100%}
+#tripcustomerpick{display:none}
+.tripclockedit{border:2px solid #96b9d2;background:#eff7fc;padding:12px;border-radius:11px;margin:12px 0}
+.tripclockedit .tripclockgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:580px){.tripclockedit .tripclockgrid{grid-template-columns:1fr}}
 /* V2.17: always accessible cloud controls and clean review flow */
 .wbquickbar{position:sticky;top:0;z-index:115;background:#0b3049;color:#f4f8fa;border-bottom:1px solid #46728a;box-shadow:0 2px 10px #0d273044}
 .wbquickinner{max-width:1440px;margin:auto;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -459,7 +471,7 @@ body:not(.wbshowweekcontext) main.wrap > div.stats{display:none!important}
 <p class="hint">Aktuelle Bedienungsanleitung für PC und Smartphone. Alle beschriebenen Funktionen beziehen sich auf die tatsächlich laufende Anwendung.</p>
 <div class="highlight"><p><strong>Anwendungsversion:</strong> <strong id="wbversionhelp">–</strong> · <strong>Veröffentlichung:</strong> <span id="wbreleasedate">–</span></p>
 <p><strong>Datenbankrevision:</strong> <span id="helpdbrev">–</span> – der Stand deiner gespeicherten Daten; nicht die Programmversion.</p></div>
-<h3>Neu in Version 2.23</h3><p><strong>PDF-Technikerzuordnung vereinfacht:</strong> Für jeden ausgelesenen Bericht kannst du „Positionen übernehmen und abgleichen“ oder „Diesen Bericht vollständig überspringen“ auswählen. Es ist kein zusätzlicher Bestätigungshaken nötig. Wird ein Bericht übersprungen, bleiben alle anderen PDFs im Stapel erhalten. Auch eindeutig erkannte PDFs können übersprungen werden. Die endgültige Speicherung erfolgt wie bisher erst nach dem Abgleich mit dem vorhandenen Datenbestand und der abschließenden Bestätigung.</p><h3>Aus Version 2.22</h3><p><strong>Weniger Ablenkung:</strong> Die Kalenderwoche und Stundenkarten erscheinen nur bei „Einsätze erfassen“ und „Wochenbericht / Export“. Im Kundenstamm, in der Einsatzhistorie und in den übrigen Reitern werden sie ausgeblendet.</p><p><strong>Automatisches Arbeitsende:</strong> Bei einem bestehenden Einsatz mit PDF-Arbeitsdauer wird nach Eingabe des Arbeitsbeginns das noch leere Arbeitsende automatisch vorgeschlagen (PDF-Nettozeit plus erfasste Arbeitspause). Beispiel 14:00 Uhr + 2:30 h = 16:30 Uhr. Der Vorschlag wird als solcher gekennzeichnet und erst durch das reguläre Speichern übernommen. Echte bereits erfasste Endzeiten bleiben unverändert.</p><h3>Aus Version 2.21</h3><p><strong>Arbeitszeitabweichungen:</strong> Ab 15 Minuten erscheint ein Kontrollhinweis; ab 30 Minuten wird dieser besonders deutlich hervorgehoben. Eine Abweichung zur PDF-Dauer <strong>sperrt den Export nicht mehr</strong>. Fehlen echte Uhrzeiten, bleibt die separate Vollständigkeitsprüfung mit begründeter Ausnahme erhalten.</p><p><strong>Ältere Serviceberichte:</strong> Werden regulär in die Einsatzhistorie übernommen. Die Dublettenprüfung verhindert ungewollte Doppelanlagen; bestehende Einsätze können abgeglichen und fehlende Kundenadressen ergänzt werden. Die Sonderoption „Nur Kundenstamm ergänzen“ ist entfallen.</p><h3>Aus Version 2.20</h3><p><strong>Arbeitszeitprüfung:</strong> Beim Nachtragen von Beginn und Ende siehst du direkt die im PDF dokumentierte Netto-Arbeitsdauer und deine tatsächliche Netto-Arbeitszeit. Ab 15 Minuten Differenz erscheint ein Kontrollhinweis; ab 30 Minuten ist der Hinweis besonders deutlich. Der Export wird durch die PDF-Abweichung nicht gesperrt. Fehlen echte Uhrzeiten, ist der Export ebenfalls gesperrt, außer du bestätigst eine begründete Ausnahme. Die Bestätigung bleibt nur gültig, solange die zugehörigen Zeitwerte unverändert sind; eine zusätzliche TSV-Datei listet bestätigte Ausnahmen auf.</p><p><strong>Vorschlag für Arbeitsende:</strong> Wenn der tatsächliche Beginn eingetragen und das Ende leer ist, kannst du die Endzeit aus PDF-Arbeitsdauer plus erfasster Arbeitspause ausdrücklich als Vorschlag übernehmen. Nach Speichern springt die Anwendung zum hervorgehobenen Eintrag in der Wochenansicht.</p><p><strong>Historische Serviceberichte:</strong> Ältere PDFs lassen sich mit Dublettenprüfung in die Einsatzhistorie importieren und um Kundendaten ergänzen.</p><h3>Aus Version 2.18</h3><p><strong>Synchronisationsschutz:</strong> Bei unterschiedlichen lokalen und Ordnerständen wird die automatische Synchronisation bis zu einer ausdrücklichen Konfliktentscheidung ausgesetzt. Der lokale Datenbestand bleibt erhalten. Statt einer Dauerleiste steht oben ein kleines Cloud-Symbol; nur Probleme werden dort deutlich markiert.</p><p><strong>Einsatzübersicht:</strong> Der rote PDF-Status ist selbst anklickbar; ein weiterer Service-Abgleich-Button entfällt. Bei Kundeneinsätzen mit fehlendem Arbeitsbeginn oder -ende öffnet „Uhrzeiten nachtragen“ den bestehenden Eintrag.</p><p><strong>Arbeitszeiten:</strong> Beginn und Ende stehen nebeneinander; die Uhrzeit-Auswahl und eine Tastatureingabe sind möglich. Wenn ein Ende vor oder gleich Beginn liegt, wird beim Speichern nach Arbeit über Mitternacht gefragt.</p><p><strong>Lokaler Ordner:</strong> Unter „Speicherung &amp; Sync“ optional verbinden. Ohne Ordner bleibt die Browserdatenbank aktiv; eine separate Sicherung kann über den Standard-Download erfolgen.</p><p><strong>PDF-Import:</strong> Kurze Erklärung zu regelbasierter PDF-Auswertung ohne KI, zum Dauerabgleich und zu Kundenstamm, Anschrift und Navigation. Manuelle Uhrzeiten bleiben erhalten; die PDF enthält in der Regel nur die Arbeitsdauer.</p><h3>Aus Version 2.17</h3><p><strong>Wochenansicht:</strong> „Eintrag anlegen“ erscheint ohne Zeilenzähler. Mehrere Einträge am Tag bleiben möglich. Jeder Kundeneinsatz erhält einen roten Status „Nicht abgeglichen“ mit direkt anklickbarem roten Hinweis zum schnellen Öffnen des PDF-Imports; bestätigte Abgleiche erscheinen grün. Eine PDF-Prüfung ist für das normale Arbeiten nicht verpflichtend.</p><p><strong>Technikerprofile:</strong> Nur unter „Einstellungen“ kannst du weitere Techniker anlegen, zwischen Profilen wechseln, sie bearbeiten oder archivieren beziehungsweise löschen. Im Alltag ist genau ein Techniker aktiv.</p><p><strong>PDF-Import:</strong> „Auswahl bestätigen und speichern“ steht ganz unten unter der Kontrolle. Nach erfolgreichem Import werden Auswahl und Vorschau automatisch geleert, sodass neue PDFs ausgewählt werden können. Bereits gespeicherte Einsätze bleiben unberührt.</p><p><strong>Synchronisation:</strong> Das Cloud-Symbol oben öffnet Ordnerzugriff beziehungsweise Synchronisation; Warnungen erscheinen bei Problemen. Fehler beim Ordnerzugriff ändern nichts am bereits lokal gesicherten Einsatz; bei Konflikten muss der Dateistand ausdrücklich verglichen werden.</p><h3>Aus Version 2.16</h3><p><strong>Einsatzassistent:</strong> Start-, Ankunfts- und Enduhrzeiten der Hinfahrt, Arbeit und Rückfahrt werden angezeigt und lassen sich bis nach dem Einsatz ändern. Fahr- und Arbeitspausen stoppen die jeweilige Uhr. Reisezeiten lassen sich aus Zeitstempeln (abzüglich Fahrpausen) berechnen oder manuell erfassen; bei der Rückfahrt kann stattdessen die Hinfahrtsdauer vorgeschlagen und übernommen werden. Mit „Einsatz abbrechen“ wird nur der aktuelle Assistenten-Einsatz gelöscht und ein begonnener Kundenwechsel wieder zurückgesetzt. PDF-geprüfte Einsätze haben in der Wochenansicht einen grünen Haken. Eine manuelle Änderung hebt diesen Status nicht automatisch auf.</p><h3>Funktionen aus Version 2.15</h3><p><strong>Einstellungen:</strong> Der Reiter „Einstellungen“ ist wieder vorhanden. Dort aktivierst du bei Bedarf „Sonderfunktionen“. Nur dann erscheint die Sonderfunktionen-Navigation mit M365/Copilot und dem Excel-Archivimport. Der normale PDF-Import heißt „Servicebericht-Import“ und ist immer verfügbar.</p>
+<h3>Neu in Version 2.24.1 – 28.10.2026</h3><p><strong>Kundensuche im laufenden Einsatz:</strong> Namen, Kundennummern, Orte und Standorte direkt mit der Tastatur suchen. Gleichnamige Kundenstandorte erscheinen einzeln. Nach Antippen werden der richtige Standort und vorhandene Adressdaten übernommen. Neue Kunden und Standorte können weiterhin angelegt werden.</p><p><strong>Uhrzeiten korrigieren:</strong> Mit „Alle Uhrzeiten korrigieren“ die erfassten Zeitstempel für Hinfahrt, Ankunft, Arbeitsbeginn/-ende und Rückfahrt in einem Dialog bearbeiten. Der Einsatz speichert die Änderungen dauerhaft, rechnet gemessene Fahrzeiten samt Pausen neu aus und erhält vorhandene PDF-Prüfnachweise. Nicht mögliche Zeitfolgen werden abgewiesen.</p><p><strong>Mehrtägige PDF-Berichte:</strong> Beim PDF-Direktimport wird das PDF-Datum als letzter Einsatztag verwendet. Wenn dasselbe Ticket für denselben Kunden an mehreren Tagen innerhalb von 14 Tagen gespeichert ist, werden die Summen von Kilometern, Reise- und Arbeitszeit gegenübergestellt. Erst nach ausdrücklicher Zustimmung bekommen alle passenden Tage den grünen PDF-Prüfstatus. Es werden keine Tageswerte überschrieben.</p><p><strong>Offline-Update:</strong> Versionskennung und Cache auf 2.24.1 aktualisiert, Datenbankstruktur und lokale Einsätze bleiben erhalten. Vor dem Update <code>wochenberichte.db</code> sichern.</p><h3>Aus Version 2.23</h3><p><strong>PDF-Technikerzuordnung vereinfacht:</strong> Für jeden ausgelesenen Bericht kannst du „Positionen übernehmen und abgleichen“ oder „Diesen Bericht vollständig überspringen“ auswählen. Es ist kein zusätzlicher Bestätigungshaken nötig. Wird ein Bericht übersprungen, bleiben alle anderen PDFs im Stapel erhalten. Auch eindeutig erkannte PDFs können übersprungen werden. Die endgültige Speicherung erfolgt wie bisher erst nach dem Abgleich mit dem vorhandenen Datenbestand und der abschließenden Bestätigung.</p><h3>Aus Version 2.22</h3><p><strong>Weniger Ablenkung:</strong> Die Kalenderwoche und Stundenkarten erscheinen nur bei „Einsätze erfassen“ und „Wochenbericht / Export“. Im Kundenstamm, in der Einsatzhistorie und in den übrigen Reitern werden sie ausgeblendet.</p><p><strong>Automatisches Arbeitsende:</strong> Bei einem bestehenden Einsatz mit PDF-Arbeitsdauer wird nach Eingabe des Arbeitsbeginns das noch leere Arbeitsende automatisch vorgeschlagen (PDF-Nettozeit plus erfasste Arbeitspause). Beispiel 14:00 Uhr + 2:30 h = 16:30 Uhr. Der Vorschlag wird als solcher gekennzeichnet und erst durch das reguläre Speichern übernommen. Echte bereits erfasste Endzeiten bleiben unverändert.</p><h3>Aus Version 2.21</h3><p><strong>Arbeitszeitabweichungen:</strong> Ab 15 Minuten erscheint ein Kontrollhinweis; ab 30 Minuten wird dieser besonders deutlich hervorgehoben. Eine Abweichung zur PDF-Dauer <strong>sperrt den Export nicht mehr</strong>. Fehlen echte Uhrzeiten, bleibt die separate Vollständigkeitsprüfung mit begründeter Ausnahme erhalten.</p><p><strong>Ältere Serviceberichte:</strong> Werden regulär in die Einsatzhistorie übernommen. Die Dublettenprüfung verhindert ungewollte Doppelanlagen; bestehende Einsätze können abgeglichen und fehlende Kundenadressen ergänzt werden. Die Sonderoption „Nur Kundenstamm ergänzen“ ist entfallen.</p><h3>Aus Version 2.20</h3><p><strong>Arbeitszeitprüfung:</strong> Beim Nachtragen von Beginn und Ende siehst du direkt die im PDF dokumentierte Netto-Arbeitsdauer und deine tatsächliche Netto-Arbeitszeit. Ab 15 Minuten Differenz erscheint ein Kontrollhinweis; ab 30 Minuten ist der Hinweis besonders deutlich. Der Export wird durch die PDF-Abweichung nicht gesperrt. Fehlen echte Uhrzeiten, ist der Export ebenfalls gesperrt, außer du bestätigst eine begründete Ausnahme. Die Bestätigung bleibt nur gültig, solange die zugehörigen Zeitwerte unverändert sind; eine zusätzliche TSV-Datei listet bestätigte Ausnahmen auf.</p><p><strong>Vorschlag für Arbeitsende:</strong> Wenn der tatsächliche Beginn eingetragen und das Ende leer ist, kannst du die Endzeit aus PDF-Arbeitsdauer plus erfasster Arbeitspause ausdrücklich als Vorschlag übernehmen. Nach Speichern springt die Anwendung zum hervorgehobenen Eintrag in der Wochenansicht.</p><p><strong>Historische Serviceberichte:</strong> Ältere PDFs lassen sich mit Dublettenprüfung in die Einsatzhistorie importieren und um Kundendaten ergänzen.</p><h3>Aus Version 2.18</h3><p><strong>Synchronisationsschutz:</strong> Bei unterschiedlichen lokalen und Ordnerständen wird die automatische Synchronisation bis zu einer ausdrücklichen Konfliktentscheidung ausgesetzt. Der lokale Datenbestand bleibt erhalten. Statt einer Dauerleiste steht oben ein kleines Cloud-Symbol; nur Probleme werden dort deutlich markiert.</p><p><strong>Einsatzübersicht:</strong> Der rote PDF-Status ist selbst anklickbar; ein weiterer Service-Abgleich-Button entfällt. Bei Kundeneinsätzen mit fehlendem Arbeitsbeginn oder -ende öffnet „Uhrzeiten nachtragen“ den bestehenden Eintrag.</p><p><strong>Arbeitszeiten:</strong> Beginn und Ende stehen nebeneinander; die Uhrzeit-Auswahl und eine Tastatureingabe sind möglich. Wenn ein Ende vor oder gleich Beginn liegt, wird beim Speichern nach Arbeit über Mitternacht gefragt.</p><p><strong>Lokaler Ordner:</strong> Unter „Speicherung &amp; Sync“ optional verbinden. Ohne Ordner bleibt die Browserdatenbank aktiv; eine separate Sicherung kann über den Standard-Download erfolgen.</p><p><strong>PDF-Import:</strong> Kurze Erklärung zu regelbasierter PDF-Auswertung ohne KI, zum Dauerabgleich und zu Kundenstamm, Anschrift und Navigation. Manuelle Uhrzeiten bleiben erhalten; die PDF enthält in der Regel nur die Arbeitsdauer.</p><h3>Aus Version 2.17</h3><p><strong>Wochenansicht:</strong> „Eintrag anlegen“ erscheint ohne Zeilenzähler. Mehrere Einträge am Tag bleiben möglich. Jeder Kundeneinsatz erhält einen roten Status „Nicht abgeglichen“ mit direkt anklickbarem roten Hinweis zum schnellen Öffnen des PDF-Imports; bestätigte Abgleiche erscheinen grün. Eine PDF-Prüfung ist für das normale Arbeiten nicht verpflichtend.</p><p><strong>Technikerprofile:</strong> Nur unter „Einstellungen“ kannst du weitere Techniker anlegen, zwischen Profilen wechseln, sie bearbeiten oder archivieren beziehungsweise löschen. Im Alltag ist genau ein Techniker aktiv.</p><p><strong>PDF-Import:</strong> „Auswahl bestätigen und speichern“ steht ganz unten unter der Kontrolle. Nach erfolgreichem Import werden Auswahl und Vorschau automatisch geleert, sodass neue PDFs ausgewählt werden können. Bereits gespeicherte Einsätze bleiben unberührt.</p><p><strong>Synchronisation:</strong> Das Cloud-Symbol oben öffnet Ordnerzugriff beziehungsweise Synchronisation; Warnungen erscheinen bei Problemen. Fehler beim Ordnerzugriff ändern nichts am bereits lokal gesicherten Einsatz; bei Konflikten muss der Dateistand ausdrücklich verglichen werden.</p><h3>Aus Version 2.16</h3><p><strong>Einsatzassistent:</strong> Start-, Ankunfts- und Enduhrzeiten der Hinfahrt, Arbeit und Rückfahrt werden angezeigt und lassen sich bis nach dem Einsatz ändern. Fahr- und Arbeitspausen stoppen die jeweilige Uhr. Reisezeiten lassen sich aus Zeitstempeln (abzüglich Fahrpausen) berechnen oder manuell erfassen; bei der Rückfahrt kann stattdessen die Hinfahrtsdauer vorgeschlagen und übernommen werden. Mit „Einsatz abbrechen“ wird nur der aktuelle Assistenten-Einsatz gelöscht und ein begonnener Kundenwechsel wieder zurückgesetzt. PDF-geprüfte Einsätze haben in der Wochenansicht einen grünen Haken. Eine manuelle Änderung hebt diesen Status nicht automatisch auf.</p><h3>Funktionen aus Version 2.15</h3><p><strong>Einstellungen:</strong> Der Reiter „Einstellungen“ ist wieder vorhanden. Dort aktivierst du bei Bedarf „Sonderfunktionen“. Nur dann erscheint die Sonderfunktionen-Navigation mit M365/Copilot und dem Excel-Archivimport. Der normale PDF-Import heißt „Servicebericht-Import“ und ist immer verfügbar.</p>
 <p><strong>Einsatzdaten Historie:</strong> Geprüfte Serviceberichte erscheinen direkt am jeweiligen Einsatz mit Ticket, PDF-Dateiname und der Schaltfläche „PDF-Vergleich“. Das Original-PDF kann bei bis zu 2 MB Dateigröße aus der Datenbank geöffnet werden, sofern die gesamte Ablagegrenze von 15 MB nicht überschritten ist. Größere PDF-Dateien sind nur mit ihrem Dateinamen verknüpft. <strong>Ein PDF-Abgleich ist nie Voraussetzung für Wochenberichte oder Exporte.</strong> Bei unterschiedlichen Daten kannst du „Manuelle Werte behalten – PDF-Abweichung geprüft“ auswählen: Die Zahlen des Einsatzes bleiben erhalten und die abweichenden PDF-Werte werden mit dem Nachweis gespeichert. Eine spätere manuelle Bearbeitung lässt den dokumentierten PDF-Abgleich bestehen; die manuelle Änderung erhält einen Änderungszeitstempel.</p>
 <p><strong>Freie Tagesplätze:</strong> Unter „Einsätze erfassen“ gibt es an jedem Tag einen anklickbaren Link „Eintrag anlegen“ ohne einen Zähler freier Zeilen. Der Tag wird beim Anklicken übernommen. Weitere Kundeneinsätze am selben Tag sind weiterhin möglich.</p>
 <p><strong>Kundenwechsel:</strong> Bei „Zum nächsten Kunden fahren“ werden nach der bestätigten Ankunft die gesamte Fahrstrecke und Reisezeit zwischen beiden Kunden auf beide Einsätze hälftig verteilt. Bei ungeraden Minuten erhält der neue Einsatz die zusätzliche Minute. Du kannst die tatsächlichen Fahrwerte vor Bestätigung anpassen.</p><h3>Weitere vorhandene Funktionen</h3><p><strong>Mobile Einsatzschritte:</strong> Im Dashboard „Neuen Einsatz erfassen“ startet die Hinfahrt. Ankunft bestätigen, Kunde eintragen, Arbeit starten, bei Bedarf pausieren/fortsetzen, Arbeit beenden. Anschließend entweder Rückfahrt oder Fahrt zum nächsten Kunden starten. Rückfahrtkilometer werden zunächst von der Hinfahrt vorgeschlagen; die Reisezeit wird wahlweise automatisch gemessen, aus der Hinfahrt übernommen oder manuell erfasst. Rückfahrtwerte zählen erst nach Bestätigung. Kilometer und Reisezeit werden getrennt protokolliert; bei einer Abweichung erscheint ein Hinweis für die mögliche interne Klärung der Kundenabrechnung. „Zum nächsten Kunden“ legt einen unabhängigen neuen Einsatz an. Bei jedem Schritt erfolgt eine lokale dauerhafte Speicherung. Unterwegs kannst du den Assistenten schließen und im Dashboard fortsetzen.</p><p><strong>Kundenanschriften und Navigation:</strong> PDF-Serviceberichte können auch Kundennummer, Straße, Postleitzahl, Ort und Land liefern. Beim bestätigten Import werden fehlende Angaben im Kundenstamm ergänzt; bestehende Adressen werden nicht automatisch überschrieben. Unter „Kunden“ findest du die gesamte Adresse, kannst nach Kundennummer oder Straße suchen und mit „Navigation öffnen“ die Route in einer Karten-App aufrufen. Die Adresse wird erst beim Öffnen des externen Kartenlinks an den Anbieter übertragen.</p><p><strong>Servicebericht-Import und Sonderfunktionen:</strong> Der sichtbare Servicebericht-Import liest RONDO-PDFs direkt ein. M365 und fertige Excel-Wochenberichte findest du nur bei aktivierten Sonderfunktionen unter „Einstellungen“. Digitale RONDO-PDFs lokal auslesen, mehrere PDFs gleichzeitig auswählen. Technikerprofile können eigene Rufnamen/Kürzel enthalten. Vollständige Namen und eindeutige Nachnamen werden erkannt; Vornamen oder Kürzel müssen bestätigt werden. Bei Berichten mit mehreren Technikern die angezeigten Leistungspositionen einzeln zuordnen. Erst nach der Auswahl der zu übernehmenden Positionen folgt der Sammelabgleich mit Dublettenerkennung und bearbeitbarer Vorschau; nicht benötigte PDF-Berichte lassen sich einzeln überspringen. <strong>Kein automatischer Import unsicherer Positionen.</strong> Gescannten oder unbekannten PDF-Formaten fehlt gegebenenfalls eine auslesbare Textebene; M365 bleibt als Alternative.</p><h3>Aus Version 2.11</h3><p><strong>Schnellabgleich beim Excel-/M365-Sammelimport:</strong> Bereits identische Einsätze werden automatisch übersprungen. Neue Einsätze sind gesammelt vorgemerkt. Nur tatsächlich abweichende oder mehrdeutige Treffer erscheinen zur Prüfung; Sammelaktionen sind verfügbar. „Bisher gespeichert“ bezieht sich auf den konkret ausgewählten Einsatz der lokalen Datenbank, nicht auf den Kundenstamm oder eine noch nicht geladene Cloud-Version.</p><h3>Aus Version 2.10</h3>
@@ -577,7 +589,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 </script>
 <script>
 'use strict';
-const WB_APP_VERSION=Object.freeze({number:'2.23.0',date:'23.10.2026',cache:'wochenberichte-static-v2.23.0'});
+const WB_APP_VERSION=Object.freeze({number:'2.24.1',date:'28.10.2026',cache:'wochenberichte-static-v2.24.1'});
 
 
 /* SQLite single-record application database codec. Self-contained, offline.
@@ -1749,6 +1761,9 @@ function renderImportReview(){
  const visible=importDecisions.map((d,i)=>({d,i})).filter(({d})=>d.category!=='unchanged'&&d.action!=='create'&&d.category!=='new');
  box.innerHTML=visible.map(({d,i})=>{
   const selection=d.action==='update'||d.action==='keep',multiple=d.candidates.length>1;
+  if(d.multiDayTargets){
+   return `<div class="importreviewcard" data-import-review="${i}"><h3>📄 PDF-Gesamtabgleich · ${esc(d.incoming.customer)} · Ticket ${esc(d.incoming.ticket)}</h3><p class="importalert">${esc(d.reason)}</p><div class="field"><label for="import-action-${i}">PDF-Abgleich ausdrücklich bestätigen</label><select id="import-action-${i}" data-import-action="${i}"><option value="review" ${d.action==='review'?'selected':''} disabled>Bitte Entscheidung treffen …</option><option value="keep" ${d.action==='keep'?'selected':''}>Gesamtsummen geprüft – alle Tage als PDF-geprüft markieren</option><option value="skip" ${d.action==='skip'?'selected':''}>Diesen Gesamt-Abgleich überspringen</option></select></div><p class="small">Kein Tageswert wird durch den PDF-Import überschrieben. Einzelne Tagesbuchungen bleiben unverändert. ${esc(importRowPreview(d))}</p></div>`;
+  }
   return `<div class="importreviewcard" data-import-review="${i}"><h3>⚠ ${esc(d.sourceLabel||'Zeile '+(i+1))}: ${esc(d.incoming.customer||'Kunde unbekannt')} · ${esc(dayFmt(d.incoming.date))} · ${esc(importWeekLabel(d.incoming.date))}</h3>
    <p class="importalert">${esc(d.reason||'Unklarer Abgleich')} · ${d.candidates.length} mögliche(r) bestehende(r) Einsatz/Einsätze.</p>
    <div class="row"><div class="field"><label for="import-action-${i}">Was soll passieren?</label><select id="import-action-${i}" data-import-action="${i}"><option value="review" ${d.action==='review'?'selected':''} disabled>Bitte Entscheidung treffen</option><option value="update" ${d.action==='update'?'selected':''} ${d.candidates.length?'':'disabled'}>Bestehenden Einsatz aktualisieren</option>${importSourceMode==='pdf'&&d.candidates.length?`<option value="keep" ${d.action==='keep'?'selected':''}>Manuelle Werte behalten – PDF-Abweichung geprüft</option>`:''}<option value="create" ${d.action==='create'?'selected':''}>Bewusst neuen Einsatz anlegen</option><option value="skip" ${d.action==='skip'?'selected':''}>Diesen Einsatz überspringen</option></select></div>
@@ -1768,6 +1783,7 @@ function importApplyPlan(decisions,existing){
  for(const d of decisions){
   if(d.action==='review')throw Error('Bitte für jede erkannte Übereinstimmung eine Entscheidung treffen.');
   if(d.action==='keep'){
+   if(d.multiDayTargets){skipped++;continue;} // Proof is stored separately for ALL matching days.
    const target=importChoice(d);if(!target)throw Error('Bitte den bestehenden Einsatz für die PDF-Prüfung auswählen.');
    if(claimed.has(target.id))throw Error('Mehrere PDF-Zeilen sollen denselben Einsatz prüfen. Bitte einzeln kontrollieren.');
    const i=output.findIndex(x=>x.id===target.id);
@@ -2067,11 +2083,13 @@ async function srStageProofs(decisions, proposed){
   if(d.action==='skip'&&d.category!=='unchanged')continue;
   const file=files.get(d.incoming.pdfDocId);if(!file)throw Error('PDF-Quelldatei nicht mehr vorhanden. Bitte PDF erneut auswählen.');
   if(d.multiDayTargets?.length){
+   if(d.action!=='keep')continue;
    const fields=srPdfValues(d.incoming),checkedAt=new Date().toISOString();
    const targetRows=d.multiDayTargets.map(t=>{
     const key=importWeekOf(t.date).key;
     const record=proposed.weeks[key]?.entries?.find(e=>e.id===t.id);
     if(!record)throw Error('Mehrtageseinsatz fehlt im Datenbestand: '+t.date);
+    if(t.snapshot&&importStoredSnapshot(record)!==t.snapshot)throw Error('Ein zugehöriger Tagesbericht wurde seit dem PDF-Abgleich verändert. Bitte Abgleichvorschau neu öffnen.');
     return {record,date:t.date,key};
    });
    const sum={km:targetRows.reduce((n,x)=>n+(x.record.km||0),0),
@@ -2079,6 +2097,7 @@ async function srStageProofs(decisions, proposed){
     workMinutes:targetRows.reduce((n,x)=>n+workM(x.record),0)};
    const differences=['km','travel','workMinutes'].filter(k=>fields[k]!=null&&Number(fields[k])!==Number(sum[k]))
     .map(k=>k==='km'?'Kilometer gesamt':k==='travel'?'Reisezeit gesamt':'Arbeitsdauer gesamt');
+   let groupChanges=0;
    for(const {record,key,date} of targetRows){
     const prior=record.serviceReportCheck;
     const audit={documentId:file.documentId,filename:file.filename,ticket:d.incoming.ticket,
@@ -2090,9 +2109,9 @@ async function srStageProofs(decisions, proposed){
     const week=proposed.weeks[key];
     if(week===db.weeks[key])proposed.weeks[key]={...week,entries:week.entries.map(e=>e.id===record.id?{...e}:e)};
     const output=proposed.weeks[key].entries.find(e=>e.id===record.id);
-    output.serviceReportCheck=audit;changes++;
+    output.serviceReportCheck=audit;changes++;groupChanges++;
    }
-   if(changes)proofs.push(file);
+   if(groupChanges)proofs.push(file);
    continue;
   }
   const key=importWeekOf(d.incoming.date).key;
@@ -2248,46 +2267,7 @@ function init(){$('historymonth').value=historyMonth;$('historyyear').value=new 
  $('checkimport').onclick=()=>{
   importSourceMode='m365';importTargetProfileId=db.selected;importProfileMismatch=false;$('excelprofilewarn').hidden=true;
   const result=parseImport($('importtext').value);
-  // Mehrtägige PDFs: Leistungsdatum ist Abrechnungs-/Enddatum, Summen nicht Tageswerte.
- const stored=importAllCurrentEntries();
- const grouped=new Map();
- result.rows.forEach((row,i)=>{const key=[row.pdfDocId,row.ticket,importStrictName(row.customer)].join('|');if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push(i)});
- const handled=new Set(),special=[];
- for(const indices of grouped.values()){
-  const last=indices.map(i=>result.rows[i]).sort((a,b)=>b.date.localeCompare(a.date))[0];
-  const matches=stored.filter(e=>e.type==='Einsatz'&&e.date<=last.date&&String(e.ticket||'').trim()===String(last.ticket||'').trim()
-   &&importNameScore(e.customer,last.customer)>=75
-   &&(!last.location||!e.location||importNameScore(e.location,last.location)>=75))
-   .sort((a,b)=>a.date.localeCompare(b.date));
-  // Only aggregate when exactly the same ticket has several separate stored dates.
-  if(matches.length<2)continue;
-  // Require contiguous reported work span (no more than 14 days), avoid unrelated old ticket reuse.
-  const daySpan=(Date.parse(matches[matches.length-1].date)-Date.parse(matches[0].date))/86400000;
-  if(daySpan>14||matches[matches.length-1].date!==last.date)continue;
-  const picked=indices.map(i=>result.rows[i]);
-  const aggregate={...last,km:picked.some(x=>x.km!=null)?picked.reduce((v,x)=>v+(x.km||0),0):null,
-   travel:picked.some(x=>x.travel!=null)?picked.reduce((v,x)=>v+(x.travel||0),0):null,
-   pdfWorkMinutes:picked.some(x=>x.pdfWorkMinutes!=null)?picked.reduce((v,x)=>v+(x.pdfWorkMinutes||0),0):null,
-   note:'',multiDayPdf:true};
-  aggregate.note=aggregate.pdfWorkMinutes==null?'':'Arbeitszeit vor Ort: '+fmtH(aggregate.pdfWorkMinutes);
-  const days=matches.map(e=>e.date);
-  // Explicitly require every stored day to match the same ticket; never make or overwrite day records.
-  if(new Set(days).size!==days.length)continue;
-  indices.forEach(i=>handled.add(i));
-  special.push({aggregate,matches,days,sourceLabel:result.labels[indices[0]]});
- }
- const ordinary=result.rows.filter((_,i)=>!handled.has(i));
- pendingImport=ordinary;
- importDecisions=importDecisionRows(ordinary,stored);
- // Confirmation of the grouped PDF marks all days, while keeping their values intact.
- special.forEach(g=>{
-  const candidate={entry:g.matches[g.matches.length-1]};
-  importDecisions.push({incoming:g.aggregate,index:importDecisions.length,candidates:[candidate],
-   action:'keep',targetId:candidate.entry.id,category:'changed',
-   reason:'Mehrtägiger PDF-Sammelabgleich: '+g.days.map(dayFmt).join(', ')+'. PDF-Zahlen gelten zusammen, Tageswerte bleiben unverändert.',
-   sourceSnapshot:importStoredSnapshot(candidate.entry),edits:null,multiDayTargets:g.matches.map(e=>({id:e.id,date:e.date})),
-   sourceLabel:g.sourceLabel});
- });
+  pendingImport=result.rows;importDecisions=importDecisionRows(pendingImport,importAllCurrentEntries());
   importRejected=result.rejected;importWarnings=result.issues;importDuplicates=result.duplicates;
   renderImportRejected();renderImportReview();
  };
@@ -3164,6 +3144,43 @@ function rondoPdfPrepare(){
  }
  return {rows,labels,issues,duplicates,skippedFiles,skippedRows};
 }
+// V2.24.1: prepare a multi-day total check only for a REAL selected PDF document.
+function rondoPdfDecisionsForMultiDay(rows,labels,existing){
+ const grouped=new Map();
+ rows.forEach((row,i)=>{
+  if(!row.pdfDocId||!row.ticket||!row.customer)return;
+  const key=[row.pdfDocId,String(row.ticket).trim(),importStrictName(row.customer)].join('|');
+  if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push(i);
+ });
+ const consumed=new Set(),special=[];
+ for(const indices of grouped.values()){
+  const parts=indices.map(i=>rows[i]),last=parts.reduce((a,b)=>a.date>=b.date?a:b);
+  // Match ONLY the 14-day lookback from the PDF END date; avoid reused ticket numbers.
+  const floor=nextDateISO(last.date,-14);
+  const matches=existing.filter(e=>e.type==='Einsatz'&&e.date>=floor&&e.date<=last.date&&String(e.ticket||'').trim()===String(last.ticket).trim()
+   &&importNameScore(e.customer,last.customer)>=75
+   &&(!last.location||!e.location||importNameScore(e.location,last.location)>=75))
+   .sort((a,b)=>a.date.localeCompare(b.date));
+  if(matches.length<2||matches[matches.length-1].date!==last.date||new Set(matches.map(e=>e.date)).size!==matches.length)continue;
+  // Customer and ticket must be consistent across all days and PDF rows.
+  if(parts.some(e=>importNameScore(e.customer,last.customer)<75||String(e.ticket||'').trim()!==String(last.ticket).trim()))continue;
+  const total=kind=>parts.some(p=>p[kind]!=null)?parts.reduce((n,p)=>n+(Number(p[kind])||0),0):null;
+  const aggregate={...last,km:total('km'),travel:total('travel'),pdfWorkMinutes:total('pdfWorkMinutes'),multiDayPdf:true};
+  const sums={km:matches.reduce((n,e)=>n+(Number(e.km)||0),0),travel:matches.reduce((n,e)=>n+(Number(e.travel)||0),0),pdfWorkMinutes:matches.reduce((n,e)=>n+workM(e),0)};
+  const compared=[['km','Kilometer','km'],['travel','Reisezeit','Minuten'],['pdfWorkMinutes','Arbeitszeit','Minuten']].filter(([key])=>aggregate[key]!=null).map(([key,label,unit])=>`${label}: PDF ${key==='km'?aggregate[key]:fmtH(aggregate[key])} ${key==='km'?'km':'h'} / Tagesbuchungen ${key==='km'?sums[key]:fmtH(sums[key])} ${key==='km'?'km':'h'}${Number(aggregate[key])!==Number(sums[key])?' ⚠ Abweichung':''}`).join(' · ');
+  const target=matches[matches.length-1];
+  special.push({incoming:aggregate,index:0,candidates:[{entry:target}],action:'review',targetId:target.id,
+   category:'changed',reason:'Mehrtägiger PDF-Gesamtabgleich für '+matches.map(e=>dayFmt(e.date)).join(', ')+'. '+compared+'. Die Tageswerte bleiben unverändert.',
+   sourceSnapshot:importStoredSnapshot(target),edits:null,multiDayTargets:matches.map(e=>({id:e.id,date:e.date,snapshot:importStoredSnapshot(e)})),sourceLabel:labels[indices[0]]});
+  indices.forEach(i=>consumed.add(i));
+ }
+ const ordinary=rows.filter((_,i)=>!consumed.has(i));
+ const ordinaryLabels=labels.filter((_,i)=>!consumed.has(i));
+ const decisions=importDecisionRows(ordinary,existing);
+ decisions.forEach((d,i)=>d.sourceLabel=ordinaryLabels[i]);
+ special.forEach(d=>{d.index=decisions.length;decisions.push(d)});
+ return decisions;
+}
 function rondoPdfLaunchReview(){
  const result=rondoPdfPrepare();
  if(!result.rows.length){
@@ -3176,8 +3193,7 @@ function rondoPdfLaunchReview(){
   throw Error('Keine Importzeilen erkannt. Bitte Auswahl und Dubletten prüfen.');
  }
  importSourceMode='pdf';importTargetProfileId=db.selected;importProfileMismatch=false;$('excelprofilewarn').hidden=true;
- pendingImport=result.rows;importDecisions=importDecisionRows(pendingImport,importAllCurrentEntries());
- importDecisions.forEach((d,i)=>d.sourceLabel=result.labels[i]);
+ pendingImport=result.rows;importDecisions=rondoPdfDecisionsForMultiDay(result.rows,result.labels,importAllCurrentEntries());
  importRejected=[];importWarnings=result.issues;importDuplicates=result.duplicates;
  renderImportRejected();renderImportReview();
  $('rondopdfstatus').innerHTML=`<div class="msg success"><strong>${result.rows.length} PDF-Einsatz/-Einsätze für den Abgleich ausgewählt.</strong> ${result.skippedFiles?`${result.skippedFiles} PDF-Bericht(e) bewusst übersprungen. `:''}Vorschau und Dublettenprüfung stehen unten unter „Abgleich und Übernahme“. Noch keine Änderung gespeichert.</div>`;
@@ -3216,7 +3232,7 @@ rondoPdfInit();
 'use strict';
 /* V2.13 – schrittweiser Einsatzassistent. Jede bestätigte Aktion schreibt eine lokale DB-Revision.
    Kompatibilität: e.km/e.travel sind weiter die Summen für Excel/PDF/Statistiken. */
-let tripCurrentId=null, tripBusy=false;
+let tripCurrentId=null, tripBusy=false, tripClockEditOpen=false;
 const tripStages={outbound:'Hinfahrt läuft',arrived:'Beim Kunden angekommen',working:'Arbeitszeit läuft',work_done:'Arbeit beendet',returning:'Rückfahrt läuft',done:'Einsatz abgeschlossen'};
 const tripEsc=value=>esc(String(value??''));
 function tripNow(){return new Date()}
@@ -3241,9 +3257,29 @@ function tripHistoricTotals(c){
 }
 function tripSuggestedHalf(total,kind){if(!Number.isFinite(total)||total<0)return '';return kind==='km'?Number((total/2).toFixed(1)):Math.round(total/2)}
 function tripCustomerControls(e){
- const choices=customerMasterArray().filter(c=>c.customer).slice().sort((a,b)=>tripCustomerSiteLabel(a).localeCompare(tripCustomerSiteLabel(b),'de')).map(c=>`<option value="${tripEsc(c.id)}" ${c.id===e.customerMasterId?'selected':''}>${tripEsc(tripCustomerSiteLabel(c))}</option>`).join('');
- return `<div class="tripbox"><div class="field"><label for="tripcustomerpick">Gespeicherten Kunden / Standort wählen</label><select id="tripcustomerpick"><option value="">Kunde selbst eingeben oder auswählen …</option>${choices}<option value="__new">+ Neuer Standort / neuer Kunde</option></select></div><div class="tripgrid"><div class="field"><label for="tripcustomer">Kunde</label><input id="tripcustomer" value="${tripEsc(e.customer||'')}" placeholder="Kundenname"></div><div class="field"><label for="triplocation">Ort / Standort</label><input id="triplocation" value="${tripEsc(e.location||'')}" placeholder="Ort"></div></div><p class="small">Kunde und Ort werden aus dem gewählten Standort übernommen. Anderen Ort vor Arbeitsbeginn bestätigen.</p></div>`;
+ const customer=tripCustomerById(e.customerMasterId),label=customer?tripCustomerSiteLabel(customer):'';
+ return `<div class="tripbox"><div class="field"><label for="tripcustomerquery">Gespeicherten Kunden / Standort suchen</label><input id="tripcustomerquery" type="search" role="combobox" aria-controls="tripcustomerresults" aria-expanded="false" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="Kundenname, Kundennummer oder Ort eingeben …" value="${tripEsc(label)}"><select id="tripcustomerpick" tabindex="-1" aria-hidden="true"><option value="">Noch keine Auswahl</option>${customer?`<option value="${tripEsc(customer.id)}" selected>${tripEsc(label)}</option>`:''}</select><div id="tripcustomerresults" class="tripcustomerresults" role="listbox" hidden></div></div><div class="tripgrid"><div class="field"><label for="tripcustomer">Kunde</label><input id="tripcustomer" value="${tripEsc(e.customer||'')}" placeholder="Kundenname"></div><div class="field"><label for="triplocation">Ort / Standort</label><input id="triplocation" value="${tripEsc(e.location||'')}" placeholder="Ort"></div></div><p class="small">Kunde, Standort und Adressdaten werden nach Auswahl übernommen. Neuen Kunden oder Standort kannst du weiterhin direkt in den Feldern eingeben.</p></div>`;
 }
+function tripFilterCustomers(query){
+ const tokens=normalizeHistory(query).trim().split(/\s+/).filter(Boolean);
+ const result=customerMasterArray().filter(c=>c.customer).filter(c=>{
+  const hay=normalizeHistory([c.customer,c.customerNumber,c.site,c.location,c.city,c.street,c.postalCode].filter(Boolean).join(' '));
+  return tokens.every(t=>hay.includes(t));
+ });
+ return result.sort((a,b)=>{
+  const aName=normalizeHistory(a.customer),bName=normalizeHistory(b.customer),needle=tokens.join(' ');
+  const score=c=>{const name=normalizeHistory(c.customer),num=normalizeHistory(c.customerNumber),loc=normalizeHistory(c.location||c.city);return (name===needle?0:name.startsWith(needle)?1:num.startsWith(needle)?2:loc.startsWith(needle)?3:4)};
+  return score(a)-score(b)||aName.localeCompare(bName,'de')||tripCustomerSiteLabel(a).localeCompare(tripCustomerSiteLabel(b),'de');
+ }).slice(0,30);
+}
+function tripShowCustomerMatches(){
+ const query=document.getElementById('tripcustomerquery'),box=document.getElementById('tripcustomerresults');if(!query||!box)return;
+ const hits=tripFilterCustomers(query.value);
+ box.hidden=false;query.setAttribute('aria-expanded','true');
+ box.innerHTML=hits.length?hits.map(c=>`<button type="button" role="option" data-trip-customer-id="${tripEsc(c.id)}"><strong>${tripEsc(c.customer)}</strong><span class="tripcustomersub">${tripEsc([c.customerNumber&&'#'+c.customerNumber,c.site,c.location||c.city,c.street].filter(Boolean).join(' · '))}</span></button>`).join(''):'<div class="tripcustomernoresults">Kein Kunde gefunden. Du kannst einen neuen Namen und Standort in den Feldern unten eingeben.</div>';
+}
+function tripHideCustomerMatches(){const query=document.getElementById('tripcustomerquery'),box=document.getElementById('tripcustomerresults');if(box)box.hidden=true;if(query)query.setAttribute('aria-expanded','false')}
+
 function tripReadCustomerInput(){return {customer:document.getElementById('tripcustomer')?.value.trim()||'',location:document.getElementById('triplocation')?.value.trim()||''}}
 function tripConfirmNewSite(e,customer,location){
  const selected=tripCustomerById(e.customerMasterId),name=normalizeCustomer(customer),city=normalizeCustomer(location);
@@ -3274,8 +3310,8 @@ function tripSave(fn,oldId=tripCurrentId){if(tripBusy)return Promise.reject(Erro
  return (async()=>{try{fn(entries[idx]);tripSyncLegacy(entries[idx]);srMarkEdited(beforeEntry,entries[idx]);if(entries[idx].customer&& !['outbound','arrived'].includes(entries[idx].trip?.stage)){const master=customerUpsert(entries[idx],{source:'Einsatzassistent'});if(master)entries[idx].customerMasterId=master.id;}await WBStore.save(db);renderWeek();tripRender();tripPaintDashboard();wbRenderStatus();return entries[idx]}catch(error){db.weeks=JSON.parse(beforeWeeks);db.customers=JSON.parse(beforeCustomers);tripError(error);throw error}finally{tripBusy=false}})();
 }
 function tripError(error){const x=document.getElementById('triperror');x.textContent='Nicht gespeichert: '+(error?.message||error);x.hidden=false;toast('Einsatz-Assistent: '+(error?.message||error),true)}
-function tripClose(){document.getElementById('tripwizard').hidden=true;tripCurrentId=null;renderDashboard()}
-function tripOpen(id){const row=tripFind(id);if(!row)return toast('Der Einsatz ist nicht vorhanden.',true);tripCurrentId=id;document.getElementById('tripwizard').hidden=false;document.getElementById('triperror').hidden=true;tripRender();document.getElementById('tripclose').focus({preventScroll:true})}
+function tripClose(){document.getElementById('tripwizard').hidden=true;tripCurrentId=null;tripClockEditOpen=false;renderDashboard()}
+function tripOpen(id){const row=tripFind(id);if(!row)return toast('Der Einsatz ist nicht vorhanden.',true);tripCurrentId=id;tripClockEditOpen=false;document.getElementById('tripwizard').hidden=false;document.getElementById('triperror').hidden=true;tripRender();document.getElementById('tripclose').focus({preventScroll:true})}
 function tripNewFlow(from=null){if(tripBusy)return toast('Es läuft noch ein Speichervorgang. Bitte Eingabe erst danach fortsetzen.',true);const running=tripActive();if(!from&&!tripBusy&&running.length){if(confirm('Ein Einsatz läuft bereits. OK: laufenden Einsatz fortsetzen. Abbrechen: einen zusätzlichen Einsatz neu starten.'))return tripOpen(running[0].entry.id)}
  const target=from?.targetCustomer||null,prior=from?.previousEntryId?null:tripHistoricTotals(target),now=tripNow(),date=dateISO(now),cw=isoInfo(now),key=wkKey(cw.year,cw.week),id='trip'+Date.now()+Math.floor(Math.random()*100000),row={id,date,type:'Einsatz',ticket:'',customer:target?.customer||'',location:target?.location||target?.city||'',customerMasterId:target?.id||null,customerNumber:target?.customerNumber||'',street:target?.street||'',postalCode:target?.postalCode||'',city:target?.city||'',site:target?.site||'',country:target?.country||'',km:null,travel:null,start:'',end:'',endDate:'',pauseMinutes:0,pauseTarget:'work',note:'',createdAt:tripStamp(now),trip:{stage:'outbound',departAt:tripStamp(now),outKm:prior?tripSuggestedHalf(prior.km,'km'):'',outMinutes:prior?tripSuggestedHalf(prior.travel,'travel'):'',outTimeMode:'measured',returnKm:'',returnMinutes:'',returnTimeMode:'measured',returnConfirmed:false,workPauseMins:0,travelPauseMs:0,returnPauseMs:0,pauseStartedAt:'',pauseMode:'',pauseIntervals:[],fromCustomer:from?.fromCustomer||'',fromLocation:from?.fromLocation||'',proposalSource:prior?.source||'',previousEntryId:from?.previousEntryId||'',intercustomerKm:0,intercustomerMinutes:0}};
  const wk=week(cw.year,cw.week,db.selected),oldEntries=wk.entries.slice(),oldCustomers=JSON.parse(JSON.stringify(db.customers||[]));
@@ -3312,9 +3348,13 @@ function tripCheckTimeline(tr){
   if(last!==null&&ms<last)throw Error('Start- und Enduhrzeiten müssen in zeitlicher Reihenfolge liegen.');last=ms;
  }
  for(const interval of tr.pauseIntervals||[]){
+  if(!['outbound','working','returning'].includes(interval.kind)||!Number.isFinite(Date.parse(interval.from))||!Number.isFinite(Date.parse(interval.to))||Date.parse(interval.to)<Date.parse(interval.from))throw Error('Ungültige erfasste Pause: Bitte Pause kontrollieren.');
   const kind=interval.kind,begin=kind==='outbound'?'departAt':kind==='working'?'workStartedAt':'returnStartedAt',finish=kind==='outbound'?'arriveAt':kind==='working'?'workEndedAt':'returnEndedAt';
   if(tr[begin]&&interval.from&&Date.parse(tr[begin])>Date.parse(interval.from))throw Error('Der Beginn darf nicht nach einer bereits erfassten Pause liegen.');
   if(tr[finish]&&interval.to&&Date.parse(tr[finish])<Date.parse(interval.to))throw Error('Das Ende darf nicht vor einer bereits erfassten Pause liegen.');
+ }
+ for(const [name,start,end,pauseMs] of [['Hinfahrt','departAt','arriveAt','travelPauseMs'],['Arbeitszeit','workStartedAt','workEndedAt','workPauseMs'],['Rückfahrt','returnStartedAt','returnEndedAt','returnPauseMs']]){
+  if(tr[start]&&tr[end]&&Number(tr[pauseMs]||0)>Date.parse(tr[end])-Date.parse(tr[start]))throw Error(name+': Die Pause ist länger als der korrigierte Zeitraum.');
  }
  if(tr.pauseStartedAt){const begin=tr.pauseMode==='outbound'?'departAt':tr.pauseMode==='working'?'workStartedAt':'returnStartedAt';
   if(tr[begin]&&Date.parse(tr[begin])>Date.parse(tr.pauseStartedAt))throw Error('Startzeit liegt nach dem Anfang der laufenden Pause.');
@@ -3329,6 +3369,21 @@ function tripReadDisplayedClocks(tr,options={}){
   else if(node.value)result[key]=tripReadClock(id,result[key]);
  }
  tripCheckTimeline(result);return result;
+}
+function tripRecalculateAfterClocks(row){
+ const tr=row.trip;
+ if(tr.arriveAt&&tripOutChoice(tr)==='measured'){
+  // Use the ORIGINAL full intercustomer leg, not the already halved outMinutes.
+  const fullKm=tr.previousEntryId?(tr.intercustomerFullKm??tr.outKm):tr.outKm;
+  tripAllocateLeg(row,fullKm,tripMins(tr.departAt,tr.arriveAt,Number(tr.travelPauseMs)||0));
+ }
+ if(tr.returnEndedAt&&tripReturnChoice(tr)==='measured')tr.returnMinutes=tripMins(tr.returnStartedAt,tr.returnEndedAt,Number(tr.returnPauseMs)||0);
+}
+function tripClockCorrectionHtml(t){
+ const keys=[['departAt','tripdepartat','Beginn Hinfahrt'],['arriveAt','triparriveat','Ankunft'],['workStartedAt','tripworkstartat','Arbeitsbeginn'],['workEndedAt','tripworkendat','Arbeitsende'],['returnStartedAt','tripreturnstartat','Beginn Rückfahrt'],['returnEndedAt','tripreturnendat','Ende Rückfahrt']];
+ const stage=t.stage,allowed=stage==='outbound'?['departAt']:stage==='arrived'?['departAt','arriveAt']:stage==='working'?['departAt','arriveAt','workStartedAt']:stage==='work_done'?['departAt','arriveAt','workStartedAt','workEndedAt']:stage==='returning'?['departAt','arriveAt','workStartedAt','workEndedAt','returnStartedAt']:null;
+ const inputs=keys.filter(([key])=>!allowed||allowed.includes(key)).filter(([key])=>t[key]||key==='workEndedAt'&&stage==='work_done'||key==='returnEndedAt'&&stage==='done').map(([key,id,label])=>tripClockInput(id,t[key],label));
+ return `<div class="tripclockedit"><h3>🕒 Uhrzeiten korrigieren</h3><p class="small">Alle bereits erfassten Zeitstempel können geändert werden, auch nach Mitternacht. Fahrt- und Arbeitspausen bleiben erhalten und werden automatisch abgezogen. Noch nicht gestartete Phasen können hier nicht vorgezogen werden.</p><div class="tripclockgrid">${inputs.join('')}</div><p class="small">Die Änderungen werden erst durch „Korrekturen speichern“ übernommen. PDF-Prüfnachweise bleiben bestehen.</p></div>`;
 }
 function tripApplyClocks(row,clocks){
  const t=row.trip;for(const key of ['departAt','arriveAt','workStartedAt','workEndedAt','returnStartedAt','returnEndedAt'])if(clocks[key])t[key]=clocks[key];
@@ -3412,7 +3467,13 @@ function tripRender(){
   content.innerHTML=`<div class="tripbox">✓ Einsatz abgeschlossen<br><b>Reise: ${tripEsc(fmtH(e.travel||0))} h · ${tripEsc(e.km??0)} km</b><p>Der freiwillige PDF-Abgleich kann später erfolgen.</p></div>${arrivedClock}${workClock}${t.returnConfirmed?returnClock:''}`;
   actions.innerHTML=tripBtn('🕒 Start-/Endzeiten korrigieren','saveTimes','')+tripBtn('Neuen Einsatz starten','newTrip')+tripBtn('Schließen','close','');
  }
- if(stage!=='done')actions.innerHTML+=tripBtn('✕ Einsatz abbrechen','abort','tripcancel');
+ if(tripClockEditOpen){
+  content.innerHTML=tripClockCorrectionHtml(t);
+  actions.innerHTML=tripBtn('✓ Korrekturen speichern','saveTimes')+tripBtn('Abbrechen – ohne Änderung','cancelClocks','');
+ }else{
+  actions.innerHTML+=tripBtn('🕒 Alle Uhrzeiten korrigieren','editClocks','');
+  if(stage!=='done')actions.innerHTML+=tripBtn('✕ Einsatz abbrechen','abort','tripcancel');
+ }
  document.getElementById('tripstored').textContent='Jeder bestätigte Schritt wird dauerhaft in IndexedDB gespeichert.';
 }
 
@@ -3443,6 +3504,8 @@ async function tripAction(action){
  if(action.startsWith('abort:'))return tripAbort(action.slice(6));
  if(action==='close')return tripClose();
  if(action==='newTrip'){tripClose();return tripNewFlow()}
+ if(action==='cancelClocks'){tripClockEditOpen=false;tripRender();return}
+ if(action==='editClocks'){tripClockEditOpen=true;tripRender();return}
  if(!tripCurrentId||tripBusy)return;
  if(action==='abort')return tripAbort(tripCurrentId);
  const found=tripFind(),e=found?.entry,t=e?.trip;if(!t)return;
@@ -3466,11 +3529,9 @@ async function tripAction(action){
    const clocks=tripReadDisplayedClocks(t);
    await tripSave(row=>{
     tripApplyClocks(row,clocks);
-    const tr=row.trip;
-    if(tr.arriveAt&&tripOutChoice(tr)==='measured')tripAllocateLeg(row,tr.previousEntryId?(tr.intercustomerFullKm??tr.outKm):tr.outKm,tripMins(tr.departAt,tr.arriveAt,Number(tr.travelPauseMs)||0));
-    if(tr.returnEndedAt&&tripReturnChoice(tr)==='measured')tr.returnMinutes=tripMins(tr.returnStartedAt,tr.returnEndedAt,Number(tr.returnPauseMs)||0);
+    tripRecalculateAfterClocks(row);
    });
-   toast('Uhrzeiten gespeichert. Automatische Reise- und Arbeitszeit neu berechnet.');
+   tripClockEditOpen=false;tripRender();toast('Uhrzeiten dauerhaft gespeichert. Reise- und Arbeitszeit wurden neu berechnet.');
   }else if(action==='arrive'){
    if(stage!=='outbound'||t.pauseStartedAt)return;
    const km=tripValidNumber('tripoutkm'),choice=tripGetChoice('out',t);
@@ -3559,8 +3620,22 @@ async function tripAction(action){
 function tripInitUI(){const mod=document.getElementById('tripwizard');if(!mod)return;
  document.getElementById('tripclose').addEventListener('click',tripClose);
  document.getElementById('tripmanual').addEventListener('click',()=>{const row=tripFind();tripClose();if(row){const [pid,year,weekNum]=row.weekKey.split('|');if(Number(year)!==sel.year||Number(weekNum)!==sel.week)switchWeek(Number(year),Number(weekNum));fillEntry(row.entry)}});
+ document.getElementById('tripcontent').addEventListener('input',e=>{
+  if(e.target.id==='tripcustomerquery'){
+   const select=document.getElementById('tripcustomerpick');if(select)select.innerHTML='<option value="" selected>Keine Auswahl</option>';
+   tripShowCustomerMatches();
+  }
+ });
+ document.getElementById('tripcontent').addEventListener('focusin',e=>{if(e.target.id==='tripcustomerquery')tripShowCustomerMatches()});
+ document.getElementById('tripcontent').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-trip-customer-id]');if(!btn)return;
+  const c=tripCustomerById(btn.dataset.tripCustomerId),select=document.getElementById('tripcustomerpick'),query=document.getElementById('tripcustomerquery');
+  if(!c||!select||!query)return;
+  select.innerHTML=`<option value="${tripEsc(c.id)}" selected>${tripEsc(tripCustomerSiteLabel(c))}</option>`;
+  query.value=tripCustomerSiteLabel(c);tripHideCustomerMatches();tripAction('pickCustomer');
+ });
+ document.getElementById('tripcontent').addEventListener('keydown',e=>{if(e.target.id==='tripcustomerquery'&&e.key==='Escape'){tripHideCustomerMatches();e.stopPropagation()}});
  document.getElementById('tripcontent').addEventListener('change',e=>{
-  if(e.target.id==='tripcustomerpick')tripAction('pickCustomer');
   if(e.target.id==='tripouttime'&&e.target.value.trim())document.getElementById('tripoutmode').value='manual';
   if(e.target.id==='tripreturntime'&&e.target.value.trim())document.getElementById('tripreturnmode').value='manual';
  });
@@ -3573,7 +3648,7 @@ renderDashboard=function(){tripBaseRenderDashboard();tripPaintDashboard()};
 tripInitUI();
 </script>
 
-<script>if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('Offline-Cache:',e)))}</script>
+<script>if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(reg=>reg.update()).catch(e=>console.warn('Offline-Cache:',e)))}</script>
 <script>
 'use strict';
 /* V2.15 – optionale Sonderfunktionen mit persistentem, datenbankweitem Flag */

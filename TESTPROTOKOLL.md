@@ -1,18 +1,41 @@
-# Testprotokoll Wochenbericht Lovrencic V2.23.0
+# Testprotokoll – Wochenbericht Lovrencic V2.24.1
 
-## Automatisierte Prüfungen (23.10.2026)
+**Prüfdatum:** 28.10.2026. **Ausgangsbasis:** Repository `Oxijan86/Wochenbericht-Erstellung-`, `main`, ursprüngliche `index.html` aus V2.24 (Git-Blob `23b1007753133358efbc2357204e7da922a86f85`). Weder GitHub noch produktive Datenbank wurden geändert.
 
-- JavaScript-Syntaxprüfung per Node.js für alle fünf eingebetteten Skripte erfolgreich.
-- **31 von 31 internen Selbsttests erfolgreich:** `test_regression.py`.
-- Vorhandene Browser-Regressionen erfolgreich: `test_v216.py`, `test_v217.py`, `test_compat_v217.py`, `test_v218.py`, `test_v218_regression.py`, `test_v219.py`, `test_v221.py`, `test_v222.py`. Der Versionsvergleich in `test_v219.py` wurde an V2.23 angepasst.
-- **Neue Browserprüfung `test_v223.py` erfolgreich:** Unabhängige Auswahl pro PDF, Technikerpositionen nur für ausgewählte Person, vollständiges Überspringen eines PDFs, Einbeziehung der anderen PDFs, auch eindeutige PDFs überspringbar, kein überflüssiger Bestätigungshaken, keine unbemerkte Übernahme leerer Positionen, bei Überspringen aller PDFs keine Speicherung, explizites Auslassen fehlerhafter PDFs, Bedienung im mobilen Layout.
-- Durchgehender Test mit simulierten PDF-Datensätzen: Aus einem Stapel mit drei PDFs zwei übersprungen, eines bewusst importiert. Ausschließlich der ausgewählte Einsatz und dessen PDF-Nachweis wurden lokal gespeichert; danach war die Importauswahl zurückgesetzt.
-- ZIP-Struktur und Integritätsprüfung bei der Paketgenerierung durchgeführt.
+## Behobene Probleme
 
-## Noch mit echten Dateien/Geräten zu prüfen
+1. Einsatzassistent/Dashboard verwendete eine native Scroll-Kundenauswahl statt einer mobil geeigneten Tastatur-Suche. Jetzt Live-Suche nach Name, Kundennummer, Standort und Adresse mit getrennter Standortauswahl und Übernahme der Stammdaten; neue Standorte weiterhin möglich.
+2. „Uhrzeiten korrigieren“ bot nur phasenweise Zeitfelder an. Jetzt eigener Korrekturdialog für alle im jeweiligen Einsatz erfassten Zeitstempel. Zeitfolge, Pausen und Datumswechsel werden validiert, gemessene Reise-/Arbeitszeiten neu berechnet. PDF-Prüfnachweise bleiben dokumentiert.
+3. V2.24 hatte den Mehrtages-Gesamtabgleich im M365-Textimport angeordnet, aber nicht im realen RONDO-PDF-Direktimport. Die PDF-Vorschau erkennt nun den zusammengehörigen Ticket-/Kunden-/Zeitraum, zeigt Summen/Abweichungen und erfordert ein ausdrückliches „Gesamtsummen geprüft“, bevor alle Tagesnachweise erstellt werden. Einzelne Tageswerte werden nicht überschrieben.
+4. Versions-/Cache-Kennung jetzt `2.24.1`, statische SW-App-Aktualisierung netzbevorzugt, bisheriger IndexedDB-Datenbankname und das SQLite-Datenformat unverändert.
 
-- Der vorhandene `test_pdf_workflow.py` benötigt echte digitale RONDO-PDFs, die hier nicht bereitgestellt wurden.
-- `test_special.py` benötigt eine externe Excel-Beispieldatei. Nicht ausgeführt.
-- Cloud-Synchronisation mit deinem tatsächlichen OneDrive-Ordner auf PC und Smartphone ist damit nicht end-to-end geprüft.
+## Erfolgreich ausgeführt
 
-**Vor dem Update eine separate lokale Sicherung der produktiven `.db`-Datei anfertigen; anschließend die tatsächlichen Einsätze und den Ordnerstatus prüfen.**
+- **JavaScript-Syntax:** alle fünf Inline-Skripte der HTML-Anwendung und `sw.js`, `node --check`, fehlerfrei.
+- **Interne Selbsttests:** 31/31 bestanden, `test_regression.py`.
+- **Alt-/Regressionstests:** `test_compat_v217.py` (19/19), `test_v216.py`, `test_v217.py`, `test_v218.py`, `test_v218_regression.py`, `test_v219.py`, `test_v221.py`, `test_v222.py`, `test_v223.py` jeweils erfolgreich unter Headless Chromium. Sie decken unter anderem Start, Hinfahrt und Arbeitspausen, Ankunft, Arbeitsbeginn/-ende, Rückfahrt, Kundenwechsel, Abbruch, vorhandene PDF-Markierung, Dialoge, Export-/Import-Logik und Sync-Konfliktschutz ab.
+- **Angepasste Alt-Testannahmen:** `test_v219.py` erwartete fest die alte Version 2.23.0; Erwartung auf 2.24.1 geändert. `test_v216.py` zeigte durch den mittlerweile gewechselten Kalenderwochenkontext den geprüften Oktober-Einsatz nicht im geöffneten Tabellenmonat; Test stellt nun die KW des Beispieldatums ein. Sonstiger Ablauf unverändert. Beide Tests danach vollständig erfolgreich. Das Kalenderwochen-Problem trat auch mit der unveränderten V2.24-App auf.
+- **Neue echte Browser-Interaktionstests `test_v2241.py`:** PC-Viewport 1260×960 und mobiler Chromium-Viewport 390×844 mit Touch-Events. Tastatursuche nach Kundennummer, Teilbegriff/Mischschreibung, separate Filialen, Auswahl/Adressübernahme, gesamter Korrekturdialog mit sechs Zeitstempeln, Uhrzeitänderungen, Fehler bei ungültiger Folge, PDF-Nachweis nach Korrektur, gezielter Abbruch, mehrfache Aufteilung von Mehrkunden-Fahrten ohne Doppelzählung – bestanden.
+- **PDF-Gesamtabgleich, synthetische Daten:** drei gespeicherte Tagesberichte vom 26.–28.10., Ticket gleich, 18 h Arbeitszeit / 4 h Reisezeit / 240 km im simulierten Servicebericht. PDF-Vorschau erzeugt Gesamtgruppe und verlangt eine Entscheidung. Nach ausdrücklich gesetzter Bestätigung wurden 3/3 Tagesberichte als geprüft markiert, alle individuellen Tageswerte unverändert; erneute Prüfung desselben Dokuments erzeugt keine doppelten Nachweise. `test_v2241.py` erfolgreich.
+- **SQLite-Kompatibilität `test_v2241_codec.py`:** synthetische Bestandsdaten mit Kunden, Einsatz und PDF-Prüfvermerk über `WBSqlite.encode`/`decode` unverändert auslesbar; SQLite-Standardtreiber kann `app_state` lesen; **`PRAGMA quick_check = ok`**, beschädigte/abgeschnittene Datei wird abgewiesen.
+- **ZIP-Struktur:** alle Dateien aus dem bisherigen V2.24-GitHub-Paket übernommen; nur Hauptdateien und dokumentierte Testanpassungen verändert. Das neue Paket ist auf Lesbarkeit und vollständiges Auspacken prüfbar.
+
+## Nicht ausgeführt oder technisch eingeschränkt
+
+- **Keine Original-RONDO-PDFs bereitgestellt.** `test_pdf_workflow.py` benötigt echte digital lesbare Serviceberichte unter `rondo_pdf_probe/` und wurde nicht erfolgreich ausgeführt. Der Mehrtages-PDF-Test verwendet ausschließlich synthetische importähnliche Datensätze; er ersetzt keine PDF-Parser- oder Geräteprüfung.
+- **`test_special.py`:** benötigt die optionale externe Excel-Musterdatei; nicht ausgeführt.
+- **Keine echte Android-Hardware:** Mobilbedienung nur mit emuliertem Chromium-Viewport/Touch geprüft; insbesondere native Tastatur-/IME-Bedienung bitte am eigenen Gerät kontrollieren.
+- **Kein produktiver OneDrive-Ordner/Ordnerfreigabe**, kein Multi-Geräte-Synchronisations-End-to-End-Test.
+- **Kein echter HTTP-/Service-Worker-Offline-Reload:** Die lokale Chromium-Umgebung sperrt Navigationen mit `ERR_BLOCKED_BY_ADMINISTRATOR`. `sw.js` ist syntaxgeprüft und quellcodekontrolliert, die Installation/Aktivierung und Cache-Lebensdauer wurden nicht in einem echten Offline-Deployment verifiziert.
+- **Keine produktive Datenbank / keine echten Nutzerdaten geöffnet.** Persistenz wurde durch vorhandene mocked-save-Browsertests, SQLite-Roundtrip und Strukturprüfung abgesichert. Echter IndexedDB-Reload im normalen HTTP-Browser konnte hier nicht ausgeführt werden. Bitte vor dem Upload die produktive `wochenberichte.db` sichern und nach dem Update eine Stichprobe im eigenen Browser prüfen.
+- **Nicht jeder Button als separater Klickpfad end-to-end getestet.** Alt-Regressionen decken die meisten zentralen Assistenten- und Verwaltungsfunktionen ab; der neue PDF-Test setzt die explizite Entscheidung im Testautomaten programmatisch und testet anschließend die reale Abgleichfunktion. Nicht automatisch getestete Einzelfälle bleiben als manueller Abnahmetest bestehen.
+
+## Benutzerprüfung vor produktiver Verwendung
+
+1. `wochenberichte.db` über „Speicherung & Sync“ separat sichern und die Sicherung unabhängig aufbewahren.
+2. `index.html` und `sw.js` zusammen nach GitHub hochladen, im Browser Seite neu laden und **Version 2.24.1** bestätigen.
+3. Alten Einsatz öffnen; Kunden, ursprüngliche Uhrzeiten und PDF-Prüfnachweise auf Vollständigkeit kontrollieren.
+4. Einen Probe-Einsatz starten, Kundenname und Filiale eintippen, dann abbrechen; prüfen, dass kein fremder Eintrag gelöscht wird.
+5. Korrektur an einem bestehenden Einsatz durchführen, neu laden und Zeiten/Nettozeit/Pausen prüfen.
+6. Mit einem echten mehrtägigen RONDO-PDF die Gesamtabgleichvorschau und grünen Haken kontrollieren; vor Bestätigung muss der Vergleich ausbleiben.
+7. Ggf. Online-/Offline-Aufruf und OneDrive-Synchronisation auf PC und Smartphone testen, ohne Website-Daten/IndexedDB zu löschen.

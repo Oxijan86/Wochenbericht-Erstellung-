@@ -1,42 +1,28 @@
-# Wochenbericht Lovrencic – V2.23.0 (23.10.2026)
+# Wochenbericht Lovrencic – V2.24.1 (28.10.2026)
 
-Die Anwendung funktioniert im Browser auf PC und Smartphone. Einsatzdaten bleiben in der bestehenden lokalen Datenbank (IndexedDB), mit optionaler Ordnersynchronisation unter „Speicherung & Sync“. **Vor der Aktualisierung bitte eine separate Datenbanksicherung erstellen.**
+Browser-Anwendung für PC und Smartphone mit lokal gespeicherter SQLite-kompatibler Datenbank (`wochenberichte.db`), IndexedDB und optionaler Ordnersynchronisation. **Bitte vor jedem Update eine separate Sicherung der produktiven Datenbank anlegen.**
 
-## Neu in V2.23
+## V2.24.1 – Korrekturen
 
-- **PDF-Import pro Datei steuern:** Jede erfolgreich ausgelesene PDF erhält die beiden Möglichkeiten „Positionen übernehmen und abgleichen“ und „Diesen Bericht vollständig überspringen“ – auch bei eindeutig erkannten Technikern.
-- **Kein zusätzlicher Techniker-Bestätigungshaken:** Bei gemischten Serviceberichten die eigenen Arbeits-, Reisezeit- und Kilometerpositionen auswählen. Der Klick auf „Berichtsauswahl prüfen und Einsätze vergleichen“ bestätigt die jeweilige Auswahl für die Vorschau. Die Daten werden erst beim abschließenden „Auswahl bestätigen und speichern“ dauerhaft übernommen.
-- **Überspringen ohne erneute Dateiauswahl:** Die übrigen PDFs bleiben im Stapel. Wenn alle PDFs übersprungen werden, kehrt die Anwendung ohne Datenänderung zur PDF-Auswahl zurück.
-- **Sicherheitsprüfung bleibt erhalten:** Ohne markierte Positionen kann ein Bericht nur übersprungen, nicht als leerer Einsatz übernommen werden. Kaputte PDFs müssen weiterhin ausdrücklich ausgeschlossen werden.
+- **Kundenauswahl im Einsatzassistenten:** statt Dropdown ein durchsuchbares Eingabefeld; Tippvorschläge nach Name, Kundennummer, Standort und Adresse; jede Filiale einzeln wählbar. Nach Auswahl übernimmt der Assistent den Kunden und seine vorhandenen Adressdaten. Neue Kunden/Standorte bleiben möglich.
+- **Uhrzeitkorrektur:** über „Alle Uhrzeiten korrigieren“ auf alle bereits erfassten Zeitstempel zugreifen. Hinfahrt, Ankunft, Arbeit und Rückfahrt werden mit Datumsangaben bearbeitet; über Mitternacht möglich. Gemessene Fahrzeiten und Nettoarbeitszeit werden neu berechnet; vorhandene Fahrt-/Arbeitspausen berücksichtigt. Bei unmöglicher Zeitfolge wird nichts gespeichert. Bei Kundenwechsel erfolgt die Aufteilung der bestätigten Gesamtfahrt wiederholbar ohne Doppelzählung.
+- **PDF-Gesamtabgleich bei mehrtägigen Einsätzen:** Jetzt **beim PDF-Direktimport** aufgerufen. Das PDF-Datum zählt als letzter Einsatztag; zusammengehörige Tagesbuchungen (gleiches Ticket und passender Kundenstandort, maximal 14 Tage zurück) werden addiert und mit PDF-Gesamtsummen verglichen. Ausdrückliche Entscheidung erforderlich. Kein Überschreiben der Tageswerte; alle beteiligten Tage werden mit PDF-Prüfnachweis gekennzeichnet. Eintägige PDF-Berichte werden weiterhin wie bisher verarbeitet.
+- **PDF-Prüfkennzeichnung bleibt nach einer Uhrzeitkorrektur bestehen.** Änderungen können im vorhandenen Prüfnachweis als Nachbearbeitung dokumentiert sein, ohne eine neue Prüfung zu erzwingen.
+- **Version und Offline-Cache:** V2.24.1, Netz-zuletzt-Cache nur für die statische Anwendung; alte Cache-Versionen beim Aktivieren entfernt. IndexedDB und externe `.db`-Dateien werden nicht gelöscht.
 
-## Aus V2.22
+## Vorherige Funktionen (bleiben erhalten)
 
-- Kalenderwoche und Stundenübersicht nur in „Einsätze erfassen“ und „Wochenbericht / Export“.
-- Nach Eingabe des Arbeitsbeginns erscheint ein automatisch berechneter Vorschlag zum Arbeitsende anhand der PDF-Dauer und einer möglichen Pause; manuelle Endzeiten werden nicht überschrieben.
+- PDF pro Datei übernehmen oder vollständig überspringen, Technikerpositionen kontrollieren, ausdrückliche Übernahme.
+- Manuelle Dienstreise-, Arbeits- und Pausenerfassung; Einsatz abbrechen; nächster Kundenstandort, Fahrzeitvorschläge, letzter Kilometerstand.
+- Historische Excel-/M365-Importe mit Dublettenprüfung und Kundenstamm; Exportprüfung, Kalenderwochen und Exportvorlage.
+- Mehrere Techniker optional, Kundendatenverwaltung, gespeicherte Einsätze und Historie, SQLite-Datenaustausch, Sync/Backups.
 
-## Aus V2.21
+## GitHub Pages und Update
 
-- **PDF-Arbeitsdauerabweichungen sind nur noch Kontrollhinweise.** 15–29 Minuten werden als Hinweis angezeigt; ab 30 Minuten erscheint ein deutlicher Warnhinweis mit den beiden Dauern und der Differenz. Der Excel-Export ist deswegen **nicht** gesperrt und es ist keine Ausnahmebegründung erforderlich.
-- **Fehlende tatsächliche Beginn-/Enduhrzeiten** sind weiterhin eine eigene Vollständigkeitsprüfung: Zunächst den Einsatz nachtragen oder eine begründete Ausnahme bestätigen. Ungültige Pausen können weiterhin blockieren.
-- **Frühere Serviceberichte regulär importieren:** Der zusätzliche Modus „Nur Kundenstamm ergänzen“ entfällt. Alte PDFs werden nach Datum in der Einsatzhistorie gespeichert oder mit bestehenden Einsätzen abgeglichen. Es bleiben manuelle Prüfungen bei unklarer Zuordnung und eine Dublettenprüfung; fehlende Kundenadressen werden ergänzt.
-- Vorhandene manuelle Uhrzeiten, PDF-Prüfnachweise, Rücksprung nach Zeitkorrektur und Synchronisations-Konfliktschutz bleiben erhalten.
+Den **gesamten Inhalt des ZIP** im Root von `Oxijan86/Wochenbericht-Erstellung-` hochladen. Mindestens `index.html` und `sw.js` gemeinsam ersetzen; zusätzliche Dokumentations- und Testdateien können ebenfalls überschrieben werden. `.nojekyll` unverändert belassen. Auf Android bzw. am PC nach dem Deployment neu laden (bei installiertem Offline-App-Icon ggf. App schließen und erneut öffnen). Die neue App zeigt **Version 2.24.1** an.
 
-## Benutzung
+**Niemals** Browser-Sitedaten bzw. IndexedDB löschen, um einen veralteten Offline-Cache zu bereinigen. Vorher separate `wochenberichte.db`-Datei sichern. Bestehende Datenbankstruktur wird durch dieses Update nicht migriert.
 
-1. Servicebericht-Import öffnen und mehrere aktuelle oder ältere PDFs einlesen. Pro PDF entweder die passenden Technikerpositionen kontrollieren oder „Diesen Bericht vollständig überspringen“ wählen. Danach „Berichtsauswahl prüfen und Einsätze vergleichen“ und abschließend „Auswahl bestätigen und speichern“ betätigen.
-2. Unter „Wochenbericht / Export“ die Exportprüfung lesen. Bei PDF-Stundenabweichungen wird die Differenz gezeigt und der Einsatz kann direkt kontrolliert werden, der Export bleibt möglich.
-3. Bei fehlenden Uhrzeiten über „Einsatz korrigieren“ nachtragen oder ausdrücklich eine begründete Ausnahme zulassen.
+## Testgrenzen
 
-## Wichtige Grenzen
-
-Die Original-Excel-Vorlage bietet sechs Einsatzzeilen pro Wochentag (Mo–Fr); weitere Einsätze stehen in einer ergänzenden TSV-Übersicht. Serviceberichte enthalten typischerweise **Netto-Arbeitsdauer, nicht Beginn/Ende**. Unterschiede können sachliche Gründe haben. Eine geräteübergreifende OneDrive-Synchronisation wurde nicht end-to-end getestet, und für den PDF-Parser lagen keine neuen originalen RONDO-Berichte vor.
-
-## GitHub Pages
-
-`index.html`, `sw.js`, `README.md` und `.nojekyll` aus dem Schnellupload in das Wurzelverzeichnis der GitHub-Pages-Quelle hochladen. Cache-Kennung `wochenberichte-static-v2.23.0`. Bei alter Darstellung Seite neu laden; Browserdatenbank **nicht** löschen.
-
-
-## V2.22
-- KW-Konfiguration und Stundenübersicht nur bei „Einsätze erfassen“ und „Wochenbericht / Export“.
-- PDF-Endzeitvorschlag nach Eingabe Arbeitsbeginn: netto PDF-Arbeitsdauer plus Arbeitspause.
-- Vorschlag bleibt bis zum Speichern ausdrücklich gekennzeichnet; bestehende Endzeiten werden nicht überschrieben.
+Automatisierte Chromium-Tests mit PC- und mobilem Viewport sind keine Prüfung auf einem realen Android-Gerät. Produktive OneDrive-Synchronisation, echte RONDO-PDFs und die produktive Datenbank wurden aus Datenschutz- und Zugriffsgründen nicht getestet. Details und Reproduktionsmöglichkeiten in `TESTPROTOKOLL.md`.
