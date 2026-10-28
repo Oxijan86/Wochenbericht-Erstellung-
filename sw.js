@@ -1,5 +1,5 @@
 /* Offline shell only. User data remains in IndexedDB / local or connected .db file. */
-const CACHE='wochenberichte-static-v2.24.3';
+const CACHE='wochenberichte-static-v2.24.4';
 const START='./index.html';
 self.addEventListener('install',event=>event.waitUntil(
  caches.open(CACHE).then(cache=>cache.add(new Request(START,{cache:'reload'}))).then(()=>self.skipWaiting())

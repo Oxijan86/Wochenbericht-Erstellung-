@@ -1,4 +1,7 @@
 
+### V2.24.4
+Reales RONDO-PDF Ticket 36416: eigener Anteil 19 h Arbeit, 4 h Reise, 270 km; abweichende Technikerpositionen ausgeschlossen. Browserprüfungen und Mehrtagesauswahl in test_v2244.py.
+
 ## V2.24.3: Testläufe
 - JavaScript-Syntax sämtlicher Inline-Skripte und des Serviceworkers: bestanden.
 - `test_regression.py`: 31/31 interne Selbsttests bestanden.

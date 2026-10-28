@@ -37,3 +37,6 @@ Den **gesamten Inhalt des ZIP** im Root von `Oxijan86/Wochenbericht-Erstellung-`
 ## Testgrenzen
 
 Automatisierte Chromium-Tests mit PC- und mobilem Viewport sind keine Prüfung auf einem realen Android-Gerät. Produktive OneDrive-Synchronisation, echte RONDO-PDFs und die produktive Datenbank wurden aus Datenschutz- und Zugriffsgründen nicht getestet. Details und Reproduktionsmöglichkeiten in `TESTPROTOKOLL.md`.
+
+### V2.24.4
+RONDO-PDF: Korrekte Kunden-/Technikerzuordnung und Mehrtagesabgleich auch bei Straßenangabe im Einsatzort.

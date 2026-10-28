@@ -1,3 +1,9 @@
+## V2.24.4 – RONDO-PDF-Abgleich
+
+- PDF-Kunde ohne Straßenadresse, wenn Straße separat erkannt wird.
+- Fremde Technikerpositionen (z. B. Hoffmann) werden nicht zum eigenen Stunden-/Kilometerkonto addiert.
+- Standortzusätze bei gleicher Ticketnummer werden bei der manuellen Mehrtagesauswahl zugelassen, sofern der Ortskern übereinstimmt.
+
 
 ## Version 2.24.3 – 28.10.2026
 - Ausgangsbasis ist die vom Nutzer hochgeladene vollständige V2.24.2 mit der 28-Tage-PDF-Zuordnung.
