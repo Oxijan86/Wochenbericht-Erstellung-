@@ -1,6 +1,17 @@
-# Wochenbericht Lovrencic – V2.24.1 (28.10.2026)
+
+## V2.24.3: automatische Stempel und Korrekturen
+Beim Kunden angekommen beendet die Hinreise und startet die Arbeitszeit. Im Assistenten „Stempelzeiten bearbeiten“ sind alle bisher erfassten Zeiten und Pausen einschließlich Datum sichtbar. Neue Pausen können ergänzt, vorhandene korrigiert oder durch Leeren beider Datumsfelder entfernt werden. Der Schalter „Auto-Start: Ankunft = Arbeitsbeginn“ ist standardmäßig aktiv. Der zweite Schalter verknüpft Arbeitsende und Rückfahrtbeginn, sofern eine Rückfahrt erfasst bzw. bewusst gestartet wird. Die Rückfahrt selbst startet nicht von allein. Beide Schalter lassen sich pro Einsatz deaktivieren. Alle Anpassungen erst nach „Korrekturen speichern“ übernehmen. Die 28-Tage-PDF-Suche aus V2.24.2 bleibt erhalten.
+
+# Wochenbericht Lovrencic – V2.24.2 (28.10.2026)
 
 Browser-Anwendung für PC und Smartphone mit lokal gespeicherter SQLite-kompatibler Datenbank (`wochenberichte.db`), IndexedDB und optionaler Ordnersynchronisation. **Bitte vor jedem Update eine separate Sicherung der produktiven Datenbank anlegen.**
+
+## V2.24.2 – PDF-Gesamtabgleich über vier Wochen
+
+- **28-Tage-Suche:** Beim direkten PDF-Import werden weitere Einsatztage desselben Kunden und Standorts bis zu 28 Tage rückwärts ab dem PDF-Enddatum vorgeschlagen. Vorhandene gleiche Ticketnummern werden erkannt; **fehlende** Ticketnummern verhindern keinen Vorschlag mehr. Abweichende vorhandene Ticketnummern werden ausgeschlossen.
+- **Tage ausdrücklich auswählen:** Alle möglichen Tage erscheinen mit Datum, Kunde, Standort, Ticket und Kilometern als Auswahlkästchen. Eindeutig gleiche Tickets sind vorausgewählt; Tage ohne Ticket sind **nicht** vorausgewählt. Mindestens zwei ausgewählte Tage einschließlich des PDF-Enddatums sind erforderlich. Die Gesamtsummen werden zur Kontrolle gegenübergestellt.
+- **Ticketnummer nur nach Bestätigung:** Erst wenn „Ausgewählte Tage prüfen und fehlende Ticketnummern übernehmen“ ausdrücklich gewählt und der Import abschließend gespeichert wird, ergänzt die App fehlende Tickets ausschließlich an den ausgewählten Tagen. Bestehende Tickets, Tageskilometer, Zeiten und Pausen bleiben unverändert. PDF-Prüfnachweise werden für die ausgewählten Tage gespeichert.
+- **Keine Datenbankmigration:** Die bisherige `wochenberichte.db` bleibt verwendbar; Service-Worker-Version wurde auf V2.24.2 angehoben. Vor dem Update Datenbank sichern.
 
 ## V2.24.1 – Korrekturen
 
@@ -19,7 +30,7 @@ Browser-Anwendung für PC und Smartphone mit lokal gespeicherter SQLite-kompatib
 
 ## GitHub Pages und Update
 
-Den **gesamten Inhalt des ZIP** im Root von `Oxijan86/Wochenbericht-Erstellung-` hochladen. Mindestens `index.html` und `sw.js` gemeinsam ersetzen; zusätzliche Dokumentations- und Testdateien können ebenfalls überschrieben werden. `.nojekyll` unverändert belassen. Auf Android bzw. am PC nach dem Deployment neu laden (bei installiertem Offline-App-Icon ggf. App schließen und erneut öffnen). Die neue App zeigt **Version 2.24.1** an.
+Den **gesamten Inhalt des ZIP** im Root von `Oxijan86/Wochenbericht-Erstellung-` hochladen. Mindestens `index.html` und `sw.js` gemeinsam ersetzen; zusätzliche Dokumentations- und Testdateien können ebenfalls überschrieben werden. `.nojekyll` unverändert belassen. Auf Android bzw. am PC nach dem Deployment neu laden (bei installiertem Offline-App-Icon ggf. App schließen und erneut öffnen). Die neue App zeigt **Version 2.24.2** an.
 
 **Niemals** Browser-Sitedaten bzw. IndexedDB löschen, um einen veralteten Offline-Cache zu bereinigen. Vorher separate `wochenberichte.db`-Datei sichern. Bestehende Datenbankstruktur wird durch dieses Update nicht migriert.
 

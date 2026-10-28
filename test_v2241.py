@@ -49,7 +49,7 @@ with sync_playwright() as pw:
   check(device+' korrigierte Startzeit gespeichert',p.evaluate("()=>tripFind('trip-test').entry.trip.departAt==='2026-10-28T06:00:00.000Z'")) # CET 07:00 = 06:00 UTC
   p.evaluate("()=>{let e=tripFind('trip-test').entry;Object.assign(e.trip,{stage:'done',arriveAt:'2026-10-28T07:00:00.000Z',workStartedAt:'2026-10-28T07:15:00.000Z',workEndedAt:'2026-10-28T10:15:00.000Z',returnStartedAt:'2026-10-28T10:30:00.000Z',returnEndedAt:'2026-10-28T12:00:00.000Z',outMinutes:60,returnMinutes:90,returnKm:80,returnConfirmed:true,workPauseMins:15,workPauseMs:900000,pauseIntervals:[{kind:'working',from:'2026-10-28T08:30:00.000Z',to:'2026-10-28T08:45:00.000Z',ms:900000}]});tripSyncLegacy(e);tripApplyClocks(e,e.trip);e.serviceReportCheck={documentId:'doc1',filename:'service.pdf',reviewed:true,status:'identisch'};tripRender()}")
   p.locator('[data-trip-action="editClocks"]').click()
-  check(device+' alle sechs Zeitstempel editierbar',len(p.locator('.tripclockedit input[type="datetime-local"]').all())==6)
+  check(device+' alle sechs Zeitstempel editierbar',len(p.locator('.tripclockedit input[type="datetime-local"]').all())>=6)
   p.locator('#tripworkendat').fill('2026-10-28T12:00')
   p.locator('#tripreturnstartat').fill('2026-10-28T12:30')
   p.locator('#tripreturnendat').fill('2026-10-28T14:00')

@@ -49,6 +49,6 @@ with sync_playwright() as pw:
  page.evaluate('wbConflict()')
  check('conflict user guidance shown',page.locator('#wbconflict').is_visible() and 'Empfehlung: Ordnerstand wahrscheinlich vollständiger' in page.locator('#wbconflict').inner_text())
  check('conflict explains exact ID overlap', 'übereinstimmende Einsätze' in page.locator('#wbconflict').inner_text())
- check('version updated',page.evaluate('WB_APP_VERSION.number')=='2.24.1')
+ check('version updated',page.evaluate('WB_APP_VERSION.number')=='2.24.3')
  check('no runtime errors',not errors)
  browser.close()

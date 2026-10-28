@@ -1,3 +1,21 @@
+
+## Version 2.24.3 – 28.10.2026
+- Ausgangsbasis ist die vom Nutzer hochgeladene vollständige V2.24.2 mit der 28-Tage-PDF-Zuordnung.
+- Ankunft beendet die Hinfahrt und startet automatisch die Arbeitszeit (abschaltbar in der Stempelkorrektur).
+- Rückfahrt bleibt eine bewusste manuelle Aktion. Bei ihrem Start wird standardmäßig das gespeicherte Arbeitsende als Rückfahrtbeginn übernommen; unabhängig einstellbar.
+- Einheitlicher Button „Stempelzeiten bearbeiten“ statt irreführender, scheinbar wirkungsloser Korrekturbuttons.
+- Alle vorhandenen Zeitstempel und Pausen editierbar, Pausen hinzufügbar und durch Leeren beider Felder entfernbar.
+- Automatische Folgestempel-Verknüpfung im Editor, nachträgliche Neuberechnung gemessener Reisezeiten und Pausen.
+- Offline-Serviceworker-Cache auf V2.24.3 erhöht; bisherige Datenbankstruktur unverändert.
+
+# V2.24.2 – 28.10.2026
+
+- Direkter PDF-Import schlägt bis zu 28 Tage zurückliegende zusammengehörige Einsätze vor, darunter Tage ohne Ticketnummer.
+- Pro Tagesbuchung manuell auswählbare Zuordnung; ungekennzeichnete Tage werden nicht automatisch übernommen, andere Tickets ausgeschlossen.
+- Vergleich der PDF-Gesamtsummen mit der gewählten Tagesauswahl; ausdrückliche Bestätigung und anschließendes Speichern nötig.
+- Fehlende Ticketnummer wird nur den ausgewählten Tagen zugeordnet; Tageskilometer, Reisezeiten und Arbeitszeiten bleiben erhalten; PDF-Prüfnachweise werden gesetzt.
+- Version 2.24.2 in der Anzeige und im Service-Worker-Cache; keine Datenbankmigration.
+
 # V2.24.1 – 28.10.2026
 
 - Interaktive Kundensuche im Einsatzassistenten: Namens- und Nummern-Fragmente, Standorte und Adressen, mobile Tastatur, getrennte Filialen.

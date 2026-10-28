@@ -1,4 +1,25 @@
-# Testprotokoll – Wochenbericht Lovrencic V2.24.1
+
+## V2.24.3: Testläufe
+- JavaScript-Syntax sämtlicher Inline-Skripte und des Serviceworkers: bestanden.
+- `test_regression.py`: 31/31 interne Selbsttests bestanden.
+- `test_v2242.py`: 28-Tage-Suche, Ticketnachtrag und PDF-Schutz in Desktop- und Mobilansicht bestanden.
+- `test_v2241.py`: ursprüngliche Assistent-/PDF-/Mehrkundentests in Desktop- und Mobilansicht bestanden (Anzeige umfasst nun zusätzlich Pausenfelder).
+- `test_v2243.py`: automatische Ankunft/Arbeitsbeginn-Verknüpfung, Änderungsverknüpfung, Pausennachtrag, individuelle Abschaltung auf PC/Mobilansicht bestanden.
+- Realbetrieb auf Android mit echten PDFs/Cloud-Synchronisation bleibt ungetestet.
+
+# Testprotokoll – Wochenbericht Lovrencic V2.24.2
+
+## Zusätzliche Tests V2.24.2 (28.10.2026)
+
+- `test_v2242.py`: echte Chromium-Klicktests auf Desktop-Breite 1280 px und mobilem 390-px-Touch-Viewport. Belegt 28-Tage-Grenze, getrennte Auswahl gespeicherter Einsatztage, Vorschläge ohne Ticket, Ausschluss eines anderen Tickets/Kunden, Pflichteinbeziehung des PDF-Endtags und ausdrückliche Zustimmung.
+- Nach Bestätigung wurden nur an zwei ausgewählten Tagen PDF-Prüfnachweise gesetzt. Die fehlende Ticketnummer wurde ausschließlich am ausgewählten Tag ergänzt. Nicht ausgewählte Einsätze, andere Tickets und **sämtliche bisherigen Tages-Kilometer, Fahrtzeiten und Arbeitszeiten** blieben unverändert.
+- `test_v2241.py` weiterhin bestanden: Kundensuche, Korrektur von Uhrzeiten, mehrtägiger PDF-Abgleich mit drei Tagen, Abbruch und Mehrkundenfahrten, jeweils auch mit Mobile-Viewport.
+- `test_regression.py`: 31/31 interne Tests bestanden; `test_v2241_codec.py`: SQLite-Roundtrip und `PRAGMA quick_check = ok`. Weitere bestehende Tests: `test_compat_v217.py`, `test_v216.py`, `test_v217.py`, `test_v218.py`, `test_v218_regression.py`, `test_v219.py`, `test_v221.py`, `test_v222.py`, `test_v223.py` bestanden. In `test_v219.py` ausschließlich die fest eingetragene erwartete Versionsnummer aktualisiert.
+- JavaScript-Syntaxprüfung aller fünf Inline-Skripte erfolgreich. `sw.js`-Cachekennung entspricht 2.24.2. Die bisher beschriebenen Grenzen (kein reales RONDO-PDF, kein echtes Android-Gerät, kein OneDrive-/Offline-End-to-End-Test, keine produktive Datenbank) gelten weiter.
+
+**Ausgangsbasis dieser Folgeversion:** vom Nutzer hochgeladenes V2.24.1-ZIP, 21 Dateien. GitHub wurde nicht verändert.
+
+---
 
 **Prüfdatum:** 28.10.2026. **Ausgangsbasis:** Repository `Oxijan86/Wochenbericht-Erstellung-`, `main`, ursprüngliche `index.html` aus V2.24 (Git-Blob `23b1007753133358efbc2357204e7da922a86f85`). Weder GitHub noch produktive Datenbank wurden geändert.
 
@@ -33,7 +54,7 @@
 ## Benutzerprüfung vor produktiver Verwendung
 
 1. `wochenberichte.db` über „Speicherung & Sync“ separat sichern und die Sicherung unabhängig aufbewahren.
-2. `index.html` und `sw.js` zusammen nach GitHub hochladen, im Browser Seite neu laden und **Version 2.24.1** bestätigen.
+2. `index.html` und `sw.js` zusammen nach GitHub hochladen, im Browser Seite neu laden und **Version 2.24.2** bestätigen.
 3. Alten Einsatz öffnen; Kunden, ursprüngliche Uhrzeiten und PDF-Prüfnachweise auf Vollständigkeit kontrollieren.
 4. Einen Probe-Einsatz starten, Kundenname und Filiale eintippen, dann abbrechen; prüfen, dass kein fremder Eintrag gelöscht wird.
 5. Korrektur an einem bestehenden Einsatz durchführen, neu laden und Zeiten/Nettozeit/Pausen prüfen.
