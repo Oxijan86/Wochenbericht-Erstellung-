@@ -1,3 +1,5 @@
+V2.24.6 (28.10.2026): Mehrtages-PDF-Abgleich erkennt zusätzlich eine angehängte Straßenadresse im Kundennamen; reproduziert mit Kundendaten aus wochenberichte.db, ohne diese Datenbank zu verändern.
+
 V2.24.5 (28.10.2026): Mehrtägige PDF-Zuordnung auch ohne vorhandene Ticketnummer, gleiche Kunden und kompatible Standorte innerhalb von 28 Tagen, explizite Tagesauswahl, Summenvergleich ohne Überschreiben.
 
 ## V2.24.4 – RONDO-PDF-Abgleich
