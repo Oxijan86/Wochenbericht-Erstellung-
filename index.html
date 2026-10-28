@@ -1691,6 +1691,7 @@ function importApplyEdits(d){
  return out;
 }
 function importRowPreview(d){
+ if(d.multiDayTargets)return 'Gesamtabgleich für '+d.multiDayTargets.map(x=>dayFmt(x.date)).join(', ')+'. PDF-Gesamtsummen: '+(d.incoming.km??'–')+' km, Fahrt '+(d.incoming.travel==null?'–':fmtH(d.incoming.travel))+' h, Arbeit '+(d.incoming.pdfWorkMinutes==null?'–':fmtH(d.incoming.pdfWorkMinutes))+' h. Keine Tagesbuchung wird verändert; nach Bestätigung werden alle Tage als PDF-geprüft markiert.';
  if(d.action==='keep')return importChoice(d)?'PDF-Abweichung kontrolliert: Vorhandene Kilometer und Zeiten bleiben erhalten. Der PDF-Bericht wird am Einsatz als geprüft dokumentiert.':'Bitte den gespeicherten Einsatz für die bestätigte Abweichung auswählen.';
  if(d.action==='skip')return 'Diese Importzeile wird übersprungen. Es werden keine Daten geändert.';
  if(d.action==='review')return 'Bitte entscheiden: Einsatz aktualisieren, neu anlegen oder überspringen.';
@@ -1800,7 +1801,7 @@ function importApplyMultiWeekPlan(decisions,weeks=db.weeks,profileId=db.selected
   const {year,week}=isoInfo(dateFromISO(d.incoming.date));
   const key=`${profileId}|${year}|${week}`;
   if(!grouped.has(key))grouped.set(key,[]);
-  grouped.get(key).push(d);
+  if(!d.multiDayTargets)grouped.get(key).push(d);
  }
  let added=0,updates=0,skipped=0;const modified=new Set(),affected=[];
  for(const [key,items] of grouped){
@@ -2065,6 +2066,35 @@ async function srStageProofs(decisions, proposed){
   // Identical imports count as verified; intentional skips with real differences do not.
   if(d.action==='skip'&&d.category!=='unchanged')continue;
   const file=files.get(d.incoming.pdfDocId);if(!file)throw Error('PDF-Quelldatei nicht mehr vorhanden. Bitte PDF erneut auswählen.');
+  if(d.multiDayTargets?.length){
+   const fields=srPdfValues(d.incoming),checkedAt=new Date().toISOString();
+   const targetRows=d.multiDayTargets.map(t=>{
+    const key=importWeekOf(t.date).key;
+    const record=proposed.weeks[key]?.entries?.find(e=>e.id===t.id);
+    if(!record)throw Error('Mehrtageseinsatz fehlt im Datenbestand: '+t.date);
+    return {record,date:t.date,key};
+   });
+   const sum={km:targetRows.reduce((n,x)=>n+(x.record.km||0),0),
+    travel:targetRows.reduce((n,x)=>n+(x.record.travel||0),0),
+    workMinutes:targetRows.reduce((n,x)=>n+workM(x.record),0)};
+   const differences=['km','travel','workMinutes'].filter(k=>fields[k]!=null&&Number(fields[k])!==Number(sum[k]))
+    .map(k=>k==='km'?'Kilometer gesamt':k==='travel'?'Reisezeit gesamt':'Arbeitsdauer gesamt');
+   for(const {record,key,date} of targetRows){
+    const prior=record.serviceReportCheck;
+    const audit={documentId:file.documentId,filename:file.filename,ticket:d.incoming.ticket,
+     date:d.incoming.date,values:fields,multiDayDates:d.multiDayTargets.map(t=>t.date),
+     multiDay:true,changed:differences.length>0,differences,
+     status:differences.length?'abweichung':'identisch',reviewed:true,checkedAt};
+    if(prior?.documentId===audit.documentId&&prior.reviewed&&prior.multiDay)continue;
+    // Clone the week and the particular entry so no original day-value is touched.
+    const week=proposed.weeks[key];
+    if(week===db.weeks[key])proposed.weeks[key]={...week,entries:week.entries.map(e=>e.id===record.id?{...e}:e)};
+    const output=proposed.weeks[key].entries.find(e=>e.id===record.id);
+    output.serviceReportCheck=audit;changes++;
+   }
+   if(changes)proofs.push(file);
+   continue;
+  }
   const key=importWeekOf(d.incoming.date).key;
   const targetId=(d.action==='update'||d.action==='keep'||d.category==='unchanged')?d.targetId:d.incoming.id;
   const record=proposed.weeks[key]?.entries?.find(e=>e.id===targetId);
@@ -2218,7 +2248,46 @@ function init(){$('historymonth').value=historyMonth;$('historyyear').value=new 
  $('checkimport').onclick=()=>{
   importSourceMode='m365';importTargetProfileId=db.selected;importProfileMismatch=false;$('excelprofilewarn').hidden=true;
   const result=parseImport($('importtext').value);
-  pendingImport=result.rows;importDecisions=importDecisionRows(pendingImport,importAllCurrentEntries());
+  // Mehrtägige PDFs: Leistungsdatum ist Abrechnungs-/Enddatum, Summen nicht Tageswerte.
+ const stored=importAllCurrentEntries();
+ const grouped=new Map();
+ result.rows.forEach((row,i)=>{const key=[row.pdfDocId,row.ticket,importStrictName(row.customer)].join('|');if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push(i)});
+ const handled=new Set(),special=[];
+ for(const indices of grouped.values()){
+  const last=indices.map(i=>result.rows[i]).sort((a,b)=>b.date.localeCompare(a.date))[0];
+  const matches=stored.filter(e=>e.type==='Einsatz'&&e.date<=last.date&&String(e.ticket||'').trim()===String(last.ticket||'').trim()
+   &&importNameScore(e.customer,last.customer)>=75
+   &&(!last.location||!e.location||importNameScore(e.location,last.location)>=75))
+   .sort((a,b)=>a.date.localeCompare(b.date));
+  // Only aggregate when exactly the same ticket has several separate stored dates.
+  if(matches.length<2)continue;
+  // Require contiguous reported work span (no more than 14 days), avoid unrelated old ticket reuse.
+  const daySpan=(Date.parse(matches[matches.length-1].date)-Date.parse(matches[0].date))/86400000;
+  if(daySpan>14||matches[matches.length-1].date!==last.date)continue;
+  const picked=indices.map(i=>result.rows[i]);
+  const aggregate={...last,km:picked.some(x=>x.km!=null)?picked.reduce((v,x)=>v+(x.km||0),0):null,
+   travel:picked.some(x=>x.travel!=null)?picked.reduce((v,x)=>v+(x.travel||0),0):null,
+   pdfWorkMinutes:picked.some(x=>x.pdfWorkMinutes!=null)?picked.reduce((v,x)=>v+(x.pdfWorkMinutes||0),0):null,
+   note:'',multiDayPdf:true};
+  aggregate.note=aggregate.pdfWorkMinutes==null?'':'Arbeitszeit vor Ort: '+fmtH(aggregate.pdfWorkMinutes);
+  const days=matches.map(e=>e.date);
+  // Explicitly require every stored day to match the same ticket; never make or overwrite day records.
+  if(new Set(days).size!==days.length)continue;
+  indices.forEach(i=>handled.add(i));
+  special.push({aggregate,matches,days,sourceLabel:result.labels[indices[0]]});
+ }
+ const ordinary=result.rows.filter((_,i)=>!handled.has(i));
+ pendingImport=ordinary;
+ importDecisions=importDecisionRows(ordinary,stored);
+ // Confirmation of the grouped PDF marks all days, while keeping their values intact.
+ special.forEach(g=>{
+  const candidate={entry:g.matches[g.matches.length-1]};
+  importDecisions.push({incoming:g.aggregate,index:importDecisions.length,candidates:[candidate],
+   action:'keep',targetId:candidate.entry.id,category:'changed',
+   reason:'Mehrtägiger PDF-Sammelabgleich: '+g.days.map(dayFmt).join(', ')+'. PDF-Zahlen gelten zusammen, Tageswerte bleiben unverändert.',
+   sourceSnapshot:importStoredSnapshot(candidate.entry),edits:null,multiDayTargets:g.matches.map(e=>({id:e.id,date:e.date})),
+   sourceLabel:g.sourceLabel});
+ });
   importRejected=result.rejected;importWarnings=result.issues;importDuplicates=result.duplicates;
   renderImportRejected();renderImportReview();
  };
