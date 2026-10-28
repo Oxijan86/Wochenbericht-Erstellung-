@@ -1,3 +1,5 @@
+V2.24.5 (28.10.2026): Mehrtägige PDF-Zuordnung auch ohne vorhandene Ticketnummer, gleiche Kunden und kompatible Standorte innerhalb von 28 Tagen, explizite Tagesauswahl, Summenvergleich ohne Überschreiben.
+
 ## V2.24.4 – RONDO-PDF-Abgleich
 
 - PDF-Kunde ohne Straßenadresse, wenn Straße separat erkannt wird.

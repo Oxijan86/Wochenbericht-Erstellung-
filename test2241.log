@@ -1,0 +1,31 @@
+PASS desktop Kundennummer zeigt zwei Standorte
+PASS desktop Mehrwort-Suche case-insensitive
+PASS desktop Standort inklusive Adresse gespeichert
+PASS desktop vollständiger Korrekturdialog
+PASS desktop korrigierte Startzeit gespeichert
+PASS desktop alle sechs Zeitstempel editierbar
+DEBUG times {'time': '2026-10-28T11:00:00.000Z', 'end': '12:00', 'work': 210, 'check': {'documentId': 'doc1', 'filename': 'service.pdf', 'reviewed': True, 'status': 'identisch', 'editedAfterCheckAt': '2026-10-28T20:40:49.795Z'}, 'error': ''}
+PASS desktop Arbeitszeit und PDF unverändert
+PASS desktop unzulässige Zeit wird abgewiesen
+PASS desktop keine JavaScript-Fehler
+PASS android_viewport Kundennummer zeigt zwei Standorte
+PASS android_viewport Mehrwort-Suche case-insensitive
+PASS android_viewport Standort inklusive Adresse gespeichert
+PASS android_viewport vollständiger Korrekturdialog
+PASS android_viewport korrigierte Startzeit gespeichert
+PASS android_viewport alle sechs Zeitstempel editierbar
+DEBUG times {'time': '2026-10-28T11:00:00.000Z', 'end': '12:00', 'work': 210, 'check': {'documentId': 'doc1', 'filename': 'service.pdf', 'reviewed': True, 'status': 'identisch', 'editedAfterCheckAt': '2026-10-28T20:40:50.677Z'}, 'error': ''}
+PASS android_viewport Arbeitszeit und PDF unverändert
+PASS android_viewport unzulässige Zeit wird abgewiesen
+PASS android_viewport keine JavaScript-Fehler
+PASS Abbrechen löscht ausschließlich laufenden Einsatz
+PASS Keine Browser-Fehler
+PDF RESULT {'grouped': True, 'explicitlyBlocked': True, 'action': 'keep', 'stageChanges': 3, 'threeChecked': True, 'sameValues': True, 'idempotentProof': True, 'legStable': True, 'details': {'sum1': 130, 'sum2': 130, 'min1': 150, 'min2': 150}, 'html': '📄 PDF-Gesamtabgleich · Becker GmbH · Ticket T-2026Vorschläge für die letzten 28 Tage bis zum PDF-Datum. Bitte jeden zugehörigen Tag selbst auswählen. Tage ohne Ticketnummer sind zunächst nicht ausgew'}
+PASS Mehrtage/mehrere Kunden: grouped
+PASS Mehrtage/mehrere Kunden: explicitlyBlocked
+PASS Mehrtage/mehrere Kunden: threeChecked
+PASS Mehrtage/mehrere Kunden: sameValues
+PASS Mehrtage/mehrere Kunden: idempotentProof
+PASS Mehrtage/mehrere Kunden: legStable
+PASS Alle drei Tagesnachweise geschrieben
+PASS Keine JS-Browserfehler in PDF-Test

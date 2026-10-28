@@ -1,3 +1,5 @@
+V2.24.5 (28.10.2026): Mehrtägige PDF-Zuordnung auch ohne vorhandene Ticketnummer, gleiche Kunden und kompatible Standorte innerhalb von 28 Tagen, explizite Tagesauswahl, Summenvergleich ohne Überschreiben.
+
 
 ### V2.24.4
 Reales RONDO-PDF Ticket 36416: eigener Anteil 19 h Arbeit, 4 h Reise, 270 km; abweichende Technikerpositionen ausgeschlossen. Browserprüfungen und Mehrtagesauswahl in test_v2244.py.

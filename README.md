@@ -1,3 +1,5 @@
+V2.24.5 (28.10.2026): Mehrtägige PDF-Zuordnung auch ohne vorhandene Ticketnummer, gleiche Kunden und kompatible Standorte innerhalb von 28 Tagen, explizite Tagesauswahl, Summenvergleich ohne Überschreiben.
+
 
 ## V2.24.3: automatische Stempel und Korrekturen
 Beim Kunden angekommen beendet die Hinreise und startet die Arbeitszeit. Im Assistenten „Stempelzeiten bearbeiten“ sind alle bisher erfassten Zeiten und Pausen einschließlich Datum sichtbar. Neue Pausen können ergänzt, vorhandene korrigiert oder durch Leeren beider Datumsfelder entfernt werden. Der Schalter „Auto-Start: Ankunft = Arbeitsbeginn“ ist standardmäßig aktiv. Der zweite Schalter verknüpft Arbeitsende und Rückfahrtbeginn, sofern eine Rückfahrt erfasst bzw. bewusst gestartet wird. Die Rückfahrt selbst startet nicht von allein. Beide Schalter lassen sich pro Einsatz deaktivieren. Alle Anpassungen erst nach „Korrekturen speichern“ übernehmen. Die 28-Tage-PDF-Suche aus V2.24.2 bleibt erhalten.
