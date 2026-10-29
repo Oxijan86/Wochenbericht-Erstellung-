@@ -1,0 +1,24 @@
+Wochenbericht Lovrencic – Version 2.25.0 – 28.10.2026
+
+Änderungen:
+- Zusammengehörige PDF-geprüfte Einsatztage werden anhand der gespeicherten PDF-Dokument-ID und Mehrtageszuordnung gemeinsam berechnet.
+- Bearbeitungsansicht: Tagesarbeitszeit und gemeinsame PDF-Arbeitssumme getrennt dargestellt.
+- Keine irreführende Tageswarnung gegenüber der gesamten PDF-Arbeitszeit.
+- Automatische Endzeit aus PDF-Gesamtdauer für Mehrtageseinsätze deaktiviert.
+- Responsive Einsatzkarten in der Wochenansicht (Smartphone), Desktop-Tabelle bleibt erhalten.
+- Aufklappbare Gesamtübersicht mit allen verknüpften Tagen, Stunden und Kilometern.
+- Datenbankformat unverändert; keine Migration und kein Zurücksetzen der lokalen Daten.
+
+GitHub Pages:
+1. Vorher in der Anwendung die Datenbank sichern und nach Möglichkeit synchronisieren.
+2. Die DATEI index.html (nicht den umgebenden Ordner) in deinem bestehenden GitHub-Repository an der bisherigen Stelle ersetzen.
+3. Änderung committen und GitHub Pages aktualisieren lassen.
+4. App gegebenenfalls neu laden; unter Hilfe/oben Version 2.25.0 prüfen.
+
+Tests:
+- JavaScript-Syntaxprüfung bestanden.
+- Rechenprüfung: 9:45 + 9:15 = 19:00 Stunden, Reise 2:00 + 2:30 = 4:30.
+- Änderung eines Tages erzeugt korrekte Summendifferenz.
+- Unvollständiger Tag wird nicht als vollständiger PDF-Zeitabgleich gewertet.
+
+Hinweis: Automatisierte Browser-End-to-End-Tests mit echter lokaler Datenbank wurden hier nicht ausgeführt. Vor produktiver Benutzung Datenbanksicherung anlegen.
