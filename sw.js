@@ -1,6 +1,6 @@
-/* Wochenbericht Lovrencic PWA 2.25.1. Offline: nur App-Dateien, niemals Kundendaten. */
-const CACHE_NAME = 'wochenberichte-pwa-v2.25.1';
-const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+/* Wochenbericht Lovrencic PWA 2.25.2. Offline: nur App-Dateien, niemals Kundendaten. */
+const CACHE_NAME = 'wochenberichte-pwa-v2.25.2';
+const SHELL = ['./', './index.html', './index.html?app=pwa', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
 });
