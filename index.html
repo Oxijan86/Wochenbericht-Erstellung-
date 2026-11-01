@@ -593,7 +593,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 </script>
 <script>
 'use strict';
-const WB_APP_VERSION=Object.freeze({number:'2.25.4',date:'01.11.2026',cache:'wochenberichte-static-v2.25.4'});
+const WB_APP_VERSION=Object.freeze({number:'2.25.5',date:'01.11.2026',cache:'wochenberichte-static-v2.25.5'});
 
 
 /* SQLite single-record application database codec. Self-contained, offline.
@@ -908,8 +908,9 @@ function wbPdfGroupSummary(e,compact=false){
  const g=wbPdfGroup(e);if(!g)return '';
  const complete=g.rows.length>=g.expected&&g.rows.every(x=>x.start&&x.end);
  const diff=g.pdf===null?null:g.work-g.pdf;
- const status=diff===null?'PDF-Arbeitsdauer unbekannt':!complete?'Teilweise erfasst – Gesamtprüfung offen':diff===0?'✓ Gemeinsame Arbeitszeit stimmt überein':'⚠ Differenz: '+fmtH(Math.abs(diff))+' h';
- return `<details class="wbgroup" ${compact?'':'open'}><summary>🔗 Gemeinsamer Servicebericht · ${g.rows.length} Tage · ${esc(status)}</summary><div class="wbgroupbody"><div class="small">${esc(g.filename)}</div><div class="wbgroupgrid"><span>Datum</span><span>Arbeit</span><span>Reise</span>${g.rows.map(x=>`<span>${esc(dayFmt(x.date))}</span><strong>${fmtH(workM(x))}</strong><span>${fmtH(netTravelM(x))}</span>`).join('')}<strong>Summe</strong><strong>${fmtH(g.work)}</strong><strong>${fmtH(g.travel)}</strong></div><div class="wbgroupresult ${complete&&diff===0?'wbgroupok':'wbgroupattention'}">PDF-Arbeit: ${g.pdf===null?'–':fmtH(g.pdf)} h · Erfasst: ${fmtH(g.work)} h · ${esc(status)} · ${g.km} km gesamt</div>${g.rows.length<g.expected?'<div class="small">Nicht alle ursprünglich zugeordneten Tage gefunden. Bitte Zuordnung prüfen.</div>':''}</div></details>`;
+ const verified=e.serviceReportCheck?.reviewed!==false;const allMatch=verified&&complete&&diff===0&&g.rows.every(x=>x.serviceReportCheck?.status==='identisch');
+ const status=diff===null?'PDF-Arbeitsdauer unbekannt':!complete?'Teilweise erfasst – Gesamtprüfung offen':allMatch?'✓ Gemeinsame Arbeitszeit stimmt überein':e.serviceReportCheck?.status==='abweichung'?'⚠ PDF geprüft – Abweichung bestätigt':'⚠ Differenz: '+fmtH(Math.abs(diff))+' h';
+ return `<details class="wbgroup" ${compact?'':'open'}><summary>🔗 Gemeinsamer Servicebericht · ${g.rows.length} Tage · ${esc(status)}</summary><div class="wbgroupbody"><div class="small">${esc(g.filename)}</div><div class="wbgroupgrid"><span>Datum</span><span>Arbeit</span><span>Reise</span>${g.rows.map(x=>`<span>${esc(dayFmt(x.date))}</span><strong>${fmtH(workM(x))}</strong><span>${fmtH(netTravelM(x))}</span>`).join('')}<strong>Summe</strong><strong>${fmtH(g.work)}</strong><strong>${fmtH(g.travel)}</strong></div><div class="wbgroupresult ${allMatch?'wbgroupok':'wbgroupattention'}">PDF-Arbeit: ${g.pdf===null?'–':fmtH(g.pdf)} h · Erfasst: ${fmtH(g.work)} h · ${esc(status)} · ${g.km} km gesamt</div>${g.rows.length<g.expected?'<div class="small">Nicht alle ursprünglich zugeordneten Tage gefunden. Bitte Zuordnung prüfen.</div>':''}</div></details>`;
 }
 function wbWorkDifference(e){
  const group=wbPdfGroup(e);if(group){if(group.pdf===null||group.rows.length<group.expected||group.rows.some(x=>!x.start||!x.end))return null;return {pdf:group.pdf,actual:group.work,delta:group.work-group.pdf,abs:Math.abs(group.work-group.pdf)};}
@@ -1363,10 +1364,10 @@ async function storeEntry(e){let entries=week().entries,i=entries.findIndex(v=>v
  if(i>=0&&entries[i].serviceReportCheck){e.serviceReportCheck=JSON.parse(JSON.stringify(entries[i].serviceReportCheck));srMarkEdited(entries[i],e)}
  if(i>=0&&entries[i].exportReview)e.exportReview=JSON.parse(JSON.stringify(entries[i].exportReview));
  e.createdAt=i>=0?(entries[i].createdAt||legacyCreatedAt(entries[i])):new Date().toISOString();const previousEntries=entries.slice(),previousCustomers=JSON.parse(JSON.stringify(db.customers||[])),previousDraft=db.draft;try{if(i>=0)entries[i]=e;else entries.push(e);const master=customerUpsert(e,{source:'Manuell'});if(master)e.customerMasterId=master.id;db.draft=null;await WBStore.save(db);renderWeek();return e;}catch(error){week().entries=previousEntries;db.customers=previousCustomers;db.draft=previousDraft;throw error;}}
-function htmlEntryLine(e){let ticket=e.ticket||'—',description=e.type==='Einsatz'?`${e.customer||'(Kunde fehlt)'}${e.location?' | '+e.location:''}`:e.customer;return `<tr data-entry-row="${esc(e.id)}"><td>${esc(e.start||'—')}–${esc(e.end||'Läuft …')}${e.endDate&&e.endDate!==e.date?' (+1 Tag)':''}<div class="small">${esc(e.type)}${e.start&&!e.end?' · ⏳ Läuft':''}</div></td><td title="${esc(e.note)}">${esc(description)}<div class="small">Ticket: ${esc(ticket)}</div>${e.type==='Einsatz'?(e.serviceReportCheck?.reviewed!==false&&e.serviceReportCheck?`<div class="wbproofline"><span class="srcheck checked-ok" title="PDF-Abgleich durchgeführt; auch spätere manuelle Änderungen heben die Prüfung nicht auf">✓ PDF abgeglichen · ${esc(e.serviceReportCheck.filename||'Servicebericht')}</span></div>${e.serviceReportCheck.multiDay?wbPdfGroupSummary(e,true):''}`:`<div class="wbproofline"><button class="srcheck wbproofmissing wbstatusbutton" type="button" data-service-import="${esc(e.id)}" title="PDF-Bericht auswählen und diesen Einsatz abgleichen">● Nicht abgeglichen ↗</button></div>`):''}${e.type==='Einsatz'&&(!e.start||!e.end)?`<div class="wbproofline"><button class="srcheck wbmissingtime wbstatusbutton" type="button" data-missing-times="${esc(e.id)}" title="Bestehenden Einsatz öffnen und tatsächliche Beginn-/Enduhrzeiten ergänzen">● Uhrzeiten nachtragen ↗</button></div>`:''}</td><td class="right" title="${workSource(e)==='Bemerkung'?'Aus Bemerkung: Arbeitszeit vor Ort':''}">${fmtH(workM(e))}${workSource(e)==='Bemerkung'?' *':''}</td><td class="right">${e.travel==null?'—':fmtH(netTravelM(e))}</td><td class="right">${e.km==null?'—':esc(e.km)+' km'}</td><td style="min-width:130px"><div class="btnrow"><button class="btn tiny" data-edit="${esc(e.id)}" type="button">Bearbeiten</button>${e.start&&!e.end?`<button class="btn tiny green" data-stop="${esc(e.id)}" type="button">Jetzt stoppen</button>`:''}<button class="btn tiny danger" data-delete="${esc(e.id)}" type="button">×</button></div></td></tr>`}
+function htmlEntryLine(e){let ticket=e.ticket||'—',description=e.type==='Einsatz'?`${e.customer||'(Kunde fehlt)'}${e.location?' | '+e.location:''}`:e.customer;return `<tr data-entry-row="${esc(e.id)}"><td>${esc(e.start||'—')}–${esc(e.end||'Läuft …')}${e.endDate&&e.endDate!==e.date?' (+1 Tag)':''}<div class="small">${esc(e.type)}${e.start&&!e.end?' · ⏳ Läuft':''}</div></td><td title="${esc(e.note)}">${esc(description)}<div class="small">Ticket: ${esc(ticket)}</div>${e.type==='Einsatz'?(e.serviceReportCheck?.reviewed!==false&&e.serviceReportCheck?`<div class="wbproofline"><span class="srcheck ${e.serviceReportCheck.changed?'checked-diff':'checked-ok'}" title="PDF-Abgleich durchgeführt; auch spätere manuelle Änderungen heben die Prüfung nicht auf">${e.serviceReportCheck.changed?'⚠ PDF geprüft – Abweichung bestätigt':'✓ PDF abgeglichen'} · ${esc(e.serviceReportCheck.filename||'Servicebericht')}</span></div>${e.serviceReportCheck.multiDay?wbPdfGroupSummary(e,true):''}`:`<div class="wbproofline"><button class="srcheck wbproofmissing wbstatusbutton" type="button" data-service-import="${esc(e.id)}" title="PDF-Bericht auswählen und diesen Einsatz abgleichen">● Nicht abgeglichen ↗</button></div>`):''}${e.type==='Einsatz'&&(!e.start||!e.end)?`<div class="wbproofline"><button class="srcheck wbmissingtime wbstatusbutton" type="button" data-missing-times="${esc(e.id)}" title="Bestehenden Einsatz öffnen und tatsächliche Beginn-/Enduhrzeiten ergänzen">● Uhrzeiten nachtragen ↗</button></div>`:''}</td><td class="right" title="${workSource(e)==='Bemerkung'?'Aus Bemerkung: Arbeitszeit vor Ort':''}">${fmtH(workM(e))}${workSource(e)==='Bemerkung'?' *':''}</td><td class="right">${e.travel==null?'—':fmtH(netTravelM(e))}</td><td class="right">${e.km==null?'—':esc(e.km)+' km'}</td><td style="min-width:130px"><div class="btnrow"><button class="btn tiny" data-edit="${esc(e.id)}" type="button">Bearbeiten</button>${e.start&&!e.end?`<button class="btn tiny green" data-stop="${esc(e.id)}" type="button">Jetzt stoppen</button>`:''}<button class="btn tiny danger" data-delete="${esc(e.id)}" type="button">×</button></div></td></tr>`}
 function wbMobileEntryCard(e){
  const proof=e.serviceReportCheck;
- const badge=e.type==='Einsatz'?(proof&&proof.reviewed!==false?`<span class="srcheck">✓ PDF abgeglichen</span>`:`<button class="srcheck wbproofmissing wbstatusbutton" data-service-import="${esc(e.id)}" type="button">● Nicht abgeglichen ↗</button>`):'';
+ const badge=e.type==='Einsatz'?(proof&&proof.reviewed!==false?`<span class="srcheck ${proof.changed?'checked-diff':''}">${proof.changed?'⚠ PDF geprüft – Abweichung bestätigt':'✓ PDF abgeglichen'}</span>`:`<button class="srcheck wbproofmissing wbstatusbutton" data-service-import="${esc(e.id)}" type="button">● Nicht abgeglichen ↗</button>`):'';
  return `<article class="wbmobilecard" data-entry-row="${esc(e.id)}"><div class="wbmobiletitle"><strong>${esc(e.customer||e.type||'Einsatz')}</strong><span>${esc(e.location||'')}</span><span class="small">Ticket: ${esc(e.ticket||'–')} · ${esc(e.start||'–')}–${esc(e.end||'–')}</span></div><div class="wbmobilemetrics"><div><small>Arbeit</small><strong>${fmtH(workM(e))} h</strong></div><div><small>Reise</small><strong>${fmtH(netTravelM(e))} h</strong></div><div><small>km</small><strong>${esc(e.km??'–')}</strong></div></div><div class="wbproofline">${badge}${proof?.multiDay?'<span class="badge">🔗 Mehrtägig</span>':''}</div>${proof?.multiDay?wbPdfGroupSummary(e,true):''}${e.type==='Einsatz'&&(!e.start||!e.end)?`<button class="srcheck wbmissingtime wbstatusbutton" data-missing-times="${esc(e.id)}" type="button">● Uhrzeiten nachtragen ↗</button>`:''}<div class="wbmobileactions"><button class="btn" data-edit="${esc(e.id)}" type="button">Bearbeiten</button>${e.start&&!e.end?`<button class="btn green" data-stop="${esc(e.id)}" type="button">Stoppen</button>`:''}<button class="btn danger" data-delete="${esc(e.id)}" type="button" aria-label="Eintrag löschen">×</button></div></article>`;
 }
 function renderEntries(){
@@ -1810,9 +1811,9 @@ function renderImportReview(){
  box.innerHTML=visible.map(({d,i})=>{
   const selection=d.action==='update'||d.action==='keep',multiple=d.candidates.length>1;
   if(d.multiDayChoices){
-   const chosen=d.multiDayChoices.filter(c=>c.selected),canConfirm=chosen.length>=2&&(d.pdfPeriodEnd?chosen.every(c=>c.entry.date>=d.pdfPeriodStart&&c.entry.date<=d.pdfPeriodEnd):chosen.some(c=>c.entry.date===d.incoming.date));
-   return `<div class="importreviewcard" data-import-review="${i}"><h3>📄 PDF-Gesamtabgleich · ${esc(d.incoming.customer)} · Ticket ${esc(d.incoming.ticket)}</h3><p class="small">${d.pdfPeriodStart?`Einsatzzeitraum laut Bericht: <strong>${esc(dayFmt(d.pdfPeriodStart))} bis ${esc(dayFmt(d.pdfPeriodEnd))}</strong>. Das Buchungsdatum ${esc(dayFmt(d.incoming.date))} wird nicht als Einsatztag verwendet.`:'Vorschläge für die letzten <strong>28 Tage</strong> bis zum PDF-Datum.'} Bitte <strong>jeden zugehörigen Tag selbst auswählen</strong>. Tage ohne Ticketnummer sind zunächst nicht ausgewählt. Gleicher Kunde und plausibler Standort werden auch ohne Ticket erkannt. Andere vorhandene Ticketnummern werden ausgeschlossen.</p>
-    <div role="group" aria-label="Zusammengehörige Einsatztage auswählen">${d.multiDayChoices.map((c,j)=>`<label style="display:flex;align-items:center;gap:10px;padding:9px;border-bottom:1px solid #dde5ed"><input type="checkbox" style="width:20px;height:20px;min-height:20px;flex:none" data-multiday-choice="${i}" data-multiday-index="${j}" ${c.selected?'checked':''}><span><strong>${esc(dayFmt(c.entry.date))}</strong> · ${esc(c.entry.customer)} · ${esc(c.entry.location||'Standort fehlt')} · ${esc(c.entry.ticket||'ohne Ticketnummer')}<br><span class="small">${esc(String(c.entry.km??'–'))} km · Fahrt ${esc(c.entry.travel==null?'–':fmtH(c.entry.travel))} h</span></span></label>`).join('')}</div>
+   const chosen=d.multiDayChoices.filter(c=>c.selected),canConfirm=chosen.length>=2;
+   return `<div class="importreviewcard" data-import-review="${i}"><h3>📄 PDF-Gesamtabgleich · ${esc(d.incoming.customer)} · Ticket ${esc(d.incoming.ticket)}</h3><p class="small">${d.pdfPeriodStart?`Einsatzzeitraum laut Bericht: <strong>${esc(dayFmt(d.pdfPeriodStart))} bis ${esc(dayFmt(d.pdfPeriodEnd))}</strong>. Das Buchungsdatum ${esc(dayFmt(d.incoming.date))} ist nicht automatisch der tatsächliche Einsatztag. Auch weitere passende Tage können manuell zugeordnet werden.`:'Vorschläge für die letzten <strong>28 Tage</strong> bis zum PDF-Datum.'} Bitte <strong>jeden zugehörigen Tag selbst auswählen</strong>. Tage außerhalb des PDF-Zeitraums können dazugehören, wenn du sie ausdrücklich auswählst. Tage ohne Ticketnummer sind zunächst nicht ausgewählt. Gleicher Kunde und plausibler Standort werden auch ohne Ticket erkannt. Andere vorhandene Ticketnummern werden ausgeschlossen.</p>
+    <div role="group" aria-label="Zusammengehörige Einsatztage auswählen">${d.multiDayChoices.map((c,j)=>`<label style="display:flex;align-items:center;gap:10px;padding:9px;border-bottom:1px solid #dde5ed"><input type="checkbox" style="width:20px;height:20px;min-height:20px;flex:none" data-multiday-choice="${i}" data-multiday-index="${j}" ${c.selected?'checked':''}><span><strong>${esc(dayFmt(c.entry.date))}</strong>${d.pdfPeriodStart&&(c.entry.date<d.pdfPeriodStart||c.entry.date>d.pdfPeriodEnd)?' <span class="badge">Außerhalb PDF-Zeitraum</span>':''} · ${esc(c.entry.customer)} · ${esc(c.entry.location||'Standort fehlt')} · ${esc(c.entry.ticket||'ohne Ticketnummer')}<br><span class="small">Arbeit ${fmtH(workM(c.entry))} h · ${esc(String(c.entry.km??'–'))} km · Fahrt ${esc(c.entry.travel==null?'–':fmtH(netTravelM(c.entry)))} h</span></span></label>`).join('')}</div>
     <div class="wbpdfsummary"><strong>PDF-Gesamtsummen (nur gewählter Techniker)</strong><div class="wbpdfnumbers"><span>Arbeit<br><b>${d.incoming.pdfWorkMinutes==null?'–':fmtH(d.incoming.pdfWorkMinutes)+' h'}</b></span><span>Reise<br><b>${d.incoming.travel==null?'–':fmtH(d.incoming.travel)+' h'}</b></span><span>Strecke<br><b>${d.incoming.km??'–'} km</b></span></div><p class="small">Die PDF enthält Gesamtwerte. Tageszeiten und Kilometer werden nicht automatisch überschrieben oder verteilt.</p></div><p class="importalert">${esc(d.reason)}</p>
     <div class="field"><label for="import-action-${i}">PDF-Abgleich ausdrücklich bestätigen</label><select id="import-action-${i}" data-import-action="${i}"><option value="review" ${d.action==='review'?'selected':''} disabled>Bitte Entscheidung treffen …</option><option value="keep" ${d.action==='keep'?'selected':''} ${canConfirm?'':'disabled'}>Ausgewählte Tage prüfen und fehlende Ticketnummern übernehmen</option><option value="skip" ${d.action==='skip'?'selected':''}>Diesen Gesamt-Abgleich überspringen</option></select></div>${canConfirm?'':'<p class="msg error">Mindestens zwei passende Arbeitstage auswählen. Fehlen die Einträge, zuerst die tatsächlichen Einsatztage erfassen; der PDF-Import legt keine erfundenen Tageswerte an.</p>'}</div>`;
   }
@@ -2136,7 +2137,7 @@ async function srStageProofs(decisions, proposed){
   const file=files.get(d.incoming.pdfDocId);if(!file)throw Error('PDF-Quelldatei nicht mehr vorhanden. Bitte PDF erneut auswählen.');
   if(d.multiDayChoices){
    if(d.action!=='keep')continue;
-   if(d.multiDayTargets.length<2||!d.multiDayTargets.some(t=>t.date===d.incoming.date))throw Error('Für den PDF-Gesamtabgleich mindestens zwei Tage einschließlich des PDF-Enddatums auswählen.');
+   if(d.multiDayTargets.length<2)throw Error('Für den PDF-Gesamtabgleich mindestens zwei zusammengehörige Einsatztage auswählen.');
    const fields=srPdfValues(d.incoming),checkedAt=new Date().toISOString();
    const targetRows=d.multiDayTargets.map(t=>{
     const key=importWeekOf(t.date).key;
@@ -2146,7 +2147,7 @@ async function srStageProofs(decisions, proposed){
     return {record,date:t.date,key};
    });
    const sum={km:targetRows.reduce((n,x)=>n+(x.record.km||0),0),
-    travel:targetRows.reduce((n,x)=>n+(x.record.travel||0),0),
+    travel:targetRows.reduce((n,x)=>n+netTravelM(x.record),0),
     workMinutes:targetRows.reduce((n,x)=>n+workM(x.record),0)};
    const differences=['km','travel','workMinutes'].filter(k=>fields[k]!=null&&Number(fields[k])!==Number(sum[k]))
     .map(k=>k==='km'?'Kilometer gesamt':k==='travel'?'Reisezeit gesamt':'Arbeitsdauer gesamt');
@@ -2157,7 +2158,7 @@ async function srStageProofs(decisions, proposed){
      date:d.incoming.date,values:fields,multiDayDates:d.multiDayTargets.map(t=>t.date),
      multiDay:true,changed:differences.length>0,differences,
      status:differences.length?'abweichung':'identisch',reviewed:true,checkedAt};
-    if(prior?.documentId===audit.documentId&&prior.reviewed&&prior.multiDay)continue;
+    if(prior?.documentId===audit.documentId&&prior.reviewed&&prior.multiDay&&JSON.stringify(prior.multiDayDates||[])===JSON.stringify(audit.multiDayDates)&&prior.status===audit.status)continue;
     // Clone the week and the particular entry so no original day-value is touched.
     const week=proposed.weeks[key];
     if(week===db.weeks[key])proposed.weeks[key]={...week,entries:week.entries.map(e=>e.id===record.id?{...e}:e)};
@@ -3229,7 +3230,7 @@ function rondoPdfPrepare(){
 function rondoPdfMultiDayRefresh(d){
  const selected=(d.multiDayChoices||[]).filter(c=>c.selected);
  d.multiDayTargets=selected.map(c=>({id:c.entry.id,date:c.entry.date,snapshot:importStoredSnapshot(c.entry)}));
- const sum={km:selected.reduce((n,c)=>n+(Number(c.entry.km)||0),0),travel:selected.reduce((n,c)=>n+(Number(c.entry.travel)||0),0),pdfWorkMinutes:selected.reduce((n,c)=>n+workM(c.entry),0)};
+ const sum={km:selected.reduce((n,c)=>n+(Number(c.entry.km)||0),0),travel:selected.reduce((n,c)=>n+netTravelM(c.entry),0),pdfWorkMinutes:selected.reduce((n,c)=>n+workM(c.entry),0)};
  const pdf=d.incoming;
  const details=[['km','Kilometer'],['travel','Reisezeit'],['pdfWorkMinutes','Arbeitszeit']].filter(([key])=>pdf[key]!=null).map(([key,label])=>{
   const unit=key==='km'?' km':' h',show=n=>key==='km'?String(n):fmtH(n);
@@ -3272,8 +3273,8 @@ function rondoPdfDecisionsForMultiDay(rows,labels,existing){
   const to=parts.map(p=>p.pdfServiceEnd).filter(Boolean).sort().at(-1);
   const hasPeriod=!!(from&&to&&from<to);
   // A single billing date is not the date of a multi-day service visit.
-  const floor=hasPeriod?from:nextDateISO(last.date,-28);
-  const ceiling=hasPeriod?to:last.date;
+  const floor=nextDateISO(hasPeriod?from:last.date,-28);
+  const ceiling=nextDateISO(hasPeriod?to:last.date,28);
   const pdfTicket=String(last.ticket||'').trim();
   const matches=existing.filter(e=>{
    if(e.type!=='Einsatz'||e.date<floor||e.date>ceiling)return false;
@@ -3283,7 +3284,7 @@ function rondoPdfDecisionsForMultiDay(rows,labels,existing){
    if(!(oldTicket&&pdfTicket&&oldTicket===pdfTicket)&&!rondoPdfSameSite(e.location,last.location))return false;
    return true;
   }).sort((a,b)=>a.date.localeCompare(b.date));
-  if(!hasPeriod&&(matches.length<2||!matches.some(e=>e.date===last.date)))continue;
+  if(matches.length<2)continue;
   const total=kind=>parts.some(p=>p[kind]!=null)?parts.reduce((n,p)=>n+(Number(p[kind])||0),0):null;
   const aggregate={...last,km:total('km'),travel:total('travel'),pdfWorkMinutes:total('pdfWorkMinutes'),multiDayPdf:true};
   const target=matches.at(-1)||null;

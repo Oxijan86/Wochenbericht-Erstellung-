@@ -1,0 +1,9 @@
+Wochenbericht Lovrencic PWA 2.25.5
+
+- Alle passenden Einsatztage mit gleicher Ticketnummer auch außerhalb des im PDF genannten Einsatzzeitraums auswählbar (Suchfenster +/-28 Tage).
+- Mindestens zwei Tage für die gemeinsame Abgleichbestätigung.
+- PDF-Gesamtwerte bleiben Kontrollwerte. Manuelle Tageswerte werden nicht überschrieben.
+- Abweichungen werden als ausdrücklich geprüft gekennzeichnet.
+- Voosen Ticket 26379: 28., 29. und 30.10.2026 können gemeinsam ausgewählt werden.
+
+Vor dem Update Datenbank sichern. Dateien direkt in das Stammverzeichnis des GitHub-Pages-Repositories hochladen.
