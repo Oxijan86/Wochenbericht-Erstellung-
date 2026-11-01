@@ -1,0 +1,10 @@
+Version 2.25.6 – 01.11.2026
+
+Korrektur: PDF-Gesamtabgleich vor der Einzelaktualisierung bei Kurzname im Kundenstamm (Voosen/Bäckerei Voosen GmbH & Co. KG).
+Passende Einsatztage innerhalb 28 Tagen außerhalb des PDF-Zeitraums können ausgewählt werden.
+Die Anwahl ist bewusst zunächst leer. Mindestens zwei Tage für die gemeinsame Prüfung erforderlich.
+Tageszeiten und Kilometer werden dabei niemals automatisch durch PDF-Summen ersetzt.
+
+Regressionstest: Voosen 28., 29., 30.10.2026, Ticket 26379, PDF Arbeit 23:30, Reise 6:15, km 405; erfasst 21:15, 6:15, 408.
+
+Vor Installation die wochenberichte.db sichern.
