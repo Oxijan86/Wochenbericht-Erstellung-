@@ -593,7 +593,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 </script>
 <script>
 'use strict';
-const WB_APP_VERSION=Object.freeze({number:'2.25.2',date:'01.11.2026',cache:'wochenberichte-static-v2.25.2'});
+const WB_APP_VERSION=Object.freeze({number:'2.25.3',date:'01.11.2026',cache:'wochenberichte-static-v2.25.3'});
 
 
 /* SQLite single-record application database codec. Self-contained, offline.
@@ -2980,7 +2980,14 @@ async function rondoPdfText(file){
  while((m=objs.exec(raw))){const start=objs.lastIndex,end=raw.indexOf('endobj',start);if(end<0)continue;
   const header=raw.slice(start,Math.min(end,start+900));const streamIndex=raw.indexOf('stream',start);
   if(streamIndex<0||streamIndex>end||!header.includes('stream')){objs.lastIndex=end+6;continue}
-  const dict=raw.slice(start,streamIndex);let pos=streamIndex+6;
+  const dict=raw.slice(start,streamIndex);
+  // Cross-reference, embedded-object and metadata streams do not contain page text.
+  // Some producer-generated XRef streams contain an incomplete DEFLATE trailer;
+  // trying to inflate them wrongly aborts an otherwise readable service report.
+  if(/\/Type\s*\/XRef\b|\/Type\s*\/ObjStm\b|\/Type\s*\/Metadata\b/.test(dict)){
+   objs.lastIndex=end+6;continue;
+  }
+  let pos=streamIndex+6;
   if(raw[pos]==='\r')pos++;if(raw[pos]==='\n')pos++;
   const endstream=raw.indexOf('endstream',pos);if(endstream<0||endstream>end){objs.lastIndex=end+6;continue}
   let chunk=bytes.slice(pos,endstream);while(chunk.length&&[10,13].includes(chunk[chunk.length-1]))chunk=chunk.subarray(0,chunk.length-1);

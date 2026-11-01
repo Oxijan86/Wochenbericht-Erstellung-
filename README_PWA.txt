@@ -5,3 +5,5 @@ Alle Dateien index.html, sw.js, manifest.webmanifest, icon-192.png, icon-512.png
 Vorher wochenberichte.db sichern und synchronisieren. Keine Website-Daten löschen, keine andere PWA deinstallieren. Wenn Chrome weiterhin bereits installiert meldet, handelt es sich nicht zwingend um einen Manifestfehler; diese Änderung kann ein defektes Chrome-/Android-Installationsregister nicht garantiert reparieren.
 
 PWA-Offline-Cache speichert nur App-Oberfläche, keine Datenbank oder PDF. Berechtigungen nach Installation prüfen.
+
+Version 2.25.3: PDF-Import überspringt interne XRef-/ObjStm-/Metadata-Streams, ohne die Nutzdaten des Serviceberichts zu verändern.
