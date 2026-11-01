@@ -1,0 +1,5 @@
+Version 2.25.4 – Technikerbezogene PDF-Positionen und mehrtägiger Abgleich.
+Voosen 26379: Tobias 23:30 Arbeit / 6:15 Reise / 405 km; JP Schröder wird ausgeschlossen.
+Berichtszeitraum 28.–29.10.2026 hat Vorrang gegenüber Buchungsdatum 30.10.2026.
+Fehlende Einsatztage zuerst selbst erfassen; nichts automatisch verteilen.
+Vor Update Datenbank sichern.

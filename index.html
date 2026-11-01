@@ -359,7 +359,7 @@ body:not(.wbshowweekcontext) main.wrap > div.stats{display:none!important}
 .wbmobilelist{display:none}.wbgroup{border:1px solid #bcd5e5;background:#f2f8fc;border-radius:10px;margin:10px 0;min-width:0;overflow:hidden}.wbgroup summary{cursor:pointer;padding:10px 12px;color:#205373;font-weight:750;font-size:13px;overflow-wrap:anywhere}.wbgroupbody{padding:4px 12px 12px}.wbgroupgrid{display:grid;grid-template-columns:minmax(90px,1.5fr) 1fr 1fr;gap:7px 9px;margin:10px 0;font-size:13px;align-items:center}.wbgroupgrid>:nth-child(-n+3){font-weight:750;border-bottom:1px solid #bed3e1;padding-bottom:6px}.wbgroupresult{padding:9px;border-radius:8px;font-size:13px;font-weight:650;overflow-wrap:anywhere}.wbgroupok{background:#e2f5e9;color:#126444}.wbgroupattention{background:#fff4df;color:#74500b}
 @media(max-width:780px){#entrylist .wbdesktoptable{display:none}.wbmobilelist{display:grid;gap:10px}.wbmobilecard{border:1px solid #d2dfe8;border-radius:13px;background:#fff;padding:13px;min-width:0}.wbmobiletitle{display:grid;gap:4px;overflow-wrap:anywhere}.wbmobiletitle strong{font-size:16px;color:#193e58}.wbmobilemetrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0}.wbmobilemetrics>div{min-width:0;border-radius:8px;background:#eef5fa;padding:9px 6px;text-align:center}.wbmobilemetrics small{display:block;color:#5a6d7c;font-size:11px}.wbmobilemetrics strong{display:block;font-size:15px}.wbmobileactions{display:flex;gap:8px;margin-top:12px}.wbmobileactions .btn:first-child{flex:1}.wbmobileactions .btn{min-height:46px}.wbmobilecard .srcheck{overflow-wrap:anywhere;white-space:normal}.wbgroup summary{line-height:1.5}}
 @media print{.wbmobilelist,.wbgroup{display:none!important}}
-</style></head><body>
+<style>/* V2.25.4: compact multi-day totals */.wbpdfsummary{border:1px solid #c8e0d2;background:#f0f8f3;padding:12px;border-radius:12px;margin:12px 0}.wbpdfnumbers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:9px 0}.wbpdfnumbers span{background:white;border:1px solid #d5e4db;border-radius:9px;padding:9px;font-size:13px;min-width:0}.wbpdfnumbers b{font-size:18px;color:#173f34}@media(max-width:400px){.wbpdfnumbers b{font-size:15px}}#importreview .importreviewcard{overflow-wrap:anywhere}</style></head><body>
 <div class="wbquickbar" id="wbquickbar" role="region" aria-label="Ordnerzugriff und Synchronisation">
 <div class="wbquickinner"><div class="wbquickinfo"><span id="wbquicklocal" aria-live="polite">Lokaler Speicher wird geprüft …</span><span id="wbquickremote" aria-live="polite">Ordnerstatus wird geprüft …</span></div>
 <div class="wbquickactions"><button class="btn tiny" id="wbquickfolder" type="button">Ordnerzugriff</button><button class="btn tiny primary" id="wbquicksync" type="button">Jetzt synchronisieren</button><button class="btn tiny" id="wbquickdetails" type="button">Details</button></div></div></div>
@@ -593,7 +593,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 </script>
 <script>
 'use strict';
-const WB_APP_VERSION=Object.freeze({number:'2.25.3',date:'01.11.2026',cache:'wochenberichte-static-v2.25.3'});
+const WB_APP_VERSION=Object.freeze({number:'2.25.4',date:'01.11.2026',cache:'wochenberichte-static-v2.25.4'});
 
 
 /* SQLite single-record application database codec. Self-contained, offline.
@@ -1810,11 +1810,11 @@ function renderImportReview(){
  box.innerHTML=visible.map(({d,i})=>{
   const selection=d.action==='update'||d.action==='keep',multiple=d.candidates.length>1;
   if(d.multiDayChoices){
-   const chosen=d.multiDayChoices.filter(c=>c.selected),canConfirm=chosen.length>=2&&chosen.some(c=>c.entry.date===d.incoming.date);
-   return `<div class="importreviewcard" data-import-review="${i}"><h3>📄 PDF-Gesamtabgleich · ${esc(d.incoming.customer)} · Ticket ${esc(d.incoming.ticket)}</h3><p class="small">Vorschläge für die letzten <strong>28 Tage</strong> bis zum PDF-Datum. Bitte <strong>jeden zugehörigen Tag selbst auswählen</strong>. Tage ohne Ticketnummer sind zunächst nicht ausgewählt. Gleicher Kunde und plausibler Standort werden auch ohne Ticket erkannt. Andere vorhandene Ticketnummern werden ausgeschlossen.</p>
+   const chosen=d.multiDayChoices.filter(c=>c.selected),canConfirm=chosen.length>=2&&(d.pdfPeriodEnd?chosen.every(c=>c.entry.date>=d.pdfPeriodStart&&c.entry.date<=d.pdfPeriodEnd):chosen.some(c=>c.entry.date===d.incoming.date));
+   return `<div class="importreviewcard" data-import-review="${i}"><h3>📄 PDF-Gesamtabgleich · ${esc(d.incoming.customer)} · Ticket ${esc(d.incoming.ticket)}</h3><p class="small">${d.pdfPeriodStart?`Einsatzzeitraum laut Bericht: <strong>${esc(dayFmt(d.pdfPeriodStart))} bis ${esc(dayFmt(d.pdfPeriodEnd))}</strong>. Das Buchungsdatum ${esc(dayFmt(d.incoming.date))} wird nicht als Einsatztag verwendet.`:'Vorschläge für die letzten <strong>28 Tage</strong> bis zum PDF-Datum.'} Bitte <strong>jeden zugehörigen Tag selbst auswählen</strong>. Tage ohne Ticketnummer sind zunächst nicht ausgewählt. Gleicher Kunde und plausibler Standort werden auch ohne Ticket erkannt. Andere vorhandene Ticketnummern werden ausgeschlossen.</p>
     <div role="group" aria-label="Zusammengehörige Einsatztage auswählen">${d.multiDayChoices.map((c,j)=>`<label style="display:flex;align-items:center;gap:10px;padding:9px;border-bottom:1px solid #dde5ed"><input type="checkbox" style="width:20px;height:20px;min-height:20px;flex:none" data-multiday-choice="${i}" data-multiday-index="${j}" ${c.selected?'checked':''}><span><strong>${esc(dayFmt(c.entry.date))}</strong> · ${esc(c.entry.customer)} · ${esc(c.entry.location||'Standort fehlt')} · ${esc(c.entry.ticket||'ohne Ticketnummer')}<br><span class="small">${esc(String(c.entry.km??'–'))} km · Fahrt ${esc(c.entry.travel==null?'–':fmtH(c.entry.travel))} h</span></span></label>`).join('')}</div>
-    <p class="importalert">${esc(d.reason)}</p><p class="small">${esc(importRowPreview(d))}</p>
-    <div class="field"><label for="import-action-${i}">PDF-Abgleich ausdrücklich bestätigen</label><select id="import-action-${i}" data-import-action="${i}"><option value="review" ${d.action==='review'?'selected':''} disabled>Bitte Entscheidung treffen …</option><option value="keep" ${d.action==='keep'?'selected':''} ${canConfirm?'':'disabled'}>Ausgewählte Tage prüfen und fehlende Ticketnummern übernehmen</option><option value="skip" ${d.action==='skip'?'selected':''}>Diesen Gesamt-Abgleich überspringen</option></select></div>${canConfirm?'':'<p class="msg error">Mindestens zwei Arbeitstage auswählen, darunter den letzten Tag laut PDF.</p>'}</div>`;
+    <div class="wbpdfsummary"><strong>PDF-Gesamtsummen (nur gewählter Techniker)</strong><div class="wbpdfnumbers"><span>Arbeit<br><b>${d.incoming.pdfWorkMinutes==null?'–':fmtH(d.incoming.pdfWorkMinutes)+' h'}</b></span><span>Reise<br><b>${d.incoming.travel==null?'–':fmtH(d.incoming.travel)+' h'}</b></span><span>Strecke<br><b>${d.incoming.km??'–'} km</b></span></div><p class="small">Die PDF enthält Gesamtwerte. Tageszeiten und Kilometer werden nicht automatisch überschrieben oder verteilt.</p></div><p class="importalert">${esc(d.reason)}</p>
+    <div class="field"><label for="import-action-${i}">PDF-Abgleich ausdrücklich bestätigen</label><select id="import-action-${i}" data-import-action="${i}"><option value="review" ${d.action==='review'?'selected':''} disabled>Bitte Entscheidung treffen …</option><option value="keep" ${d.action==='keep'?'selected':''} ${canConfirm?'':'disabled'}>Ausgewählte Tage prüfen und fehlende Ticketnummern übernehmen</option><option value="skip" ${d.action==='skip'?'selected':''}>Diesen Gesamt-Abgleich überspringen</option></select></div>${canConfirm?'':'<p class="msg error">Mindestens zwei passende Arbeitstage auswählen. Fehlen die Einträge, zuerst die tatsächlichen Einsatztage erfassen; der PDF-Import legt keine erfundenen Tageswerte an.</p>'}</div>`;
   }
   return `<div class="importreviewcard" data-import-review="${i}"><h3>⚠ ${esc(d.sourceLabel||'Zeile '+(i+1))}: ${esc(d.incoming.customer||'Kunde unbekannt')} · ${esc(dayFmt(d.incoming.date))} · ${esc(importWeekLabel(d.incoming.date))}</h3>
    <p class="importalert">${esc(d.reason||'Unklarer Abgleich')} · ${d.candidates.length} mögliche(r) bestehende(r) Einsatz/Einsätze.</p>
@@ -3065,6 +3065,10 @@ function rondoProfileHeaderMatch(header,selectedProfile,allProfiles=[]){
  return {strong:false,ambiguous:true,reason:'Berichtskopf gehört möglicherweise zu einem anderen Techniker'};
 }
 function rondoPositionTag(description){
+ // RONDO frequently puts the technician directly after the activity label.
+ // E.g. "Arbeitszeit Tobias Lovrencic", "Fahrtkosten km JP Schröder".
+ const named=String(description||'').match(/^(?:Arbeitszeit|Working\s*time|Fahrtkosten\s*km|Travel\s*distance|Fahr\s*[-/]?\s*\/?\s*Reisezeit|Fahr-\s*\/\s*Reisezeit|Reisezeit)\s+(.+)$/i);
+ if(named)return named[1].trim();
  let suffix=String(description||'').match(/\bS&M\s+(.*)$/i)?.[1]?.trim()||'';
  // Common directions describe a journey, not a technician.
  suffix=suffix.replace(/^(?:(?:drive\s+back|return\s+trip|return|back|one\s+way|r[uü]ckfahrt|hinfahrt|r[uü]ck|hin)\s*)+/i,'').trim();
@@ -3093,6 +3097,10 @@ function rondoParseReport(pdf,selectedProfile,allProfiles=[]){
  let nameParts=cut.slice(0,postIdx>0?postIdx:Math.min(cut.length,3)).filter(v=>!v.includes('@'));
  if(nameParts.length>1&&/(?:str\.|straße|strasse|weg|allee|ring|platz|street|laan|Bramenberg|Wetterschacht|Meysstr\.|Kölner Str\.)/i.test(nameParts[nameParts.length-1]))nameParts.pop();
  nameParts=nameParts.filter(v=>!/^herrn?\s/i.test(v));const customer=nameParts.filter(v=>v!==street).join(' ').replace(/\s+/g,' ').trim();
+ const serviceSpan=all.match(/Datum\s*:\s*(\d{2}\.\d{2}\.\d{4})\s*[-–]\s*(\d{2}\.\d{2}\.\d{4})/i);
+ const isoDate=v=>v.split('.').reverse().join('-');
+ const serviceStart=serviceSpan?isoDate(serviceSpan[1]):null;
+ const serviceEnd=serviceSpan?isoDate(serviceSpan[2]):null;
  const head=rondoProfileHeaderMatch(headerTech,selectedProfile,allProfiles);
  const headMatches=head.strong;
  const pos=[];
@@ -3132,7 +3140,7 @@ function rondoParseReport(pdf,selectedProfile,allProfiles=[]){
   const include=[...selected,...uncertain];const total=kind=>Math.round(include.filter(p=>p.kind===kind).reduce((sum,p)=>sum+p.value,0)*(kind==='km'?1:60));
   const mins=kind=>total(kind),fmt=n=>Math.floor(n/60)+':'+String(n%60).padStart(2,'0');
   const risk=uncertain.length>0||excluded.some(p=>p.assignment==='other')||head.ambiguous||(!headMatches&&selected.length>0)||(!headMatches&&!selected.length);
-  rows.push({date,ticket,customer,location,km:include.some(x=>x.kind==='km')?mins('km'):null,travel:include.some(x=>x.kind==='travel')?mins('travel'):null,work:include.some(x=>x.kind==='work')?mins('work'):null,headerTech,headerMatched:headMatches,customerNum,postalCode,street,city,country,positions:items,confidence:!risk?'high':'review',reason:risk?(headMatches?'Mehrere Techniker oder uneindeutige Positionszuordnung: bitte kontrollieren.':head.reason+'; Positionen einzeln bestätigen.'):'Positionen anhand des Technikerprofils zugeordnet.'});
+  rows.push({date,ticket,customer,location,serviceStart,serviceEnd,km:include.some(x=>x.kind==='km')?mins('km'):null,travel:include.some(x=>x.kind==='travel')?mins('travel'):null,work:include.some(x=>x.kind==='work')?mins('work'):null,headerTech,headerMatched:headMatches,customerNum,postalCode,street,city,country,positions:items,confidence:!risk?'high':'review',reason:risk?(headMatches?'Mehrere Techniker oder uneindeutige Positionszuordnung: bitte kontrollieren.':head.reason+'; Positionen einzeln bestätigen.'):'Positionen anhand des Technikerprofils zugeordnet.'});
  }
  return {ticket,customer,location,headerTech,rows};
 }
@@ -3206,7 +3214,7 @@ function rondoPdfPrepare(){
    const row=file.rows[ri];
    const positions=rondoPdfSelectedPositions(fi,ri);
    if(!positions.length)throw Error('Keine Positionen ausgewählt für '+file.filename+' / Ticket '+row.ticket+'. Bitte Positionen auswählen oder den gesamten Bericht überspringen.');
-   const converted=rondoPdfConvertRow(row,positions,file.filename);converted.pdfDocId=file.documentId;converted.pdfWorkMinutes=positions.filter(x=>x.kind==='work').reduce((n,x)=>n+Math.round(x.value*60),0);
+   const converted=rondoPdfConvertRow(row,positions,file.filename);converted.pdfDocId=file.documentId;converted.pdfServiceStart=row.serviceStart;converted.pdfServiceEnd=row.serviceEnd;converted.pdfWorkMinutes=positions.filter(x=>x.kind==='work').reduce((n,x)=>n+Math.round(x.value*60),0);
    if(converted.travel===null||!converted.note)issues.push(file.filename+': Zeitpositionen unvollständig – Werte vor dem Speichern kontrollieren.');
    if(!converted.customer||!converted.location)issues.push(file.filename+': Kundenname/Ort nicht vollständig – unbedingt kontrollieren.');
    const signature=[converted.date,converted.ticket,converted.customer.toLowerCase(),converted.location.toLowerCase(),converted.km,converted.travel,converted.note].join('|');
@@ -3260,28 +3268,29 @@ function rondoPdfDecisionsForMultiDay(rows,labels,existing){
  const consumed=new Set(),special=[];
  for(const indices of grouped.values()){
   const parts=indices.map(i=>rows[i]),last=parts.reduce((a,b)=>a.date>=b.date?a:b);
-  const floor=nextDateISO(last.date,-28),pdfTicket=String(last.ticket||'').trim();
+  const from=parts.map(p=>p.pdfServiceStart).filter(Boolean).sort()[0];
+  const to=parts.map(p=>p.pdfServiceEnd).filter(Boolean).sort().at(-1);
+  const hasPeriod=!!(from&&to&&from<to);
+  // A single billing date is not the date of a multi-day service visit.
+  const floor=hasPeriod?from:nextDateISO(last.date,-28);
+  const ceiling=hasPeriod?to:last.date;
+  const pdfTicket=String(last.ticket||'').trim();
   const matches=existing.filter(e=>{
-   if(e.type!=='Einsatz'||e.date<floor||e.date>last.date)return false;
+   if(e.type!=='Einsatz'||e.date<floor||e.date>ceiling)return false;
    const oldTicket=String(e.ticket||'').trim();
    if(oldTicket&&pdfTicket&&oldTicket!==pdfTicket)return false;
-   // A matching ticket cannot rescue a different customer; a missing ticket is fine.
    if(!rondoPdfCustomerCompatible(e.customer,last.customer))return false;
-   // Identical tickets are a strong signal, even if address spelling changes.
-   // Without ticket require a compatible site (same municipality or street).
    if(!(oldTicket&&pdfTicket&&oldTicket===pdfTicket)&&!rondoPdfSameSite(e.location,last.location))return false;
    return true;
   }).sort((a,b)=>a.date.localeCompare(b.date));
-  if(matches.length<2||!matches.some(e=>e.date===last.date))continue;
-  if(parts.some(e=>!rondoPdfCustomerCompatible(e.customer,last.customer)||(pdfTicket&&String(e.ticket||'').trim()&&String(e.ticket).trim()!==pdfTicket)))continue;
+  if(!hasPeriod&&(matches.length<2||!matches.some(e=>e.date===last.date)))continue;
   const total=kind=>parts.some(p=>p[kind]!=null)?parts.reduce((n,p)=>n+(Number(p[kind])||0),0):null;
   const aggregate={...last,km:total('km'),travel:total('travel'),pdfWorkMinutes:total('pdfWorkMinutes'),multiDayPdf:true};
-  const target=matches.find(e=>e.date===last.date);
-  // All candidate dates are visible. Only exact ticket matches are preselected;
-  // ticketless days must be selected manually by the user.
+  const target=matches.at(-1)||null;
   const choices=matches.map(e=>({entry:e,selected:!!pdfTicket&&String(e.ticket||'').trim()===pdfTicket}));
-  const decision={incoming:aggregate,index:0,candidates:[{entry:target}],action:'review',targetId:target.id,
-   category:'changed',sourceSnapshot:importStoredSnapshot(target),edits:null,multiDayChoices:choices,sourceLabel:labels[indices[0]]};
+  const decision={incoming:aggregate,index:0,candidates:target?[{entry:target}]:[],action:'review',targetId:target?.id||'',
+   category:'changed',sourceSnapshot:target?importStoredSnapshot(target):null,edits:null,multiDayChoices:choices,
+   pdfPeriodStart:hasPeriod?from:null,pdfPeriodEnd:hasPeriod?to:null,sourceLabel:labels[indices[0]]};
   rondoPdfMultiDayRefresh(decision);special.push(decision);
   indices.forEach(i=>consumed.add(i));
  }

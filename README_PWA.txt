@@ -6,4 +6,4 @@ Vorher wochenberichte.db sichern und synchronisieren. Keine Website-Daten lösch
 
 PWA-Offline-Cache speichert nur App-Oberfläche, keine Datenbank oder PDF. Berechtigungen nach Installation prüfen.
 
-Version 2.25.3: PDF-Import überspringt interne XRef-/ObjStm-/Metadata-Streams, ohne die Nutzdaten des Serviceberichts zu verändern.
+Version 2.25.4: PDF-Import überspringt interne XRef-/ObjStm-/Metadata-Streams, ohne die Nutzdaten des Serviceberichts zu verändern.
