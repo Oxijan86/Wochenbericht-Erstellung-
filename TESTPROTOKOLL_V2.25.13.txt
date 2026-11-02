@@ -1,0 +1,21 @@
+Wochenbericht Lovrencic – Testprotokoll 2.25.13
+================================================
+Fehlernachstellung im Browser mit simulierten Einsatzdaten:
+- Version 2.25.12: reportProblems(2026,42) wirft ReferenceError: y is not defined.
+- Version 2.25.13: derselbe Aufruf erfolgreich, Initialisierung init() erfolgreich.
+
+Regressionsprüfung mit drei Einträgen aus KW 42/2026:
+- Montag regulär: 8:00 Stunden / 20 km.
+- Mittwoch Feiertagseinsatz: 6:00 Stunden inkl. Reisezeit.
+- Samstag Sondereinsatz: 6:45 Stunden inkl. Reisezeit.
+- Reguläre Wochensumme: 8:00 Stunden (480 Minuten).
+- Gesonderte Stunden: 12:45 Stunden (765 Minuten).
+- Regulärer Excel-Export: Summe 8:00 Stunden / 20 km.
+- Separater Excel-Export: gültige XLSX-ZIP-Struktur.
+- Exportprüfung: keine Referenzfehler, Hinweis auf getrennte Abrechnung sichtbar.
+- JavaScript-Dateien und Service Worker: Syntaxprüfung mit Node erfolgreich.
+
+Hinweise:
+- Browserprüfung mit simulierten Daten, keine produktive Datenbank geöffnet.
+- Kein Live-Test mit Cloud-Ordnerberechtigungen oder echter Edge-PWA möglich.
+- Datenschema unverändert. Bestandsdateien werden durch dieses ZIP nicht überschrieben.
