@@ -1,0 +1,39 @@
+INTERNE TESTS – Wochenbericht Lovrencic 2.25.10
+Testdatum: 02.11.2026
+Basis: reale PDF-Dateien und simulierte Anwendungsdatenbank im Headless Chromium.
+
+BESTEHENDE FUNKTIONEN
+62 von 62 Regressionstests erfolgreich (Smartphone 390 px, Desktop 1380 px):
+- PDF-Dateiauswahl/Schaltflächen; Stinges und Voosen auslesen
+- Technikertrennung; Datumsänderungen und gemeinsame Mehrtageseinsätze
+- Fehlerhafte PDF isolieren, mehrere PDFs, Zurücksetzen
+- Darstellung/Navigation in zehn Bereichen
+- Wochenberechnung, SQLite-Kodierung/Dekodierung, keine Browser-JavaScript-Fehler
+
+NEUE TESTS
+28 von 28 Testpunkten erfolgreich (Smartphone 390 px, Desktop 1366 px und alter Datenbestand):
+- Original-PDF ZusFassung_20261005171953 .pdf wird vollständig geöffnet
+- Hauptticket 28553, Kunde Bäckerei Musswessels, Techniker Tobias Lovrencic erkannt
+- Ohne Leistungsdatum: Datum und PDF-Buchungsdatum bleiben wirklich leer
+- Hauptticket: 5:00 h Arbeit / 5:30 h Reisezeit / 502 km korrekt erkannt
+- Unterticket 28552 (Inspection/Maintenance 3) nicht zum Hauptticket addiert
+- Vergleich mit fehlendem Datum blockiert; kein Speicherzugriff
+- Historisches Datum 12.03.2025 manuell eingebbar
+- Passende Einsätze aus 2025 und 2026 trotz Abstand deutlich über 28 Tagen auswählbar
+- Abweichende Ticketnummern und andere Kunden bleiben ausgeschlossen
+- Anzeige / Änderung ohne unbeabsichtigte Datenbankmutation
+- Keine ungefangenen Browser-JavaScript-Fehler
+
+EXTRA MEHRTAGES-PROBELAUF
+Pass: Musswessels-PDF ohne Datumsangabe, manuelle Zuordnung von
+12.03.2025 und 20.05.2025, beide Tage sichtbar trotz 69 Tagen Abstand.
+Keine Duplikate, keine Änderung der vorhandenen Tageswerte während der Vorschau.
+
+CODE- UND PAKETTEST
+JavaScript-Prüfung aller Skriptblöcke und des Service Workers mit Node.js.
+ZIP-Integrität: überprüft.
+
+NICHT GETESTET
+Produktive Edge-PWA auf dem Nutzergerät, persönlicher Cloud-Ordner,
+Geräteberechtigungen und realer Synchronisationskonflikt.
+Die Testfälle decken wichtige Funktionen ab, aber nicht jede denkbare Benutzeraktion.

@@ -1,0 +1,27 @@
+Wochenbericht Lovrencic – Version 2.25.10 (02.11.2026)
+
+NEU / BEHOBEN
+- Die frühere 28-Tage-Grenze für die Suche nach zugehörigen Tagen im PDF-Gesamtabgleich entfällt. Auch eine zusätzliche 35-Tage-Begrenzung bei der Suche nach manuell korrigierten Einträgen wurde entfernt.
+- PDF-Berichte ohne Datum in den Leistungspositionen werden jetzt ausgelesen. Das tatsächliche Datum muss vor dem Vergleich zwingend manuell eingetragen werden; es wird NICHT aus dem Meldedatum, PDF-Dateinamen oder Ticket-Erstellungsdatum abgeleitet.
+- Mehrere tatsächliche Tage pro PDF können wie bisher hinzugefügt werden, auch in unterschiedlichen Kalenderwochen oder Jahren.
+- Bei PDF-Positionen werden Hauptticket und Untertickets getrennt: Leistungspositionen nach „Untertickets“ werden nicht zur Hauptticket-Arbeit addiert.
+- Die bestehende Technikertrennung, Erfassung und Datenbankstruktur wurden beibehalten.
+
+TESTFALL
+RONDO Bäckerei Musswessels, Hauptticket 28553, Unterticket 28552.
+PDF zeigt Arbeitszeit 5:00 h, Reisezeit 5:30 h und Fahrtkosten 502 km (Datumsspalte leer).
+Diese Werte werden erkannt. Das Einsatzdatum bleibt leer, bis es manuell festgelegt wird.
+Die zusätzliche Wartungsposition des Untertickets wird nicht als Hauptticket-Arbeitszeit hinzuaddiert.
+
+WICHTIGE GRENZEN
+- Zur Sicherheit bleiben die anderen Prüfungen (Ticketnummer, Kunde, Standort, ausdrückliche Bestätigung) aktiv.
+- 31 manuell eingegebene Einsatztage pro PDF-Positionengruppe sind maximal möglich.
+- Gültige manuelle Einsatztage sind entsprechend der bestehenden App-Datumsprüfung zwischen 2020 und 2100.
+- Bestehende Tageswerte dürfen nicht ungefragt mit PDF-Gesamtwerten überschrieben werden.
+- Eine echte Synchronisierung mit deinem persönlichen Cloud-/Dateiordner konnte nicht automatisiert getestet werden.
+
+INSTALLATION
+1. Vor dem Update in der Anwendung synchronisieren und wochenberichte.db separat sichern.
+2. Die fünf PWA-Dateien index.html, sw.js, manifest.webmanifest, icon-192.png und icon-512.png im GitHub-Pages-Ordner ersetzen.
+3. Commit changes; anschließend warten, bis GitHub Pages die neue Version ausliefert.
+4. Edge-PWA neu öffnen und Versionsetikett 2.25.10 kontrollieren.

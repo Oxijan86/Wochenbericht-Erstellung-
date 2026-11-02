@@ -10,3 +10,5 @@ Installation/Update auf GitHub Pages:
 Version 2.25.9 behebt das versehentliche Entfernen zweier PDF-Klickhandler in Version 2.25.8. Eine neue Dateiauswahl leert alte, ungespeicherte PDF-Vorschauen (nicht die Datenbank). Einzelne ungültige PDF-Dateien werden für den Benutzer separat angezeigt.
 
 Hinweis: Die PWA-Installation und Cloud-Ordnerrechte sind vom jeweiligen Browser abhängig. Die Tests erfolgten in Chromium mit simuliertem Datenbestand; ein produktiver Edge-Cloud-Test ist nicht möglich.
+
+Version 2.25.10: PDF-Dateien ohne Positionsdatum werden gelesen; Einsatzdatum ist vor Vergleich manuell einzugeben. 28-Tage-Grenze für Vorschläge entfernt.
