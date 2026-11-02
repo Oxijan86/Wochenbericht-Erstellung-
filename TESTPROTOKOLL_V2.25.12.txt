@@ -1,0 +1,23 @@
+Wochenbericht Lovrencic – Version 2.25.12
+Gezielte Regressionstests vom 02.11.2026 (simulierter Browser-Datenbestand)
+
+PASS – JavaScript-Syntax sämtlicher Inline-Skripte und Service Worker (node --check).
+PASS – Browser initialisiert ohne ungefangene JavaScript-Fehler, Version 2.25.12.
+PASS – Standard-Montag (8:00 h) bleibt in der regulären Wochenberechnung.
+PASS – Markierter Feiertagseinsatz am Mittwoch ist von regulärer Zeit ausgeschlossen.
+PASS – Markierter werktäglicher Sondereinsatz ist von regulärer Zeit ausgeschlossen.
+PASS – Samstag und Sonntag (Kundeneinsätze) werden automatisch separat geführt.
+PASS – Tätigkeit "Feiertag" als arbeitsfreier Tag wird nicht als Arbeitseinsatz markiert.
+PASS – Zusammenfassung: 8:00 regulär, 15:45 separat, Wochen-Saldo nur regulär.
+PASS – Ausgeschlossene Sonderstunden werden nicht in die nächste KW fortgeschrieben.
+PASS – Formular kann Kennzeichnung setzen; Bearbeiten lädt dieselbe Kennzeichnung.
+PASS – Separate Excel enthält 4 Sonder-Einsätze, regulärer Excel keine Sonder-Tickets.
+PASS – Separate XLSX-Datei ist gültiges ZIP/OOXML.
+PASS – Excel HH:MM-Zellformat für Beginn und Ende, [h]:mm für Dauern.
+PASS – Formel-Cache für Gesamtzeit in App-Excel stimmt (Samstag 6:45 h).
+PASS – Bemerkungen nennen Samstags-/Sonntags-/Feiertags-/Sondereinsatz kurz.
+PASS – Bestehende PWA-Konfiguration, App-ID und Datenbankformat unverändert.
+
+Nicht getestet: Deine persönliche Edge-PWA mit verbundenem Datenbank-/Cloudordner,
+ein vollständiger realer Arbeitsalltag sowie jede Kombination mit PDF-Import.
+Vor Produktiveinsatz daher Sicherung erstellen und Stichproben prüfen.
