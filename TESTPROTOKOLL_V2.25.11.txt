@@ -1,0 +1,37 @@
+Wochenbericht Lovrencic – V2.25.11 Interne Prüfung (02.11.2026)
+================================================================
+Grundlage: Version 2.25.10 + originale RONDO-PDFs Stinges, Voosen,
+Musswessels und simulierte Datenbankeinträge.
+
+1. Bestehende UI-/PDF-/SQLite-Regressionen
+   62/62 Tests bestanden, jeweils Browser Chromium 390px und 1380px.
+   Enthalten: Navigation, PDF-Import, Dateiauswahl, PDF-Datumsanpassung,
+   Techniker-Isolation, Mehrtagesauswahl, SQLite Roundtrip, Fehlerfall-PDF,
+   Preview ohne Datenänderung, Wochenberechnung.
+
+2. Neue Funktionsprüfung
+   36/36 Prüfpunkte bestanden, jeweils Browser 390px und 1380px.
+   Musswessels Hauptticket 28553 5:00 h + Unterticket 28552 3:00 h
+   = 8:00 h bei bestätigter Technikerzuordnung; Unterticket abwählbar.
+   Reisezeit 5:30 h / Kilometer 502. Kein Datum in der PDF erforderlich,
+   manuelle echte Einsatzdaten weiter möglich.
+   Stinges Ticket 36134 6:00 h, Reise 0:45, km 68.
+   Voosen Ticket 26379 23:30 h, Reise 6:15, km 405 (andere Techniker
+   werden ausgeschlossen).
+   Wochenende KW 42: 6:00 h Arbeit + 0:45 h Reise = 6:45 h separat.
+   Startsaldo-Vorwoche enthält keine Wochenendstunden.
+   Eigenständiges Excel (.xlsx) mit Formeln und Kurz-Bemerkung.
+   Normaler Wochen-Excel-Export und Fehlersperren unverändert.
+
+3. Downloadtest
+   Browser-Benutzeraktion „Wochenendbericht (.xlsx)“ mit Samstag
+   und Sonntag: tatsächlicher Download, ZIP-Integrität des .xlsx,
+   Tabelleninhalte und Wochenend-Bemerkungen bestanden.
+   Separate Musterdatei Stinges als echtes .xlsx mit artifact_tool erstellt.
+
+4. Statische Prüfungen
+   JavaScript-Syntax via node --check, ZIP-Inhaltsliste und CRC-Prüfung.
+
+Einschränkungen: Keine produktive Edge-PWA oder echte Cloud-Ordnersynchronisierung
+getestet. Tests beweisen nicht die Fehlerfreiheit aller möglichen Datenbestände.
+Vor Installation bitte DB sichern.
