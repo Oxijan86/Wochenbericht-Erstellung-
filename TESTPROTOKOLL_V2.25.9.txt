@@ -1,0 +1,24 @@
+Interne Testdokumentation – Wochenbericht Lovrencic PWA 2.25.9 – 02.11.2026
+
+ERGEBNIS
+- Browserintegration (simulierte Datenbank): 62 von 62 Prüfungen erfolgreich; getestet mit 390 px (Smartphone) und 1380 px (Desktop).
+- Datumswechsel über ISO-KW (43 -> 42): Ein Datensatz wird verschoben, ID und PDF-Nachweis erhalten, keine Dublette (Bestanden).
+- Syntax: sämtliche 5 Inline-JavaScript-Skripte (node --check) + sw.js (Bestanden).
+- ZIP / PWA-Manifest / App-Icons: Dateiliste, JSON, Bildgrößen, CRC (Bestanden).
+
+BROWSERPRÜFUNGEN JE BILDSCHIRMGRÖSSE
+- HTML/App-Version/Grundfunktionen laden; PDF-Auswahl meldet Dateianzahl direkt.
+- Auslesen per tatsächlichem Klick auf „PDF-Dateien auslesen und abgleichen“.
+- Original-Stinges-PDF (Ticket 36134): 6:00 h Arbeit, 0:45 h Reise, 68 km für Tobias; PDF-Buchungsdatum 19.10.2026 und manuell korrigierter Einsatz 17.10.2026.
+- Klick auf „Berichtsauswahl prüfen und Einsätze vergleichen“ öffnet Vergleich.
+- Auswahl einer anderen PDF setzt nur veraltete ungespeicherte Vorschauen zurück.
+- Original-Voosen-PDF (Ticket 26379): 23:30 h Arbeit, 6:15 h Reise, 405 km für Tobias, ohne Werte des zweiten Technikers.
+- Drei Einsatztage 28./29./30.10.2026 werden einer gemeinsamen Berichtsgruppe zugeordnet; keine Vervielfachung der PDF-Gesamtwerte.
+- Batch aus einer gültigen und einer absichtlich beschädigten PDF: korrekter Bericht bleibt in der Vorschau, fehlerhafte Datei wird getrennt angezeigt.
+- Leeren und erneutes Lesen der Dateiauswahl; keine Datenbankänderung bei Vorschau.
+- Navigation: Dashboard, Einsätze, Historie, Kunden, Wochenbericht/Export, PDF-Import, Speicherung/Sync, Backups, Einstellungen, Hilfe.
+- Wochen-Summenberechnung und SQLite-Kodierung/Dekodierung mit drei gespeicherten Beispieldatensätzen.
+- Keine unbehandelten JavaScript-Ausnahmen im Browser.
+
+EINSCHRÄNKUNGEN
+Nicht verifiziert: komplette produktive Edge-PWA-Installation, echte Cloud-Ordnerfreigabe und Synchronisierung mit der Originaldatenbank des Benutzers; echter Chromium-Origin-Speicher (Umgebung sperrt localhost/http-Navigation). Stattdessen wurden Datenbankzustand und SQLite-Roundtrip simuliert. Dies ist eine breite Funktions- und Regressionstest-Suite, keine formale Vollabdeckung jeder möglichen Bedienfolge.

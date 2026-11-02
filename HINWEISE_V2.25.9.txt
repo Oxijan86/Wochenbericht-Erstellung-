@@ -1,0 +1,5 @@
+Wochenbericht Lovrencic PWA 2.25.9 (02.11.2026)
+
+Behoben: Die PDF-Dateiauswahl zeigt wieder den Status; die verschwundenen Click-Handler für PDF-Auslesen und Berichtsauswahl bestätigen sind wieder aktiv. Fehler je Datei werden getrennt angezeigt. Der Import schreibt erst nach Bestätigung Daten.
+
+Gegenüber v2.25.8 bleibt das DB-Format identisch. Beim Aktualisieren der GitHub Pages alle PWA-Dateien hochladen und Version 2.25.9 prüfen. Vorher Datenbank sichern.
