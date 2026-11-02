@@ -1,0 +1,5 @@
+Version 2.25.8 – PDF-Import mit mehreren tatsächlichen Einsatztagen
+
+Im PDF-Import lassen sich pro Berichtspositionsgruppe über „Weiteren Einsatztag hinzufügen“ beliebige Datumswerte (bis 31 Tage) eintragen, auch in verschiedenen ISO-Kalenderwochen.
+Beim Abgleich werden die explizit angegebenen Daten nur vorhandenen passenden Einsätzen zugeordnet. Alle zugehörigen Tage müssen per Haken bestätigt werden. Fehlt ein Tag, wird die PDF-Gesamtprüfung blockiert, bis ein Eintrag erfasst wurde. Die PDF-Summen gelten für die Gruppe, nicht je Tag.
+Die Datumsänderung einzelner Einsätze über Kalenderwochen ist aus V2.25.7 erhalten.

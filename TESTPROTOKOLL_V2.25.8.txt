@@ -1,0 +1,12 @@
+Interne Prüfung · Version 2.25.8 · 02.11.2026
+
+1. JavaScript: Alle fünf Inline-Skripte mit Node.js --check validiert (Bestanden).
+2. Original-PDF Stinges (Ticket 36134): 6:00 h Arbeit, 0:45 h Reise und 68 km für T. Lovrencic erkannt (Bestanden). PDF-Buchungsdatum 19.10.2026 bleibt erhalten; manuelle Einsatztage 17.10. und 18.10. verarbeitet.
+3. Simulierte Datenbank mit 2 Tagen: Tageswerte und Kennungen bleiben erhalten, 2 PDF-Prüfnachweise werden im Vorschlag erzeugt, Originaldaten im Arbeitsspeicher bleiben bis zur Bestätigung unverändert (Bestanden).
+4. Fehlender Einsatztag 20.10.2026 wird als fehlend gemeldet, keine automatische Erstellung (Bestanden).
+5. Einzelne Datumskorrektur 19.10.2026 -> 17.10.2026 (KW 43 -> 42) mit Erhalt der Kennung und Uhrzeiten im bestehenden PDF-Importablauf (Bestanden).
+6. Original-PDF Voosen (Ticket 26379): 23:30 h Arbeit, 6:15 h Reise und 405 km ausschließlich für Tobias Lovrencic erkannt (Bestanden). Bei Datumsangaben 28., 29. und 30.10. werden alle drei passenden Einträge angeboten (Bestanden).
+7. PWA: Version und Service-Worker-Cache auf 2.25.8 gesetzt; Manifest und Icons unverändert.
+8. ZIP-Inhalt und Prüfsumme/CRC geprüft (Bestanden).
+
+Einschränkung: Browser-Simulation mit künstlicher Datenbank, kein produktiver Edge-PWA-Test mit Nutzer-Synchronisierungsordner. Vor Update Datenbank sichern.

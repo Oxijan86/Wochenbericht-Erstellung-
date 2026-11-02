@@ -1,9 +1,8 @@
-Wochenbericht Lovrencic PWA 2.25.2
+Wochenbericht Lovrencic PWA 2.25.8 (02.11.2026)
 
-Alle Dateien index.html, sw.js, manifest.webmanifest, icon-192.png, icon-512.png gemeinsam in denselben GitHub-Pages-Ordner hochladen; index.html, sw.js und manifest.webmanifest ersetzen. Die feste Manifest-App-ID setzt den tatsächlichen GitHub-Pages-Pfad /Wochenbericht-Erstellung/ voraus. Falls die Veröffentlichung unter einer anderen Groß-/Kleinschreibung oder einem anderen Ordner erfolgt, muss die ID entsprechend angepasst werden.
-
-Vorher wochenberichte.db sichern und synchronisieren. Keine Website-Daten löschen, keine andere PWA deinstallieren. Wenn Chrome weiterhin bereits installiert meldet, handelt es sich nicht zwingend um einen Manifestfehler; diese Änderung kann ein defektes Chrome-/Android-Installationsregister nicht garantiert reparieren.
-
-PWA-Offline-Cache speichert nur App-Oberfläche, keine Datenbank oder PDF. Berechtigungen nach Installation prüfen.
-
-Version 2.25.4: PDF-Import überspringt interne XRef-/ObjStm-/Metadata-Streams, ohne die Nutzdaten des Serviceberichts zu verändern.
+GitHub: alle Dateien ins Hauptverzeichnis der Wochenbericht-Erstellung hochladen.
+PDF: Mehrere tatsächliche Einsatztage frei hinzufügen, korrigieren oder entfernen.
+PDF-Buchungsdatum bleibt unverändert; gemeinsame PDF-Gesamtwerte werden nicht mehrfach gebucht.
+Noch nicht vorhandene Tage müssen vor der gemeinsamen Prüfung manuell erfasst werden.
+Bestehende Uhrzeiten, Kilometer, Datenbank- und PWA-Funktionen unverändert.
+Vor dem Update Datenbank sichern und Cloud-Synchronisierung abschließen.
