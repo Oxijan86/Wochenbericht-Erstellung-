@@ -1,0 +1,22 @@
+INTERNE PRÜFUNG – VERSION 2.25.14
+11.11.2026
+
+Erfolgreich geprüft:
+- JavaScript-Syntax aller Inline-Skripte und Service Worker (node --check).
+- Chromium-Skriptlauf mit Smartphone-Viewport und ohne JavaScript-Ausnahme.
+- Browser-Suite: 20/20 Tests, darunter Datumskandidaten mit komplett falschem und leerem Kundennamen, Mehrtagesvorschläge, Berechtigungs-/Konfliktentscheidungen, Schutz der bereits eingegebenen Arbeits-/Reisezeiten und Kilometer, Samstags- und Werktags-Sondereinsätze.
+- Echter PDF-Parser: RONDO-Stinges und Musswessels werden in Chromium eingelesen; zusätzlich Voosen ausgelesen und personenbezogene Positionen erkannt.
+- Kundenwechsel mit simuliertem bestehenden Datensatz: Ticket bleibt erhalten, Kilometer-Dialog OK erhält 88 km, Abbrechen setzt Kilometer auf leer, ursprüngliche Uhrzeiten/Bemerkung bleiben erhalten, keine zweite Einsatzkopie.
+- Simulierter Mehrtages-PDF-Prüfnachweis: optionales Übernehmen von Kunde/Ticket/Ort nur für den angehakten Tag; Uhrzeiten/Kilometer/Reisezeit und der nicht zum Übernehmen freigegebene Tag bleiben unverändert; Originalzustand während Vorschau nicht mutiert.
+- Unterschiedliche Cloud-Datenbank-IDs und nicht verwandte Revisionen werden von der vorhandenen Entscheidungslogik als Konflikt statt als automatisches Upload erkannt.
+
+EINSCHRÄNKUNGEN
+Ein vollständiger Ende-zu-Ende-Test gegen die produktive wochenberichte.db, Microsoft Edge PWA unter Android, die Verzeichnisberechtigungen auf dem Gerät sowie den tatsächlichen OneDrive-/Cloud-Upload ist in dieser Umgebung NICHT erfolgt. Keine pauschale Aussage „komplette Anwendung unter allen Umständen fehlerfrei“ möglich. Externe Synchronisierung kann unabhängig vom Browser weiter verzögert sein.
+
+Empfohlener Test in echter Umgebung:
+1. Datenbankdatei sichern, Update einspielen, Version 2.25.14 kontrollieren.
+2. Testeinsatz speichern, neue Synchronisierungsleiste und Ordnerfreigabe prüfen.
+3. Auf einem zweiten Gerät zuerst Cloud-Revision prüfen; niemals unbesehen lokalen Stand überschreiben.
+4. PDF mit abweichendem Kundennamen importieren, korrekten vorhandenen Einsatz wählen und die PDF-Stammdaten bestätigen.
+5. Mehrtages-PDF laden, tatsächliche Tage auswählen, Summen, Ticketdaten und Prüfnachweise kontrollieren.
+6. Wochenend-, Feiertags- und regulären Excel-Export stichprobenartig prüfen.
