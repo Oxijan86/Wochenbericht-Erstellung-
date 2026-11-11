@@ -1,0 +1,29 @@
+Interne Prüfung – Wochenbericht Lovrencic 2.25.15
+Datum: 11.11.2026
+
+1. JavaScript-Syntax in allen fünf Inline-Skripten: BESTANDEN (node --check).
+2. Service Worker: bestehende Offline-PWA-Dateien mit Cache-Version 2.25.15 beibehalten.
+3. Browserdarstellung Chromium 390 px und 1280 px: keine ungefangenen JavaScript-Seitenfehler, korrekte Versionsanzeige.
+4. Vergleich Voosen: 405 km PDF gegenüber 408 km aus 3 Tagen, Differenz +3 km: BESTANDEN.
+5. Fehlende PDF-Kilometer: als „Keine PDF-Angabe“, nicht als 0 km: BESTANDEN.
+6. Bei eindeutiger Technikerzuordnung sind die drei PDF-Leistungspositionen trotzdem sichtbar: BESTANDEN.
+7. Mobile Positionsauswahl: Abwahl der Kilometerposition aktualisiert PDF-Kilometersumme auf „nicht angegeben“: BESTANDEN.
+8. PDF-Auslesung: Stinges (36134), Musswessels (28553 mit Unterticket), Voosen (26379 mit mehreren Technikern): BESTANDEN.
+9. Synchronisierungsleiste: angezeigt bei lokalen Änderungen, geschlossen nach bestätigtem Cloud-Abgleich, erneut sichtbar nach weiterer Änderung, bei Konflikt nicht geschlossen: BESTANDEN.
+10. Zwei getrennte simulierte Gerätestände (Smartphone und PC) mit tatsächlich ausgeführtem Anwendungscode, einem simulierten IndexedDB und einem simulierten File-System-Access-Ordner:
+    a. Gemeinsame Datenbankrevision auf beiden Geräten geladen: BESTANDEN.
+    b. Smartphone: Kilometeränderung und zusätzlicher Einsatz lokal gespeichert, Berechtigung entzogen, Cloud nicht aktualisiert: BESTANDEN.
+    c. PC: mit älterer Revision bearbeitet, andere Bemerkung und weiteren Einsatz ergänzt, Cloud synchronisiert: BESTANDEN.
+    d. Smartphone synchronisiert danach: Divergenz erkannt, automatisches Überschreiben blockiert: BESTANDEN.
+    e. Unterschiede pro Feld und nur auf einem Gerät vorhandene Einsätze angezeigt: BESTANDEN.
+    f. Konflikte manuell zusammengeführt: Handy-Kilometer 82, PC-Bemerkung „PC Änderung“, beide zusätzlichen Einsätze erhalten (3 Gesamt): BESTANDEN.
+    g. Zusammenführung nur lokal gespeichert; Cloud-Datei vor Veröffentlichung bytegenau unverändert: BESTANDEN.
+    h. Nachträgliche Fremdänderung in der Cloud: Veröffentlichung verweigert: BESTANDEN.
+    i. Nach erneuter Prüfung Original-Cloud-Datei vor Ersetzung gesichert, zusammengeführter Stand veröffentlicht, Cloud- und lokale Revisionskennung gleich: BESTANDEN.
+11. Mögliche Doppelbuchung (gleiches Datum, Ticket/Kunde und gleiche Uhrzeiten, unterschiedliche Kennungen): Warnung angezeigt und zusätzliche Bestätigung erforderlich: BESTANDEN.
+12. Felder „Kunde“, „Ticket“, „Zeit“, „Kilometer“, Wochenbemerkungen, Kunden- und Technikerprofile sind in der Vergleichsvorschau nach Änderungsart getrennt: BESTANDEN im UI-Simulationstest.
+
+WICHTIGE GRENZEN
+- Das Dateisystem und IndexedDB für den Zwei-Geräte-Test wurden im Browser simuliert. Es wurden echte Methoden der Wochenbericht-Anwendung ausgeführt, aber KEIN Zugriff auf den produktiven OneDrive-Ordner und KEIN Test auf einem realen Smartphone oder Windows-PC vorgenommen.
+- Browser und Geräte können Ordnerberechtigungen wieder entziehen. Der produktive Edge-PWA-/Cloud-Betrieb muss nach dem Update mit gesicherten echten Daten kontrolliert werden.
+- Es handelt sich um gezielte Regressionen und Nutzungsszenarien, nicht um mathematisch vollständige Abdeckung sämtlicher Bedienabläufe.
